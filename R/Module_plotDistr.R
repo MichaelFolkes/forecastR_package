@@ -24,7 +24,7 @@ if(is.null(col.vec)){ col.vec <- rep(1,length(list.in))}
 	if(is.null(x.lim)){x.lim <- range(list.in ,na.rm=TRUE);x.lim <- c(x.lim[1]*0.9,x.lim[2]*1.1)}
 
 	if(sum(!is.finite(x.lim))>0){ x.lim <- c(0,10)}
-	
+
 	probs.use <- seq(0,1,by=0.0001)
 
 	plot(1:5,1:5,type="n",ylim = c(0,1),xlim=x.lim, xlab= x.lab, ylab="Cumulative Proportion" ,bty="n" )
@@ -34,15 +34,15 @@ if(is.null(col.vec)){ col.vec <- rep(1,length(list.in))}
 		vec.use <- list.in[[i]]
 		cdf.use <- quantile(vec.use,na.rm=TRUE,probs=probs.use)
 		med.use <- median(vec.use,na.rm=TRUE)
-		
-		
+
+
 		if(sum(!is.na(vec.use))>20){lines(cdf.use,probs.use,type="s",lwd=lwd.vec[i],col=col.vec[i])}
-		
+
 		if(add.med){
 			segments(med.use,0,med.use,0.5,col=col.vec[i])
 			text(med.use,0,labels = med.use,cex=0.7,col=col.vec[i])
 			} # end if adding med
-		
+
 		} # end looping through vectors
 
 
@@ -54,10 +54,6 @@ if(is.null(col.vec)){ col.vec <- rep(1,length(list.in))}
 }
 
 
-
-#################
-# BOXPLOTS side by side
-################
 
 
 box.plot <- function(list.in= NULL,y.lab = "Size (MEF)",fill.vec = NULL ,border.vec= NULL,
@@ -78,8 +74,8 @@ if(length(border.vec)==1){ border.vec <- rep(border.vec,length(list.in))}
 
 
 	if(is.null(y.lim)){y.lim <- range(list.in ,na.rm=TRUE);y.lim <- c(y.lim[1]*0.9,y.lim[2]*1.1)}
-	
-	
+
+
 	plot(1:5,1:5,type="n",ylim = y.lim,xlim=c(0,length(list.in)+1), ylab= y.lab, xlab="" , axes=FALSE, bty="n" )
 	axis(2)
 
@@ -96,38 +92,38 @@ if(length(border.vec)==1){ border.vec <- rep(border.vec,length(list.in))}
 		rect(i - 0.2 ,quants.use[2],i+0.2, quants.use[4],border=border.vec[i],col = fill.vec[i])
 		segments(i - 0.2 ,quants.use[3],i+0.2, quants.use[3],col=border.vec[i])
 
-		
+
 		if(sum(!is.na(vec.use))>5 & violin){
-		
+
 				#"erase" half the boxplot
-				rect(i - 0.2 ,par("usr")[3],i-0.04, par("usr")[4],border="white",col = "white")	
+				rect(i - 0.2 ,par("usr")[3],i-0.04, par("usr")[4],border="white",col = "white")
 				# calculate the kernel density (i.e. shape of the violin half
 				tmp <- density(list.in[[i]],na.rm=TRUE)
-				
+
 				# "rotate the violin"
 				y.new <- -tmp$y/max(tmp$y)*0.4
-					
+
 				# plot it
 				polygon(y.new+i-0.04,tmp$x,col=fill.vec[i],border="white")
 				lines(y.new+i-0.04,tmp$x,type="l",xlim=c(0,8),col="white")
 
 				} #end violin
-		
-		
-		
-		
-		
+
+
+
+
+
 		if(labels){
 			text(i+0.22,quants.use[3], labels=quants.use[3],cex=0.8,adj=0,col="darkgrey")
 			#text(i+0.22,quants.use, labels=quants.use,cex=0.8,adj=0,col="darkgrey")
 			#text(i+0.22,range(vec.use,na.rm=TRUE), labels=range(vec.use,na.rm=TRUE),cex=0.8,adj=0,col="darkgrey")
-			
-			
 
-			
+
+
+
 			}
-				
-	
+
+
 
 		} # end looping through vectors
 
@@ -143,12 +139,12 @@ if(length(border.vec)==1){ border.vec <- rep(border.vec,length(list.in))}
 		text(1:length(list.in),par("usr")[3],labels=n.obs,adj=c(0.5,-0.3),cex=0.8,col="red")
 		text(0.5,par("usr")[3],labels="n=",adj=c(0.5,-0.3),cex=0.8,col="red")
 		}
-	
+
 	axis(1,at = 1:length(list.in),labels=FALSE)
     text(1:length(list.in), par("usr")[3], labels = names(list.in),srt=labels.angle,xpd=NA, adj=labels.adj)
 
-	
-	
+
+
 }
 
 
