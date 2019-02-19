@@ -1,0 +1,43 @@
+Package: forecastR
+Type: Package
+Title: Forecast stuff
+Version: 0.0.0.9000
+Authors@R: c(
+    person("Antonio", "Velez-Espino", "Antonio.Velez-Espino@dfo-mpo.gc.ca", role="cre"),
+    person("Gottfried", "Pestal", "gottfried.pestal@solv.ca", role = "aut"),
+    person("Michael", "Folkes", "michael.folkes@dfo-mpo.gc.ca", role = "aut"),
+    person("Isabella", "Ghement", role = "aut")
+    )
+Author: Antonio Velez-Espino [cre],
+  Gottfried Pestal [aut],
+  Michael Folkes [aut],
+  Isabella Ghement [aut],
+Maintainer: Michael Folkes <michael.folkes@dfo-mpo.gc.ca>
+Description: ForecastR generates age-specific (or total abundance) forecasts of
+    escapement or terminal run using a variety of generic models, enabling the
+    users to perform the following interactive tasks with the help of SHINY 
+    interface. These tasks include: 
+    (a) the selection of forecasting approaches from a wide set of statistical 
+    and/or mechanistic models for forecasting terminal run, escapement or 
+    pre-fishery abundance (production); 
+    (b) the selection of several measures of retrospective forecast performance 
+    (e.g., MRE, MAE, MAPE, MASE, RMSE); 
+    (c) the comparison of best forecasting models and model ranking based on the
+    selected performance metrics; and, 
+    (d) the reporting of forecasting results (point forecasts and interval 
+    forecasts) and diagnostics by producing either a detailed report or an 
+    executive-summary report.
+License: GPL (>= 2)
+LazyData: TRUE
+URL: https://github.com/avelez-espino/Ck-ForecastR-Releases
+BugReports: https://github.com/avelez-espino/Ck-ForecastR-Releases/issues
+Depends: R (>= 3.3.1)
+Imports: forecast,
+    markdown,
+    meboot,
+    moments,
+    rmarkdown,
+    stringi
+VignetteBuilder: knitr
+Date: 2019-02-18 17:11:41 PDT
+RoxygenNote: 6.1.1

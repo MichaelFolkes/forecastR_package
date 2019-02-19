@@ -1,0 +1,20 @@
+Hi all,
+Here are some details regarding the folder structure in the new repo.
+In alphabetical order:
+“ForecastR Reports” is clearly where you intend output to go, but this will not be a part of the package build. We can leave it for now. And I’m happy to discuss the logic.
+
+“inst” stands for ‘install’, any folder or file in here gets included on the user’s machine when installing the package. The subfolder ‘extdata’ has the data files. The subfolder ‘forecastR’ has both ui.R, server.R and the markdown folder. This is where they should remain for implementation in the package.  I’ve updated some of the paths in the various times you “source(*.R)”.  However, once we move to build the package all “source()” commands will have to be removed. 
+
+“man” will hold the help files that define each function. To be created much in the future.
+
+“notes” – self-explanatory.
+
+“Output” – like “ForecastR reports”, this can be around during development phase but I assume not needed after package installation.
+
+“R”.  In this folder there should be only R files that consist of R functions, meaning we must eventually remove any R files that are scripts (a set of function calls).  Perhaps all scripts could be moved to the folder “tmpscripts”, which will be excluded from the package build. We can discuss details later.
+
+“Readme.md” is used by github, that’s the text you see below the code listing (on github). This is where we describe the package and how to install. 
+Other files I can describe in the future.
+
+I hope this helps.
+Michael 

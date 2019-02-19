@@ -1,0 +1,23 @@
+Stock_Name,Stock_Species,Stock_Abundance,Forecasting_Year,Run_Year,Brood_Year,Age_Class,Average_Escapement,Average_Terminal_Run,Cov_VarName3
+Nehalem,Chinook salmon,Terminal Run,2016,1994,NA,Total,NA,6486,1.46
+,,,,1995,NA,Total,NA,5194,-0.34
+,,,,1996,NA,Total,NA,9211,-1.13
+,,,,1997,NA,Total,NA,10026,-0.23
+,,,,1998,NA,Total,NA,8245,-3.42
+,,,,1999,NA,Total,NA,8064,0.55
+,,,,2000,NA,Total,NA,6856,-0.45
+,,,,2001,NA,Total,NA,11660,-1.82
+,,,,2002,NA,Total,NA,18089,0.3
+,,,,2003,NA,Total,NA,10906,-3.84
+,,,,2004,NA,Total,NA,9974,-0.34
+,,,,2005,NA,Total,NA,8114,-0.75
+,,,,2006,NA,Total,NA,4717,1.21
+,,,,2007,NA,Total,NA,4308,0.93
+,,,,2008,NA,Total,NA,3809,0.4
+,,,,2009,NA,Total,NA,4562,4.57
+,,,,2010,NA,Total,NA,4438,-2.41
+,,,,2011,NA,Total,NA,6172,2.23
+,,,,2012,NA,Total,NA,6776,1.43
+,,,,2013,NA,Total,NA,15036,1.41
+,,,,2014,NA,Total,NA,9362,0.91
+,,,,2015,NA,Total,NA,12621,-1.04

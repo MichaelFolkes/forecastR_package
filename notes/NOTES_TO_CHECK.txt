@@ -1,0 +1,5 @@
+2 output? files disappeared between commits
+- arimafit.txt
+-expsmoothfit.txt
+
+are these temporary files that get removed if the report finishes?

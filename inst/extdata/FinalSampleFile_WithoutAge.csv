@@ -1,0 +1,24 @@
+Stock_Name,Stock_Abundance,Stock_Species,Forecasting_Year,Run_Year,Brood_Year,Age_Class,Average_Escapement,CV_Escapement,Average_Terminal_Run,CV_Terminal_Run,Average_Production,CV_Production
+GSQ,Escapement,Chinook salmon,2017,1994,NA,Total,9615,NA,NA,NA,NA,NA
+,,,,1995,NA,Total,11495,NA,NA,NA,NA,NA
+,,,,1996,NA,Total,10378,NA,NA,NA,NA,NA
+,,,,1997,NA,Total,11536,NA,NA,NA,NA,NA
+,,,,1998,NA,Total,22715,NA,NA,NA,NA,NA
+,,,,1999,NA,Total,26783,NA,NA,NA,NA,NA
+,,,,2000,NA,Total,35101,NA,NA,NA,NA,NA
+,,,,2001,NA,Total,42436,NA,NA,NA,NA,NA
+,,,,2002,NA,Total,41022,NA,NA,NA,NA,NA
+,,,,2003,NA,Total,40500,NA,NA,NA,NA,NA
+,,,,2004,NA,Total,31803,NA,NA,NA,NA,NA
+,,,,2005,NA,Total,28490,NA,NA,NA,NA,NA
+,,,,2006,NA,Total,50989,NA,NA,NA,NA,NA
+,,,,2007,NA,Total,24877,NA,NA,NA,NA,NA
+,,,,2008,NA,Total,19392,NA,NA,NA,NA,NA
+,,,,2009,NA,Total,31323,NA,NA,NA,NA,NA
+,,,,2010,NA,Total,22480,NA,NA,NA,NA,NA
+,,,,2011,NA,Total,18751,NA,NA,NA,NA,NA
+,,,,2012,NA,Total,42830,NA,NA,NA,NA,NA
+,,,,2013,NA,Total,40341,NA,NA,NA,NA,NA
+,,,,2014,NA,Total,41418,NA,NA,NA,NA,NA
+,,,,2015,NA,Total,37253,NA,NA,NA,NA,NA
+,,,,2016,NA,Total,38648,NA,NA,NA,NA,NA

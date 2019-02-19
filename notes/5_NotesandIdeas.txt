@@ -1,0 +1,7 @@
+
+# feeding data back and forth between server and shiny
+#https://ryouready.wordpress.com/2013/11/20/sending-data-from-client-to-server-and-back-using-shiny/
+
+# progress bar
+# https://gallery.shinyapps.io/085-progress/
+# https://shiny.rstudio.com/articles/progress.html

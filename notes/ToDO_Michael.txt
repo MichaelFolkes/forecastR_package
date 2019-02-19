@@ -1,0 +1,5 @@
+- issues with "data.frame(i" in "RETRO - Simple Sibling Regression_functions.R"" on lines 29, 171, 369, 493. These are all hiding inside for loops, which all appear to be exact copies of each other. Find out why that data.frame call fails and bigger issue is can the repetition of for loops be removed? The problem is in:
+'individual.ages.retro.predictive.performance.simple.sibling.regression.youngest
+
+-
+-truncate function will work on samples that are output of doBoot() found in DEV_Test_NewModules_Part10_doBoot.R

@@ -1,0 +1,3 @@
+this is a place where MF is storing quick questions to be discussed on calls.
+
+- in extdata folder, what are the "RevStructure" files?
