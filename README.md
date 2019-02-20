@@ -4,11 +4,9 @@ This repository is the pre-cursor to full deployment of the package, and as such
 ## How To Install
 
 ```
-
 install.packages("devtools") # Install the devtools package
 library(devtools) # Load the devtools package.
 install_github("MichaelFolkes/forecastR_package")
-
 ```
 
 **Note**: There is another reposisitory called [forecastR Releases](https://github.com/avelez-espino/Ck-ForecastR-Releases), 
