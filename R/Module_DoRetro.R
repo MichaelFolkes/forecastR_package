@@ -139,7 +139,7 @@ for(fc.yr.retro in retro.yrs){
 	int.sample <- as.data.frame(lapply(sd.est,function(x){sample.raw <- rnorm(interval.n *1.1,0,x);sample.out <- sample.raw[sample.raw<=quantile(sample.raw,probs=0.9)] }))
 	#take 10% more samples, then trim off the largest 5 %
 
-	int.sample <- round(exp(int.sample+ as.list(log(pt.fc[[1]]))))
+	int.sample <- round(exp(int.sample+ as.list(log(fc.calc$pt.fc[[1]]))))
 
 
 
