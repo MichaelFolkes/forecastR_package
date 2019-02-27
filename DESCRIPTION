@@ -26,7 +26,8 @@ Description: ForecastR generates age-specific (or total abundance) forecasts of
     selected performance metrics; and, 
     (d) the reporting of forecasting results (point forecasts and interval 
     forecasts) and diagnostics by producing either a detailed report or an 
-    executive-summary report.
+    executive-summary report. 
+    test
 License: GPL (>= 2)
 LazyData: TRUE
 URL: https://github.com/avelez-espino/Ck-ForecastR-Releases
