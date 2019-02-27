@@ -133,7 +133,8 @@ rankModels <- function(dat,columnToRank=NULL, relative.bol=FALSE){
 
 #abs value to account for mre and mpe possibly being negative
 #apply to all metrics as it makes no impact
-dat.df <- abs(dat.df)
+# GP added subsetting to implement columnToRank argument
+ dat.df <- abs(dat.df[,column.ind])
 
 #here is the ranking:
 if(relative.bol){
