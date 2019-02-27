@@ -71,6 +71,8 @@ for(model.name in names(settings.list) ){
 
 	if(do.retro){
 
+	
+	
 
 
 	 retro.out  <- 	doRetro(model= model.use, data = dat.prepped$data,
