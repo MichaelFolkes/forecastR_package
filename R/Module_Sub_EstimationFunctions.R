@@ -186,7 +186,7 @@ return(tmp.out)
 } # end sibreg.simple.datacheck
 
 
-sibreg.simple.est <- function(model.data,tracing=FALSE){
+sibreg.simple.est <- function(model.data,settings=NULL,tracing=FALSE){
 # do the estimation (1 instance)
 # model.data needs to have the following columns:
 #  Column 1 =  Age X by run year
@@ -194,6 +194,9 @@ sibreg.simple.est <- function(model.data,tracing=FALSE){
 #  Using the convention that first col always has the reponse var, in order to set up consistency with covariate models
 #  For example  if Col 1 is Age6_2008, then Col 2 has to be Age5_2007
 #  column names can be any valid R column name. Outputs (e.g. coefficients) will be labelled accordingly
+
+# Note: settings argument doesn't do anything for now, but it needs to be a placeholder because of the way
+# generic calls are set up to alternative SIbReg models, and the Kalman filter Sib Reg needs settings.
 
 # NOTE: This fits a linear regression through the origin 
 # (i.e. intercept set to 0 by specifying "y ~ -1 + x")
@@ -416,7 +419,7 @@ return(tmp.out)
 } # end logpower.simple.datacheck
 
 
-logpower.simple.est <- function(model.data,tracing=FALSE){
+logpower.simple.est <- function(model.data, settings = NULL, tracing=FALSE){
 # do the estimation (1 instance)
 # model.data needs to have the following columns:
 #  Column 1 =  Age X by run year
@@ -424,6 +427,10 @@ logpower.simple.est <- function(model.data,tracing=FALSE){
 #  Using the convention that first col always has the reponse var, in order to set up consistency with covariate models
 #  For example  if Col 1 is Age6_2008, then Col 2 has to be Age5_2007
 #  column names can be any valid R column name. Outputs (e.g. coefficients) will be labelled accordingly
+
+# Note: settings argument doesn't do anything for now, but it needs to be a placeholder because of the way
+# generic calls are set up to alternative SIbReg models, and the Kalman filter Sib Reg needs settings.
+
 
 # NOTE: This fits a linear regression WITHOUT forcing the line through the origin 
 # (i.e. specifying model as "y ~ 1 + x")  (the +1 is just for notation consistency with the simple sib reg model
