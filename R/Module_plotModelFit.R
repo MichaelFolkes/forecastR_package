@@ -5,6 +5,7 @@
 #  - others are model specific (e.g. time series plot of Kalman Filter time-varying parameter)
 
 
+
 plotModelFit <- function(fit.obj, options= list(plot.which = "all",age.which="all",plot.add=FALSE),fc.add=NULL){
 
 
@@ -17,7 +18,7 @@ plotModelFit <- function(fit.obj, options= list(plot.which = "all",age.which="al
 
 
 # plot.which = "all" -> do all plots
-#            = one of  "fitted_ts"  "resid_ts"  "resid_hist"   "resid_qq"  "fitvsobs" "curvefit"
+#            = one of  "fitted_ts"  "resid_ts"  "resid_hist"   "resid_qq"  "fitvsobs" "residvsfitted" "modeldiagnostic"    # TBI: "curvefit"                    
 #            = "precheck.report" -> do the first 4 listed in previous line
 
 # and additional components depending on the model        
@@ -58,25 +59,66 @@ if(!options$plot.add){par(mfrow=mfrow.use)}
 
 for(age.plot in ages.list){
 
+par(pty="s")
+
 # only do plot if have fitted values for that age class
 if("fitted.values" %in% names(fit.obj[[age.plot]]) ){
+
+# fading  colors
+x <- fit.obj[[age.plot]]$obs.values
+bg.fade <- c(rep(0,max(0,length(x)-35)),seq(0.045,1, length.out=min(35,length(x))))
+bg.col <- rgb(1, 0, 0,bg.fade)
+
 
 	plot.lims <- c(0, max(fit.obj[[age.plot]]$obs.values,fit.obj[[age.plot]]$fitted.values,na.rm=TRUE))
 
 	plot(fit.obj[[age.plot]]$obs.values,fit.obj[[age.plot]]$fitted.values, bty="n",xlab="Observed", ylab="Fitted",
-			xlim=plot.lims,ylim=plot.lims)
+			xlim=plot.lims,ylim=plot.lims,col="darkblue",bg=bg.col,cex=1.4)
 	abline(0,1,col="black",lwd=1)
 	abline(lm(fit.obj[[age.plot]]$fitted.values ~ fit.obj[[age.plot]]$obs.values),col="red",lwd=2)
-	points(fit.obj[[age.plot]]$obs.values,fit.obj[[age.plot]]$fitted.values,pch=21,col="darkblue",bg="lightgrey",cex=1.2)
+	points(fit.obj[[age.plot]]$obs.values,fit.obj[[age.plot]]$fitted.values,pch=21,col="darkblue",bg=bg.col,cex=1.4)
 	title(main= paste(fit.obj[[age.plot]]$model.type,age.plot,sep=" - "))
 
 	perc.over <- round(100*sum(fit.obj[[age.plot]]$fitted.values > fit.obj[[age.plot]]$obs.values) / length(fit.obj[[age.plot]]$fitted.values))
-	text(0,par("usr")[4]*0.9,labels=paste(perc.over,"% Fitted > Obs"),col="red",cex=0.8,adj=0)
+	text(0,par("usr")[4]*0.9,labels=paste(perc.over,"% Fitted > Obs"),col="red",cex=1,adj=0)
 	
 	}
 } # end looping through age classes
 
 } # end if doing fit vs. obs
+
+
+
+# -----------------------------------------------------
+# Plot 1b: Residual vs Fitted scatterplot 
+if(options$plot.which %in% c("all","residvsfitted")){
+
+if(!options$plot.add){par(mfrow=mfrow.use)}
+
+for(age.plot in ages.list){
+
+
+# only do plot if have fitted values for that age class
+if("fitted.values" %in% names(fit.obj[[age.plot]]) ){
+
+# fading  colors
+x <- fit.obj[[age.plot]]$fitted.values
+bg.fade <- c(rep(0,max(0,length(x)-35)),seq(0.045,1, length.out=min(35,length(x))))
+bg.col <- rgb(1, 0, 0,bg.fade)
+
+	plot(fit.obj[[age.plot]]$fitted.values, fit.obj[[age.plot]]$residuals, bty="n",xlab="Fitted", ylab="Residuals",
+			col="darkblue",bg=bg.col,cex=1.4)
+	abline(h=0,col="darkblue")		
+	abline(lm(fit.obj[[age.plot]]$residuals ~ fit.obj[[age.plot]]$fitted.values),col="red",lwd=2)
+	points(fit.obj[[age.plot]]$fitted.values,fit.obj[[age.plot]]$residuals,pch=21,col="darkblue",bg=bg.col,cex=1.4)
+	title(main= paste(fit.obj[[age.plot]]$model.type,age.plot,sep=" - "))
+
+	
+	}
+} # end looping through age classes
+
+} # end if doing residuals vs. fitted
+
 
 
 
