@@ -327,6 +327,21 @@ if(options$plot.which %in% c("all","modeldiagnostic","precheck.report")){
 if(!options$plot.add){par(mfrow=mfrow.use)}
 
 
+# blank plots for others (none yet)
+if(fit.obj[[2]]$model.type!="SibRegKalman"){
+
+for(age.plot in ages.list){
+
+ plot(1:10,1:10,bty="n",type="n",xlab="",ylab="");text(5,5,"N/A")
+
+	
+} # end looping through age classes
+
+
+} # end if doing other than kalman
+
+
+
 
 # Diagnostic plot for kalman filter: time varying parameter
 # check if second youngest has kalman filter
