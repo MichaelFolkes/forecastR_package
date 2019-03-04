@@ -288,7 +288,7 @@ if("residuals" %in% names(fit.obj[[age.plot]]) ){
 
 
 
-# Plot 6: residual time qqplot
+# Plot 6: residual  qqplot
 
 if(options$plot.which %in% c("all","resid_qq","precheck.report")){
 
@@ -313,8 +313,51 @@ if("residuals" %in% names(fit.obj[[age.plot]]) ){
 
 
 
-} # end if doing residual time series
+} # end if doing residual qqplot
 
+
+# -----------------------------------------------------
+# Plot 7: Model-Specific Diagnostic Plot
+
+# THIS DIFFERS BY MODEL TYPE
+# FOR NOW HAVE ONLY KALMAN FILTER SIBREG
+
+if(options$plot.which %in% c("all","modeldiagnostic","precheck.report")){
+
+if(!options$plot.add){par(mfrow=mfrow.use)}
+
+
+
+# Diagnostic plot for kalman filter: time varying parameter
+# check if second youngest has kalman filter
+if(fit.obj[[2]]$model.type=="SibRegKalman"){
+
+
+for(age.plot in ages.list){
+
+
+kf.have <- "smoothe.mean.a" %in% names(fit.obj[[age.plot]]$fit.obj[[2]]) 
+
+if(!kf.have){ plot(1:10,1:10,bty="n",type="n",xlab="",ylab="");text(5,5,"N/A")}
+
+if(kf.have ){
+
+	plot(fit.obj[[age.plot]]$run.yrs, fit.obj[[age.plot]]$fit.obj[[2]]$smoothe.mean.a, bty="n",xlab="Year", ylab="a parameter",
+			col="darkblue",type="l",cex=1.4)
+
+	abline(h=mean(fit.obj[[age.plot]]$fit.obj[[2]]$smoothe.mean.a),col="red")		
+	
+	title(main= paste(fit.obj[[age.plot]]$model.type,age.plot,sep=" - "))
+
+		} # end if have kf
+	
+} # end looping through age classes
+
+
+} # end if doing SIbRegKalman
+
+
+} # end if doing modeldiagnostic
 
 
 
