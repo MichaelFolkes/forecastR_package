@@ -158,7 +158,7 @@ if(tracing){ print(yrs.match); print(data.in)}
 
 # plan is that all the sibreg models are identical before and after this step
 # only the estimator code differs (and the output will have some model-specific list elements)
-out.list[[paste(age.prefix,age.do,sep="")]] <- c(estimation.functions[[model]]$estimator(data.in) ,list(run.yrs = yrs.use.y))
+out.list[[paste(age.prefix,age.do,sep="")]] <- c(estimation.functions[[model]]$estimator(data.in,settings=settings) ,list(run.yrs = yrs.use.y))
 
 
 }
