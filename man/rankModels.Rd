@@ -21,7 +21,9 @@ second, third,...). TRUE will use scaled ranking. Default is FALSE. Look to
 Details for additional information.}
 }
 \value{
-A list of data frames. Each data frame represents the results of each age class (i.e. the third dimension of the input array). with ranking by performance metric and overall average.
+A list of data frames. Each data frame represents the results of each
+  age class (i.e. the third dimension of the input array). with ranking by
+  performance metric and overall average.
 }
 \description{
 Calculate age-specific and overall model rank.
