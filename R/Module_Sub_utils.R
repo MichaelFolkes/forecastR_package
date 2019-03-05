@@ -1,3 +1,5 @@
+is_installed <- function(mypkg){ is.element(mypkg, installed.packages()[,1])}
+
 
 
 #' @title Package load or install and load

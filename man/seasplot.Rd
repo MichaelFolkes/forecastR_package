@@ -56,10 +56,11 @@ An object of class \code{seasexpl} containing:
 Construct seasonal plots of various styles for a given time series. The series can automatically detrended as needed.
 }
 \examples{
-seasplot(referrals,outplot=1)
 
 }
 \author{
 Nikolaos Kourentzes, \email{nikolaos@kourentzes.com}.
 }
+\keyword{internal}
+\keyword{seasplot(referrals,outplot=1)}
 \keyword{ts}
