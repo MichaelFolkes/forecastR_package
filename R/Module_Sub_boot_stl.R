@@ -166,6 +166,8 @@ stlboot <- function (ts, k = 1, test.season = c(TRUE, FALSE), outplot = c(FALSE,
 #' @keywords ts
 #'
 #' @examples
+#'
+#' @keywords internal
 #' seasplot(referrals,outplot=1)
 #'
 seasplot <- function(y,m=NULL,s=NULL,trend=NULL,colour=NULL,alpha=0.05,
