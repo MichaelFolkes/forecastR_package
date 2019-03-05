@@ -3,7 +3,7 @@
 #  - some are generic (e.g. obs vs fitted, residuals qqplot)
 #  - others are model specific (e.g. time series plot of Kalman Filter time-varying parameter)
 
-=======
+
 #' Plot a model fit...
 #'
 #' @param fit.obj
