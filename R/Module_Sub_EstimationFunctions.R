@@ -14,18 +14,18 @@
 
 lm.fit <- function(formula.use,data.use){
   fits <- lm(formula=formula.use,data=data.use)
-  
+
   summary.fits <- summary(fits)
-  
+
   fits.out <- list(coefficients= fits$coefficients ,coefficients.table = summary.fits$coefficients ,
-  					residuals= fits$residuals, 
+  					residuals= fits$residuals,
   					fit.obj = fits,
-  					obs.values = data.use[,1]   ,fitted.values.raw = fits$fitted.values, 
+  					obs.values = data.use[,1]   ,fitted.values.raw = fits$fitted.values,
   					data = data.use[,2:dim(data.use)[2]],
-  					sigma 	= summary.fits$sigma, df 	= summary.fits$df, fstatistic 	= summary.fits$fstatistic, 
+  					sigma 	= summary.fits$sigma, df 	= summary.fits$df, fstatistic 	= summary.fits$fstatistic,
   					r.squared 	= summary.fits$r.squared , adj.r.squared 	= summary.fits$adj.r.squared
   			)
-  
+
   return(fits.out)
 
 }#END lm.fit
@@ -60,7 +60,7 @@ filter.coeff <- avg.yrs
 names(filter.coeff) <- "filter.coeff"
 
 if(method == "classic"){
-	fits.out <-   list(coefficients = filter.coeff, obs.values = data.use[as.character(yrs.out)] ,fitted.values.raw = rng.avg.vals[as.character(yrs.out)], 
+	fits.out <-   list(coefficients = filter.coeff, obs.values = data.use[as.character(yrs.out)] ,fitted.values.raw = rng.avg.vals[as.character(yrs.out)],
 					data = data.use, residuals= data.use[as.character(yrs.out)]-rng.avg.vals[as.character(yrs.out)],
 					run.yrs = yrs.out)
 } # end if classic
@@ -195,7 +195,7 @@ sibreg.simple.est <- function(model.data,tracing=FALSE){
 #  For example  if Col 1 is Age6_2008, then Col 2 has to be Age5_2007
 #  column names can be any valid R column name. Outputs (e.g. coefficients) will be labelled accordingly
 
-# NOTE: This fits a linear regression through the origin 
+# NOTE: This fits a linear regression through the origin
 # (i.e. intercept set to 0 by specifying "y ~ -1 + x")
 
 if(tracing){print("Starting sibreg.simple.est()")}
@@ -214,10 +214,10 @@ sibreg.pt.fc <- function(fit.obj, data,settings=NULL){
 # fit.obj = object created from fitModel()
 # data = data frame with one element of the list created by sub.fcdata()
 
-			pt.fc <- predict.lm(fit.obj,newdata = data )	
+			pt.fc <- predict.lm(fit.obj,newdata = data )
 
 	return(pt.fc)
-			
+
 } # end sibreg.pt.fc
 
 # Merge object
@@ -265,7 +265,7 @@ sibreg.complex.est <- function(model.data,tracing=FALSE){
 #  For example  if Col 1 is Age6_2008, then Col 2 has to be Age5_2007
 #  column names can be any valid R column name. Outputs (e.g. coefficients) will be labelled accordingly
 
-# NOTE: This fits a linear regression through the origin 
+# NOTE: This fits a linear regression through the origin
 # (i.e. intercept set to 0 by specifying "y ~ -1 + x")
 
 if(tracing){print("Starting sibreg.simple.est()")}
@@ -284,10 +284,10 @@ sibreg.complex.pt.fc <- function(fit.obj, data,settings = NULL){
 # fit.obj = object created from fitModel()
 # data = data frame with one element of the list created by sub.fcdata()
 
-			pt.fc <- predict.lm(fit.obj,newdata = data )	
+			pt.fc <- predict.lm(fit.obj,newdata = data )
 
 	return(pt.fc)
-			
+
 }#END sibreg.complex.pt.fc
 
 # Merge object
@@ -313,7 +313,7 @@ if(tracing){print("Starting sibreg.kalman.datacheck() - Placholder only for now"
 # Zero values a problem? -> need to think this through and test
 
 
-} # end sibreg.Kalman.datacheck 
+} # end sibreg.Kalman.datacheck
 
 
 sibreg.kalman.est <- function(model.data,settings=list(int.avg=5),tracing=FALSE){
@@ -327,7 +327,7 @@ if(tracing){print("Starting sibreg.kalman.est() - Placholder only for now")}
 
 # using functions provided by Carrie Holt, and adapting her example code
 # keeping the notation consistent for now
-# BUT: changed the initial values for ln.sig.e and ln.sig.w from log(1) to 10, 
+# BUT: changed the initial values for ln.sig.e and ln.sig.w from log(1) to 10,
 # and for var.a from 1 to 10 (based on trial and error)
 
 x <- model.data[,2]
@@ -347,14 +347,14 @@ names(coef.kf) <- c("a.kf","b")
 fitted.kf <-  output$smoothe.mean.a + output$b * x
 
 model.fit <- list(   coefficients= coef.kf ,coefficients.table = coef.kf ,
-					residuals= fitted.kf - y , 
+					residuals= fitted.kf - y ,
 					fit.obj = list(coefficients = coef.kf, output),
-					obs.values = model.data[,1]   ,fitted.values.raw = fitted.kf, 
+					obs.values = model.data[,1]   ,fitted.values.raw = fitted.kf,
 					data = model.data[,2:dim(model.data)[2]],
-					sigma 	= NA, df 	= NA , fstatistic 	= NA, 
+					sigma 	= NA, df 	= NA , fstatistic 	= NA,
 					r.squared 	= NA , adj.r.squared 	= NA
 			)
-		
+
 
 
 
@@ -370,13 +370,13 @@ sibreg.kalman.pt.fc <- function(fit.obj, data, settings=NULL){
 # fit.obj = object created from fitModel()
 # data = data frame with one element of the list created by sub.fcdata()
 
-	# don't understand why unlist() is needed here, but without it this 
+	# don't understand why unlist() is needed here, but without it this
 	# messes up the storage matrix in sub.pt.fc()
 	pt.fc <-  unlist(fit.obj$coefficients["a.kf"] + fit.obj$coefficients["b"] * data	)
 
-	
+
 	return(pt.fc)
-			
+
 } # end sibreg.pt.fc
 
 sibreg.kalman.list <- list(estimator = sibreg.kalman.est, datacheck= sibreg.kalman.datacheck, pt.fc = sibreg.kalman.pt.fc)
@@ -425,13 +425,13 @@ logpower.simple.est <- function(model.data,tracing=FALSE){
 #  For example  if Col 1 is Age6_2008, then Col 2 has to be Age5_2007
 #  column names can be any valid R column name. Outputs (e.g. coefficients) will be labelled accordingly
 
-# NOTE: This fits a linear regression WITHOUT forcing the line through the origin 
+# NOTE: This fits a linear regression WITHOUT forcing the line through the origin
 # (i.e. specifying model as "y ~ 1 + x")  (the +1 is just for notation consistency with the simple sib reg model
 
 if(tracing){print("Starting logpower.simple.est()")}
 
 
-logpower.formula <-  paste("log(",names(model.data)[1], ") ~ 1 + log(",names(model.data)[2],")")   # +1 
+logpower.formula <-  paste("log(",names(model.data)[1], ") ~ 1 + log(",names(model.data)[2],")")   # +1
 model.fit <- lm.fit(formula.use = logpower.formula ,data.use=model.data)
 return(c(list(model.type = "SibRegLogPower",formula=logpower.formula,var.names = names(model.data)[2],est.fn = "lm()"),
 					model.fit,list(fitted.values = exp(model.fit$fitted.values.raw)) ))
@@ -447,16 +447,16 @@ logpower.pt.fc <- function(fit.obj, data, settings = NULL){
 			n <- length(fit.obj$fitted.values)
 			bias.correction <- (summary(fit.obj)$sigma^2 * ((n-2)/n)) / 2
 			pt.fc <- exp(pt.fc.raw + bias.correction) # convert back from log, including bias correction
-			# bias correction as per Sprugel (1983), 
+			# bias correction as per Sprugel (1983),
 			# adapting code from earlier version of ForecastR, which used:
 			# sigma.ols <- summary(model)$sigma
             # n <- nrow(model.frame(model))
             # sigma.squared.mle <- sigma.ols^2 * ((n-2)/n)
 			# round(exp(p + (sigma.squared.mle/2)))
-			
-			
+
+
 	return(pt.fc)
-			
+
 } # end sibreg.pt.fc
 
 # Merge object
@@ -494,9 +494,6 @@ arima.est <- function(model.data,settings=list(BoxCox=FALSE), tracing=FALSE){
 # do the estimation (1 instance)
 # model.data is a univariate time series
 
-#library(forecast)
-
-
 if(tracing){print("Starting arima.est()")}
 
 if(settings$BoxCox){lambda.use <- forecast::BoxCox.lambda(model.data, method="guerrero") }
@@ -523,7 +520,7 @@ arima.pt.fc <- function(fit.obj, data ,settings=list(BoxCox=FALSE)){
 # just feeding in an obj with NA
 
 # https://stats.stackexchange.com/questions/155305/how-does-r-calculate-prediction-intervals-in-the-forecast-package
-	
+
 	#print("settings$BoxCox")
 	#print(settings$BoxCox)
 	#print(data)
@@ -534,23 +531,23 @@ arima.pt.fc <- function(fit.obj, data ,settings=list(BoxCox=FALSE)){
 	#print(data)
 	#print("lambda fc")
 	#print(lambda.use)
-	
+
 	# why does ets() need/use forecast() while auto.arima uses predict()?  They are both in the {forecast} #library -> need to do some searching/testing
 	# Also, for the ARIMA output, need to store the exact object as a list element (some replication)
-	# but it seems the predict() needs it	
+	# but it seems the predict() needs it
 
 	# BoxCox conversion issue: predict.Arima does not use lambda argument
 	# pt.fc <- as.numeric(predict(fit.obj,n.ahead=1,lambda=lambda.use)$pred  )
-	
+
 	# do it via forecast(), which is the same approach used for exp smooth fc via ets()
-	pt.fc <-  as.numeric(forecast(fit.obj, h=1,lambda=lambda.use,biasadj=TRUE)$mean)
-	
+	pt.fc <-  as.numeric(forecast::forecast(fit.obj, h=1,lambda=lambda.use,biasadj=TRUE)$mean)
+
 	#why still need to back convert? The forecast() call already uses lambda???
 	#if(settings$BoxCox){pt.fc <- InvBoxCox(pt.fc,lambda.use) }
-	
-	
+
+
 	return(pt.fc)
-			
+
 } # end arima.pt.fc
 
 # Merge object
@@ -587,9 +584,6 @@ expsmooth.est <- function(model.data,settings=list(BoxCox=FALSE), tracing=FALSE)
 # do the estimation (1 instance)
 # model.data is a univariate time series
 
-#library(forecast)
-
-
 if(tracing){print("Starting expsmooth.est()")}
 
 if(settings$BoxCox){lambda.use <- forecast::BoxCox.lambda(model.data, method="guerrero") }
@@ -619,28 +613,26 @@ expsmooth.pt.fc <- function(fit.obj, data, settings=list(BoxCox=FALSE)){
 # https://stats.stackexchange.com/questions/155305/how-does-r-calculate-prediction-intervals-in-the-forecast-package
 
 
-	
-if(settings$BoxCox){lambda.use <- forecast::BoxCox.lambda(data, method="guerrero") }
-if(!settings$BoxCox){lambda.use <- NULL }	
 
-	
+if(settings$BoxCox){lambda.use <- forecast::BoxCox.lambda(data, method="guerrero") }
+if(!settings$BoxCox){lambda.use <- NULL }
+
+
 	#print("data")
 	#print(data)
 	#print("lambda fc")
-	#print(lambda.use)	
-	
-	
-	#library(forecast)
+	#print(lambda.use)
+
 	 pt.fc <-  as.numeric(forecast::forecast(fit.obj, h=1,lambda=lambda.use,biasadj=TRUE)$mean)
-	 
+
 	#why still need to back convert? The forecast() call already uses lambda???
 	#if(settings$BoxCox){pt.fc <- InvBoxCox(pt.fc,lambda.use) }
-		
+
 #print(lambda.use)
 #print(pt.fc)
-			
+
 	return(pt.fc)
-			
+
 } # end expsmooth.pt.fc
 
 # Merge object
@@ -658,6 +650,4 @@ estimation.functions <- list(Naive = naive.list,
                              TimeSeriesArima = arima.list,
                              TimeSeriesExpSmooth = expsmooth.list,
                              SibRegComplex=sibreg.complex.list)
-								
-								
-								
+
