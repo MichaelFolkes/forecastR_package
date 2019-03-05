@@ -129,7 +129,7 @@ for(fc.yr.retro in retro.yrs){
 	retro.mat.obs <- data.extract(data = data ,yrs = retro.yrs,option="obs" )
 
 	retro.mat.resids <- retro.mat.fc - retro.mat.obs
-	log.resids <- log(retro.mat.fc) - log(retro.mat.obs)
+	log.resids <- log1p(retro.mat.fc) - log1p(retro.mat.obs)  # to handle records with 0 abd for some ages
 
 	# sample retro-based intervals
 

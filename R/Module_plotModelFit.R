@@ -5,6 +5,7 @@
 #  - others are model specific (e.g. time series plot of Kalman Filter time-varying parameter)
 
 
+
 plotModelFit <- function(fit.obj, options= list(plot.which = "all",age.which="all",plot.add=FALSE),fc.add=NULL){
 
 
@@ -17,7 +18,7 @@ plotModelFit <- function(fit.obj, options= list(plot.which = "all",age.which="al
 
 
 # plot.which = "all" -> do all plots
-#            = one of  "fitted_ts"  "resid_ts"  "resid_hist"   "resid_qq"  "fitvsobs" "curvefit"
+#            = one of  "fitted_ts"  "resid_ts"  "resid_hist"   "resid_qq"  "fitvsobs" "residvsfitted" "modeldiagnostic"    # TBI: "curvefit"                    
 #            = "precheck.report" -> do the first 4 listed in previous line
 
 # and additional components depending on the model        
@@ -58,25 +59,66 @@ if(!options$plot.add){par(mfrow=mfrow.use)}
 
 for(age.plot in ages.list){
 
+par(pty="s")
+
 # only do plot if have fitted values for that age class
 if("fitted.values" %in% names(fit.obj[[age.plot]]) ){
+
+# fading  colors
+x <- fit.obj[[age.plot]]$obs.values
+bg.fade <- c(rep(0,max(0,length(x)-35)),seq(0.045,1, length.out=min(35,length(x))))
+bg.col <- rgb(1, 0, 0,bg.fade)
+
 
 	plot.lims <- c(0, max(fit.obj[[age.plot]]$obs.values,fit.obj[[age.plot]]$fitted.values,na.rm=TRUE))
 
 	plot(fit.obj[[age.plot]]$obs.values,fit.obj[[age.plot]]$fitted.values, bty="n",xlab="Observed", ylab="Fitted",
-			xlim=plot.lims,ylim=plot.lims)
+			xlim=plot.lims,ylim=plot.lims,col="darkblue",bg=bg.col,cex=1.4)
 	abline(0,1,col="black",lwd=1)
 	abline(lm(fit.obj[[age.plot]]$fitted.values ~ fit.obj[[age.plot]]$obs.values),col="red",lwd=2)
-	points(fit.obj[[age.plot]]$obs.values,fit.obj[[age.plot]]$fitted.values,pch=21,col="darkblue",bg="lightgrey",cex=1.2)
+	points(fit.obj[[age.plot]]$obs.values,fit.obj[[age.plot]]$fitted.values,pch=21,col="darkblue",bg=bg.col,cex=1.4)
 	title(main= paste(fit.obj[[age.plot]]$model.type,age.plot,sep=" - "))
 
 	perc.over <- round(100*sum(fit.obj[[age.plot]]$fitted.values > fit.obj[[age.plot]]$obs.values) / length(fit.obj[[age.plot]]$fitted.values))
-	text(0,par("usr")[4]*0.9,labels=paste(perc.over,"% Fitted > Obs"),col="red",cex=0.8,adj=0)
+	text(0,par("usr")[4]*0.9,labels=paste(perc.over,"% Fitted > Obs"),col="red",cex=1,adj=0)
 	
 	}
 } # end looping through age classes
 
 } # end if doing fit vs. obs
+
+
+
+# -----------------------------------------------------
+# Plot 1b: Residual vs Fitted scatterplot 
+if(options$plot.which %in% c("all","residvsfitted")){
+
+if(!options$plot.add){par(mfrow=mfrow.use)}
+
+for(age.plot in ages.list){
+
+
+# only do plot if have fitted values for that age class
+if("fitted.values" %in% names(fit.obj[[age.plot]]) ){
+
+# fading  colors
+x <- fit.obj[[age.plot]]$fitted.values
+bg.fade <- c(rep(0,max(0,length(x)-35)),seq(0.045,1, length.out=min(35,length(x))))
+bg.col <- rgb(1, 0, 0,bg.fade)
+
+	plot(fit.obj[[age.plot]]$fitted.values, fit.obj[[age.plot]]$residuals, bty="n",xlab="Fitted", ylab="Residuals",
+			col="darkblue",bg=bg.col,cex=1.4)
+	abline(h=0,col="darkblue")		
+	abline(lm(fit.obj[[age.plot]]$residuals ~ fit.obj[[age.plot]]$fitted.values),col="red",lwd=2)
+	points(fit.obj[[age.plot]]$fitted.values,fit.obj[[age.plot]]$residuals,pch=21,col="darkblue",bg=bg.col,cex=1.4)
+	title(main= paste(fit.obj[[age.plot]]$model.type,age.plot,sep=" - "))
+
+	
+	}
+} # end looping through age classes
+
+} # end if doing residuals vs. fitted
+
 
 
 
@@ -246,7 +288,7 @@ if("residuals" %in% names(fit.obj[[age.plot]]) ){
 
 
 
-# Plot 6: residual time qqplot
+# Plot 6: residual  qqplot
 
 if(options$plot.which %in% c("all","resid_qq","precheck.report")){
 
@@ -271,8 +313,66 @@ if("residuals" %in% names(fit.obj[[age.plot]]) ){
 
 
 
-} # end if doing residual time series
+} # end if doing residual qqplot
 
+
+# -----------------------------------------------------
+# Plot 7: Model-Specific Diagnostic Plot
+
+# THIS DIFFERS BY MODEL TYPE
+# FOR NOW HAVE ONLY KALMAN FILTER SIBREG
+
+if(options$plot.which %in% c("all","modeldiagnostic","precheck.report")){
+
+if(!options$plot.add){par(mfrow=mfrow.use)}
+
+
+# blank plots for others (none yet)
+if(fit.obj[[2]]$model.type!="SibRegKalman"){
+
+for(age.plot in ages.list){
+
+ plot(1:10,1:10,bty="n",type="n",xlab="",ylab="");text(5,5,"N/A")
+
+	
+} # end looping through age classes
+
+
+} # end if doing other than kalman
+
+
+
+
+# Diagnostic plot for kalman filter: time varying parameter
+# check if second youngest has kalman filter
+if(fit.obj[[2]]$model.type=="SibRegKalman"){
+
+
+for(age.plot in ages.list){
+
+
+kf.have <- "smoothe.mean.a" %in% names(fit.obj[[age.plot]]$fit.obj[[2]]) 
+
+if(!kf.have){ plot(1:10,1:10,bty="n",type="n",xlab="",ylab="");text(5,5,"N/A")}
+
+if(kf.have ){
+
+	plot(fit.obj[[age.plot]]$run.yrs, fit.obj[[age.plot]]$fit.obj[[2]]$smoothe.mean.a, bty="n",xlab="Year", ylab="a parameter",
+			col="darkblue",type="l",cex=1.4)
+
+	abline(h=mean(fit.obj[[age.plot]]$fit.obj[[2]]$smoothe.mean.a),col="red")		
+	
+	title(main= paste(fit.obj[[age.plot]]$model.type,age.plot,sep=" - "))
+
+		} # end if have kf
+	
+} # end looping through age classes
+
+
+} # end if doing SIbRegKalman
+
+
+} # end if doing modeldiagnostic
 
 
 
