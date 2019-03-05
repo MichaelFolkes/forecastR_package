@@ -3,3 +3,22 @@
 
 -
 -truncate function will work on samples that are output of doBoot() found in DEV_Test_NewModules_Part10_doBoot.R
+
+#______________________________________________
+
+# functions to search for, which require package prefix:
+# forecast (done)
+# ets (done)
+# auto.arima (done)
+# naive (done)
+# BoxCox (done)
+# BoxCox.lambda (done)
+# seasplot - in stlboot fun. took seasplot from tsutils and added to forecastR so no need to install tsutils
+#
+#
+# leave out moments package
+
+
+require(utilizer)
+fn <- utilizer::searchFiles("auto.arima")
+fn

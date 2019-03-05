@@ -33,6 +33,7 @@ simplelogpowerfit.txt
 /Reference
 /WorkingGroup
 /KalmanSources
+/notes
 
 # REST IS FROM DEFAULT .gitignore for R
 

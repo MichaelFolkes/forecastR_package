@@ -99,7 +99,9 @@ getRanks <- function(dat,columnToRank=NULL, relative.bol=FALSE){
 #'   points being ranked. This approach may better represent results, especially
 #'   once ranks are averaged to an overall rank estimate.
 #'
-#' @return A list of data frames. Each data frame represents the results of each age class (i.e. the third dimension of the input array). with ranking by performance metric and overall average.
+#' @return A list of data frames. Each data frame represents the results of each
+#'   age class (i.e. the third dimension of the input array). with ranking by
+#'   performance metric and overall average.
 #' @export
 #'
 #' @examples
