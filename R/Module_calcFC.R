@@ -165,7 +165,14 @@ for(age.use in names(data)){
 
 } # end looping through age
 
-# add total if have more than q age class (1 "age class" typically = "Total")
+
+#### TEMPORARY! See https://github.com/avelez-espino/forecastR_phase4/issues/121
+
+
+	out.mat[out.mat < 0] <- 0
+
+
+# add total if have more than 1 age class (1 "age class" typically = "Total")
 if(length(names(data))>1) {out.mat <- cbind(out.mat,Total=rowSums(out.mat)) }
 
 return(out.mat)

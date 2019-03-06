@@ -121,7 +121,7 @@ for(fc.yr.retro in retro.yrs){
 
  fitted.pm.array[,,paste("FC",fc.yr.retro,sep="")] <- model.fitted$fitted.pm
 
-  fc.calc <- calcFC(fit.obj= model.fitted,data = data, fc.yr= fc.yr.retro, settings = fc.settings,tracing=FALSE)
+  fc.calc <- calcFC(fit.obj= model.fitted,data = data.use, fc.yr= fc.yr.retro, settings = fc.settings,tracing=FALSE)
 
   retro.mat.fc[paste("FC",fc.yr.retro,sep=""),] <- fc.calc$pt.fc
  }
