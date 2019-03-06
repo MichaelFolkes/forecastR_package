@@ -1,7 +1,7 @@
 # Kalman Filter Random Walk model
 #===============================================
 # Used to estimate liner regression model with time-varying intercept that follows a random walk
-# Developed by Brice MacGregror (2001), adapted by Brian Pyper, Brigitte Dorner and Carrie Holt (2002-2018)
+# Developed by Bryce MacGregror (2001), adapted by Brian Pyper, Brigitte Dorner and Carrie Holt (2002-2018)
 # For further inquires contact Carrie Holt: carrie.holt@dfo-mpo.gc.ca
 
 "kalman.rw" <- function(init.mean.a, init.var.a, b, ln.sig.e, ln.sig.w, x, y, Ts = 0)
