@@ -31,7 +31,7 @@
 #' @export
 #'
 #' @examples
-multiFC <- function(data.file, settings.list, do.retro = FALSE, do.boot = FALSE, out.type=c("short", "full"), retro.min.yrs=15, tracing=FALSE){
+multiFC <- function(data.file, settings.list, do.retro = FALSE, do.boot = FALSE, out.type=c("short", "full"), retro.min.yrs=15, retro.int.n = 100,  tracing=FALSE){
 
 ## NEED TO FIX
 # Settings.list -> fit.settings
@@ -73,15 +73,18 @@ for(model.name in names(settings.list) ){
 
 	
 	
-
-
 	 retro.out  <- 	doRetro(model= model.use, data = dat.prepped$data,
 				retro.settings = list(min.yrs=retro.min.yrs),
 				fit.settings = settings.use,
 				fc.settings = settings.use,
-				tracing=tracing,out.type=out.type)
+				tracing=tracing,out.type=out.type,
+				interval.n = retro.int.n, 
+				interval.quants = TRUE,
+				pt.fc.in = fc.calc)
+				
+				
 
-
+	
 
 	out.list[[model.name]] <- c(out.list[[model.name]],list(retro=retro.out))
 

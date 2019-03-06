@@ -162,7 +162,7 @@ for(age.use in names(data)){
 	#print(fit.settings)
 	pt.fc.tmp <-  estimation.functions[[model.type]]$pt.fc(fit.obj=fit.obj, data = data[[age.use]],settings=fit.settings)
 
-	print(pt.fc.tmp)
+	#print(pt.fc.tmp)
 
 	out.mat[,age.use] <- pt.fc.tmp[1]
 	out.mat.lower[,age.use] <- pt.fc.tmp[2]
