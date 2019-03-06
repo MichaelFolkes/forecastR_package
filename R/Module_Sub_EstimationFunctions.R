@@ -145,7 +145,7 @@ naive.pt.fc <- function(fit.obj=NULL, data,settings=NULL){
 								pt.fc.out <- c( pt.fc.out, pt.fc.out * c(0.5,1.5))
 							}
 							
-			#print(pt.fc.out)				
+			return(pt.fc.out)				
 
 } # end naive.pt.fc
 
