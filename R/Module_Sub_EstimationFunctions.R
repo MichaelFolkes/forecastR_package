@@ -330,10 +330,13 @@ sibreg.kalman.est <- function(model.data,settings=list(int.avg=5),tracing=FALSE)
 # do the estimation (1 instance)
 
 # int.avg = the number of years for averaging the "recent intercept"
+if(!is.null(settings)){
+	if(is.na(settings$int.avg)){ settings$int.avg <- 5 } # if getting NA from GUI, set to same default as NULL would use
+	}
+if(is.null(settings)){ settings$int.avg <- 5  }
+	
 
-if(is.na(settings$int.avg)){ settings$int.avg <- 5 } # if getting NA from GUI, set to same default as NULL would use
-
-if(tracing){print("Starting sibreg.kalman.est() - Placholder only for now")}
+if(tracing){print("Starting sibreg.kalman.est()")}
 
 # using functions provided by Carrie Holt, and adapting her example code
 # keeping the notation consistent for now

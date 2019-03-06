@@ -149,9 +149,9 @@ for(fc.yr.retro in retro.yrs){
 	#errors.corr	 <- errors.sample + unlist(lapply(bias.correction,FUN=function(x){rep(x,interval.n)}))
 	
 	int.sample <- expm1(errors.sample + log1p(unlist(lapply(pt.fc.in$pt.fc,FUN=function(x){rep(x,interval.n)})))) # creates a vector with n replicates of the pt fc
-
+	int.sample <- round(int.sample)
 	
-		if(interval.quants){ int.out <- as.data.frame(lapply(int.sample,function(x){quantile(x,probs=c(0.1,0.25,0.5,0.75,0.9))}))}
+	if(interval.quants){ int.out <- as.data.frame(lapply(int.sample,function(x){quantile(x,probs=c(0.1,0.25,0.5,0.75,0.9))}))}
 	if(!interval.quants){  int.out <- int.sample }
 
 
