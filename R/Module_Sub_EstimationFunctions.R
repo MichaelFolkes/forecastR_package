@@ -145,7 +145,7 @@ naive.pt.fc <- function(fit.obj=NULL, data,settings=NULL){
 								pt.fc.out <- c( pt.fc.out, pt.fc.out * c(0.5,1.5))
 							}
 							
-			print(pt.fc.out)				
+			#print(pt.fc.out)				
 
 } # end naive.pt.fc
 
@@ -471,7 +471,7 @@ logpower.pt.fc <- function(fit.obj, data, settings = NULL){
             # sigma.squared.mle <- sigma.ols^2 * ((n-2)/n)
 			# round(exp(p + (sigma.squared.mle/2)))
 
-	print(pt.fc)
+	#print(pt.fc)
 	return(pt.fc)
 
 } # end sibreg.pt.fc
@@ -564,7 +564,7 @@ arima.pt.fc <- function(fit.obj, data ,settings=list(BoxCox=FALSE)){
 	#why still need to back convert? The forecast() call already uses lambda???
 	#if(settings$BoxCox){pt.fc <- InvBoxCox(pt.fc,lambda.use) }
 
-	print(pt.fc)
+	#print(pt.fc)
 	return(pt.fc)
 
 } # end arima.pt.fc
@@ -651,7 +651,7 @@ if(!settings$BoxCox){lambda.use <- NULL }
 
 #print(lambda.use)
 #print(pt.fc)
-	print(pt.fc)
+
 	return(pt.fc)
 
 } # end expsmooth.pt.fc
