@@ -137,8 +137,15 @@ naive.pt.fc <- function(fit.obj=NULL, data,settings=NULL){
 # data = vector of N years, as pre-filtered by the sub.fcdata() subroutine
 # current setting: if ANY of the input values are NA, then the pt fc is NA
 
-			pt.fc.out <- mean(data,na.rm=FALSE)
+# How to get prediction intervals for naive? See https://github.com/avelez-espino/forecastR_phase4/issues/125
 
+			if(length(data)>1){	pt.fc.out <- c(mean(data,na.rm=FALSE),unlist(quantile(data,probs=c(0.1,0.9),na.rm=FALSE)) ) }
+			if(length(data)==1){
+								pt.fc.out <- mean(data,na.rm=FALSE)
+								pt.fc.out <- c( pt.fc.out, pt.fc.out * c(0.5,1.5))
+							}
+							
+			print(pt.fc.out)				
 
 } # end naive.pt.fc
 
@@ -217,7 +224,7 @@ sibreg.pt.fc <- function(fit.obj, data,settings=NULL){
 # fit.obj = object created from fitModel()
 # data = data frame with one element of the list created by sub.fcdata()
 
-			pt.fc <- predict.lm(fit.obj,newdata = data )
+			pt.fc <- predict.lm(fit.obj,newdata = data, interval= "prediction", level=0.8 )
 
 	return(pt.fc)
 
@@ -287,7 +294,7 @@ sibreg.complex.pt.fc <- function(fit.obj, data,settings = NULL){
 # fit.obj = object created from fitModel()
 # data = data frame with one element of the list created by sub.fcdata()
 
-			pt.fc <- predict.lm(fit.obj,newdata = data )
+			pt.fc <- predict.lm(fit.obj,newdata = data , interval= "prediction", level=0.8 )
 
 	return(pt.fc)
 
@@ -375,7 +382,11 @@ sibreg.kalman.pt.fc <- function(fit.obj, data, settings=NULL){
 
 	# don't understand why unlist() is needed here, but without it this
 	# messes up the storage matrix in sub.pt.fc()
-	pt.fc <-  unlist(fit.obj$coefficients["a.kf"] + fit.obj$coefficients["b"] * data	)
+	
+	# Need to figure out how to get prediction intervals from the a and b mean and var
+	
+	pt.fc <-  c(unlist(fit.obj$coefficients["a.kf"] + fit.obj$coefficients["b"] * data	),
+				NA,NA)
 
 
 	return(pt.fc)
@@ -449,7 +460,7 @@ return(c(list(model.type = "SibRegLogPower",formula=logpower.formula,var.names =
 logpower.pt.fc <- function(fit.obj, data, settings = NULL){
 # fit.obj = object created from fitModel()
 # data = data frame with one element of the list created by sub.fcdata()
-			pt.fc.raw <- predict.lm(fit.obj,newdata = data  )
+			pt.fc.raw <- predict.lm(fit.obj,newdata = data , interval= "prediction", level=0.8 )
 			n <- length(fit.obj$fitted.values)
 			bias.correction <- (summary(fit.obj)$sigma^2 * ((n-2)/n)) / 2
 			pt.fc <- exp(pt.fc.raw + bias.correction) # convert back from log, including bias correction
@@ -460,7 +471,7 @@ logpower.pt.fc <- function(fit.obj, data, settings = NULL){
             # sigma.squared.mle <- sigma.ols^2 * ((n-2)/n)
 			# round(exp(p + (sigma.squared.mle/2)))
 
-
+	print(pt.fc)
 	return(pt.fc)
 
 } # end sibreg.pt.fc
@@ -546,12 +557,14 @@ arima.pt.fc <- function(fit.obj, data ,settings=list(BoxCox=FALSE)){
 	# pt.fc <- as.numeric(predict(fit.obj,n.ahead=1,lambda=lambda.use)$pred  )
 
 	# do it via forecast(), which is the same approach used for exp smooth fc via ets()
-	pt.fc <-  as.numeric(forecast::forecast(fit.obj, h=1,lambda=lambda.use,biasadj=TRUE)$mean)
+	
+	fc.out <- forecast::forecast(fit.obj, h=1,lambda=lambda.use,biasadj=TRUE,level=80)
+	pt.fc <-  as.numeric(c(fc.out$mean,fc.out$lower, fc.out$upper))
 
 	#why still need to back convert? The forecast() call already uses lambda???
 	#if(settings$BoxCox){pt.fc <- InvBoxCox(pt.fc,lambda.use) }
 
-
+	print(pt.fc)
 	return(pt.fc)
 
 } # end arima.pt.fc
@@ -629,14 +642,16 @@ if(!settings$BoxCox){lambda.use <- NULL }
 	#print("lambda fc")
 	#print(lambda.use)
 
-	 pt.fc <-  as.numeric(forecast::forecast(fit.obj, h=1,lambda=lambda.use,biasadj=TRUE)$mean)
-
+    fc.out <- forecast::forecast(fit.obj, h=1,lambda=lambda.use,biasadj=TRUE,level=80)
+	pt.fc <-  as.numeric(c(fc.out$mean,fc.out$lower, fc.out$upper))
+	 
+	 
 	#why still need to back convert? The forecast() call already uses lambda???
 	#if(settings$BoxCox){pt.fc <- InvBoxCox(pt.fc,lambda.use) }
 
 #print(lambda.use)
 #print(pt.fc)
-
+	print(pt.fc)
 	return(pt.fc)
 
 } # end expsmooth.pt.fc
