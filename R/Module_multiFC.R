@@ -7,11 +7,12 @@
 #' @param data.file The data file read in with \code{read.csv}.
 #' @param settings.list A list with list sub-elements. See details.
 #' @param do.retro A Boolean (default is FALSE). Run a retrospective
-#' @param do.boot A Boolean (default is FALSE). Calculate bootstrap intervals
-#'   (only for the current forecast, not for each retro year).
+#' @param retro.min.yrs An integer of length one. Default is 15.
 #' @param out.type A character vector of length one. The choices are: "short" or
 #'   "full". See value for details.
-#' @param retro.min.yrs An integer of length one. Default is 15.
+#' @param int.type Either "None","Retrospective","Prediction", or "Bootstrap"
+#' @param int.n  number of samples used for the interval calculations
+#' @param boot.type = "meboot" or "stlboot", only applies if int.type = "Bootstrap"
 #' @param tracing A Boolean (default is FALSE)
 #'
 #' @details The settings.list argument is a list defining each forecast model in
@@ -21,17 +22,18 @@
 #'   list(model.type="Naive",settings=list(avg.yrs=1)), SibRegSimple =
 #'   list(model.type="SibRegSimple",settings=NULL))}
 #'
-#' @return A list is produced. If argument out.type = "short" and do.boot and
-#'   do.retro are FALSE, then only generate a summary table of point forecasts.
+#' @return A list is produced. If argument out.type = "short" and do.retro = FALSE, 
+#' then only generate a summary table of point forecasts.
 #'   If out.type = "short" and do.retro= TRUE, then generate 3 versions of
 #'   retrospective summary and array of fitted performance measures. If out.type
 #'   ="full" and do.retro= TRUE, then also store the model fits for each retro
-#'   year. If out.type ="short" and do.boot= TRUE, then TBD. If out.type ="full"
+#'   year. If out.type ="short" and = TRUE, then TBD. If out.type ="full"
 #'   and do.boot= TRUE, then TBD
 #' @export
 #'
 #' @examples
-multiFC <- function(data.file, settings.list, do.retro = FALSE, do.boot = FALSE, out.type=c("short", "full"), retro.min.yrs=15, retro.int.n = 100,  tracing=FALSE){
+multiFC <- function(data.file, settings.list, do.retro = FALSE, retro.min.yrs=15, out.type=c("short", "full"), 
+			int.type = "None", int.n = 100, boot.type = "meboot", tracing=FALSE){
 
 ## NEED TO FIX
 # Settings.list -> fit.settings
@@ -45,6 +47,23 @@ dat.prepped <-  prepData(data.file,out.labels="v2")  # prep data for the model f
 
 # start a list for storing
 out.list <- list()
+
+model.list <- names(settings.list)
+ages.list <- names(dat.prepped$data )
+
+# create the int.array anyway, even of int.type= None
+# this way the GUI can still grab the empty array for display
+
+			if(length(ages.list)>1){
+			int.array <- array(NA, dim= c(length(model.list),5,length(ages.list)+1), 
+										dimnames=list(model.list,paste0("p",c(10,25,50,75,90)),c(ages.list,"Total"))
+									)}
+							
+			if(length(ages.list)==1){  # for no age data
+			int.array <- array(NA, dim= c(length(model.list),5,1), 
+										dimnames=list(model.list,paste0("p",c(10,25,50,75,90)),"Total")
+									)}						
+						
 
 
 for(model.name in names(settings.list) ){
@@ -68,6 +87,19 @@ for(model.name in names(settings.list) ){
 
 	out.list[[model.name]] <- fc.calc
 
+	
+	
+	if(int.type=="Prediction"){
+	
+			int.quants <- doSampleFromInt(fc.obj=fc.calc, interval.n=int.n,interval.quants=TRUE)
+			
+			if(tracing){
+			print("prediction quants")
+			print(int.quants)
+			}
+		} # end if prediction interval
+	
+	
 
 	if(do.retro){
 
@@ -78,33 +110,63 @@ for(model.name in names(settings.list) ){
 				fit.settings = settings.use,
 				fc.settings = settings.use,
 				tracing=tracing,out.type=out.type,
-				interval.n = retro.int.n, 
+				interval.n = int.n, 
 				interval.quants = TRUE,
 				pt.fc.in = fc.calc)
 				
 				
+		if(int.type=="Retrospective"){
+			int.quants <- retro.out$retro.interval
 
-	
-
-	out.list[[model.name]] <- c(out.list[[model.name]],list(retro=retro.out))
-
+			if(tracing){
+				print("retrospective quants")
+				print(int.quants)
+				}
+			
 			}
+			
+			out.list[[model.name]] <- c(out.list[[model.name]],list(retro=retro.out ))
+
+		
+		
+		
+			} # end if retro interval
 
 
-		if(do.boot){
+		if(int.type=="Bootstrap"){
 
-			warning("bootstrap option not yet built into multiFC()")
+			
+			boot.int <- doBoot(data= dat.prepped, args.fitmodel= list(model= model.use, settings = settings.use),
+						args.calcfc = list(fc.yr= dat.prepped$specs$forecastingyear,  settings = settings.use),
+						args.boot = list(boot.type=boot.type, boot.n= int.n , plot.diagnostics=FALSE),
+						full.out = TRUE, plot.out=FALSE)
 
-			}
+			int.quants <-  as.data.frame(lapply(boot.int ,function(x){quantile(x,probs=c(0.1,0.25,0.5,0.75,0.9))}))
+
+			if(tracing){
+				print("bootstrap quants")
+				print(int.quants)
+				}
+						
+			
+			} # end if bootstrap interval
+
+			
+if(int.type != "None"){ int.array[model.name,,] <- as.matrix(int.quants) }			
+								
+
+}  # end looping through models
 
 
-}
-
-
-# create a summary array of all the point forecasts
+# create a summary array of all the point forecasts and quantiles
 extract.ptfc <- function(x){return(x$pt.fc)}
 table.ptfc <- as.data.frame(do.call(rbind,lapply(out.list,FUN=extract.ptfc)))
 dimnames(table.ptfc)[[1]] <- names(settings.list)
+
+
+
+
+
 
 
 if(do.retro){
@@ -130,12 +192,14 @@ if(do.retro){
 
 	} # end if retro
 
-if(out.type=="short" & !do.retro & !do.boot) {return.list <-  list(table.ptfc = table.ptfc)}
+if(out.type=="short" & !do.retro ) {return.list <-  list(table.ptfc = table.ptfc)}
 if(out.type=="short" & do.retro) {return.list <-  list(table.ptfc = table.ptfc, retro.pm = retros)}
 if(out.type=="full" & do.retro) {return.list <-  list(table.ptfc = table.ptfc, retro.pm = retros,retro.details = out.list)}
 
 
-
+if(int.type %in% c("Retrospective","Prediction", "Bootstrap")){
+			return.list <- c(return.list, list(int.array = int.array))
+			}
 
 return(return.list)
 

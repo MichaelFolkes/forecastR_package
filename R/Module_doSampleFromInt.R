@@ -49,3 +49,4 @@ sampleFromStats <- function(average, q, p=0.9, n=1000){
 	results <- list(sample.stats=sample.stats, results=res, results.bounded=res.bounded)
 	return(results)
 }#END sampleFromStats
+
