@@ -4,10 +4,8 @@
 #' @param fc.obj A list. Output of the function \code{\link{calcFC}}.
 #' @param interval.n A numeric value to set sample size.
 #' @param interval.quants If TRUE, calculate quantiles (p10,p25,p50,p75,p90)
-
 #'
 #' @details MF to insert
-
 #'
 #' @return A data frame with samples (rows) by age class (columns)
 #' @export
