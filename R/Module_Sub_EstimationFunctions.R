@@ -310,6 +310,20 @@ sibreg.complex.list <- list(estimator = sibreg.complex.est, datacheck= sibreg.co
 
 #### KALMAN FILTER SIBLING REGRESSION ####
 
+calc_multivariatePI <- function(a.vec, var.vec, n=1000){
+
+	df <- data.frame(a=a.vec, var=var.vec, n)
+	samples <- apply(df, 1, function(x){
+		rnorm(x['n'], mean = x['a'], sd=sqrt(x['var']))
+	})
+
+	cross_a_means <- rowMeans(samples)
+	a.pi <- quantile(cross_a_means, probs = c(0.1, 0.5, 0.9))
+
+	return(list(params.original=df, pi.estimates=a.pi))
+}#END calc_multivariatePI
+
+
 
 sibreg.kalman.datacheck <- function(model.data,tracing=FALSE){
 # verify that all the requires components are there
@@ -352,10 +366,32 @@ names(initial)<-c("b", "ln.sig.e", "ln.sig.w", "mean.a", "var.a", "Ts")
 output<-kf.rw(initial=initial,x=x,y=y)
 
 num.a <- length(output$smoothe.mean.a)
-a.out <- mean(output$smoothe.mean.a[(num.a-settings$int.avg+1):num.a])
 
-coef.kf <- c( a.out , output$b)
-names(coef.kf) <- c("a.kf","b")
+
+a.vec <- output$smoothe.mean.a[(num.a-settings$int.avg+1):num.a]
+var.vec <- output$smoothe.var.a[(num.a-settings$int.avg+1):num.a]
+
+# Using mean a and mean variance across the user-specified time period
+#a.sampled <- quantile(rnorm(1000,mean(a.vec),sqrt(mean(var.vec))),probs=c(0.1,0.9)) 
+#a.lower <- a.sampled[1]
+#a.upper <- a.sampled[2]
+
+
+# fancier version
+a.pi <- calc_multivariatePI(a.vec,var.vec,n=1000)
+#print(a.pi)
+a.lower <- a.pi$pi.estimates[1]
+a.upper <- a.pi$pi.estimates[3]
+
+a.out <- mean(a.vec)
+
+
+coef.kf <- c( a.out , output$b, a.lower,a.upper)
+names(coef.kf) <- c("a.kf","b","a.lower","a.upper")
+
+
+
+
 
 fitted.kf <-  output$smoothe.mean.a + output$b * x
 
@@ -389,7 +425,8 @@ sibreg.kalman.pt.fc <- function(fit.obj, data, settings=NULL){
 	# Need to figure out how to get prediction intervals from the a and b mean and var
 	
 	pt.fc <-  c(unlist(fit.obj$coefficients["a.kf"] + fit.obj$coefficients["b"] * data	),
-				NA,NA)
+				unlist(fit.obj$coefficients["a.lower"] + fit.obj$coefficients["b"] * data	),
+				unlist(fit.obj$coefficients["a.upper"] + fit.obj$coefficients["b"] * data	))
 
 
 	return(pt.fc)

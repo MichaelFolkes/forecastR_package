@@ -43,7 +43,10 @@ if(any(is.null(data),is.null(args.calcfc$fc.yr))){warning("must provide data fil
 #  the retrospective approach.
 
 
+
 data.booted <- createBoots(data, boot.type= args.boot$boot.type, boot.n=args.boot$boot.n, plot.diagnostics=args.boot$plot.diagnostics)
+
+
 
 # NOTE: doing this step below in a loop. it works with lapply as well, but
 #       the speed tests came out thesame, and then have to rearrange the ouputs from a list.
