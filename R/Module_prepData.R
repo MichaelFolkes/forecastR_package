@@ -164,10 +164,18 @@ datafile_new <- cbind(datafile_new,Total = rowSums(datafile_new, na.rm = TRUE))
 # 	names(tmpsub[[idx.use]])[1] <- year.labels[1]
 # 	}
 
-
+#MF: recombining to a single data frame:
+data.original <- lapply(tmpsub, function(x){
+	y.colname <- colnames(x)[3]
+	x$age <- as.integer(substr(y.colname, nchar(y.colname), nchar(y.colname)))
+	colnames(x)[3] <- "value"
+	return(x)
+	})
+data.original <- do.call('rbind', data.original)
+rownames(data.original) <- NULL
 
 # merge into data obj
-data.obj <- list(data=tmpsub , output.pre = datafile_new,specs = list(stockabundance=stockabundance, stockname=stockname, stockspecies=stockspecies , forecastingyear=forecastingyear))
+data.obj <- list(data=tmpsub, data.original=data.original, output.pre = datafile_new,specs = list(stockabundance=stockabundance, stockname=stockname, stockspecies=stockspecies , forecastingyear=forecastingyear))
 
 }#END if(file.type == "OldWithAge")
 
