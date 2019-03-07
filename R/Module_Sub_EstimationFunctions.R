@@ -145,7 +145,7 @@ naive.pt.fc <- function(fit.obj=NULL, data,settings=NULL){
 								pt.fc.out <- c( pt.fc.out, pt.fc.out * c(0.5,1.5))
 							}
 							
-			print(pt.fc.out)				
+			return(pt.fc.out)				
 
 } # end naive.pt.fc
 
@@ -330,10 +330,13 @@ sibreg.kalman.est <- function(model.data,settings=list(int.avg=5),tracing=FALSE)
 # do the estimation (1 instance)
 
 # int.avg = the number of years for averaging the "recent intercept"
+if(!is.null(settings)){
+	if(is.na(settings$int.avg)){ settings$int.avg <- 5 } # if getting NA from GUI, set to same default as NULL would use
+	}
+if(is.null(settings)){ settings$int.avg <- 5  }
+	
 
-if(is.na(settings$int.avg)){ settings$int.avg <- 5 } # if getting NA from GUI, set to same default as NULL would use
-
-if(tracing){print("Starting sibreg.kalman.est() - Placholder only for now")}
+if(tracing){print("Starting sibreg.kalman.est()")}
 
 # using functions provided by Carrie Holt, and adapting her example code
 # keeping the notation consistent for now
@@ -471,7 +474,7 @@ logpower.pt.fc <- function(fit.obj, data, settings = NULL){
             # sigma.squared.mle <- sigma.ols^2 * ((n-2)/n)
 			# round(exp(p + (sigma.squared.mle/2)))
 
-	print(pt.fc)
+	#print(pt.fc)
 	return(pt.fc)
 
 } # end sibreg.pt.fc
@@ -564,7 +567,7 @@ arima.pt.fc <- function(fit.obj, data ,settings=list(BoxCox=FALSE)){
 	#why still need to back convert? The forecast() call already uses lambda???
 	#if(settings$BoxCox){pt.fc <- InvBoxCox(pt.fc,lambda.use) }
 
-	print(pt.fc)
+	#print(pt.fc)
 	return(pt.fc)
 
 } # end arima.pt.fc
@@ -651,7 +654,7 @@ if(!settings$BoxCox){lambda.use <- NULL }
 
 #print(lambda.use)
 #print(pt.fc)
-	print(pt.fc)
+
 	return(pt.fc)
 
 } # end expsmooth.pt.fc

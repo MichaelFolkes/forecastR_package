@@ -36,11 +36,13 @@ calcFC <- function(fit.obj= NULL, data = NULL, fc.yr= NULL, settings = NULL, tra
 
 	# do the point forecast (for all age classes, have set up NoAge to work with the same function)
 
-	out.list[["pt.fc"]] <- sub.pt.fc(fit=fit.obj,data.source=data ,fc.yr = fc.yr,fit.settings=settings)
+	out.list <- sub.pt.fc(fit=fit.obj,data.source=data ,fc.yr = fc.yr,fit.settings=settings)
 
 	return(out.list)
 
 }# end calcFC()
+
+
 
 sub.fcdata <- function(fit,data,fc.yr){
 	# This function uses the fitted model parameters to calculate a forecast
@@ -139,6 +141,9 @@ data <- sub.fcdata(fit = fit , data = data.source, fc.yr=fc.yr)
 out.mat <-  matrix(NA,nrow=1,ncol=length(names(data)),dimnames = list(paste("FC",fc.yr,sep=""),
 						names(data)  ))
 
+out.mat.lower <- out.mat.upper <- out.mat
+						
+						
 # loop through the age classes
 
 for(age.use in names(data)){
@@ -159,23 +164,30 @@ for(age.use in names(data)){
 
 	#print(pt.fc.tmp)
 
-	out.mat[,age.use] <- pt.fc.tmp
-
-
+	out.mat[,age.use] <- pt.fc.tmp[1]
+	out.mat.lower[,age.use] <- pt.fc.tmp[2]
+	out.mat.upper[,age.use] <- pt.fc.tmp[3]
 
 } # end looping through age
 
 
 #### TEMPORARY! See https://github.com/avelez-espino/forecastR_phase4/issues/121
-
+### 
 
 	out.mat[out.mat < 0] <- 0
-
+	out.mat.lower[out.mat.lower < 0] <- 0
+	out.mat.upper[out.mat.upper < 0] <- 0
 
 # add total if have more than 1 age class (1 "age class" typically = "Total")
-if(length(names(data))>1) {out.mat <- cbind(out.mat,Total=rowSums(out.mat)) }
+# NOTE: simply adding up lower and upper bounds for now (See https://github.com/avelez-espino/forecastR_phase4/issues/124)
+if(length(names(data))>1) {
+		out.mat <- cbind(out.mat,Total=rowSums(out.mat)) 
+		out.mat.lower <- cbind(out.mat.lower,Total=rowSums(out.mat.lower)) 
+		out.mat.upper <- cbind(out.mat.upper,Total=rowSums(out.mat.upper)) 		
+		
+		}
 
-return(out.mat)
+return(list(pt.fc = out.mat, lower = out.mat.lower, upper = out.mat.upper))
 
 
 }# end sub.pt.fc

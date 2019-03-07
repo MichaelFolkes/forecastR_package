@@ -132,7 +132,7 @@ fitModelandcalcFC <- function( data = NULL, fitmodel.args =list (model= NULL,  s
 						settings = fitmodel.args$settings,tracing=FALSE)
 
 	 pt.fc <- calcFC(fit.obj= fit.out, data = data, fc.yr= calcfc.args$fc.yr,
-						settings = calcfc.args$settings, tracing=FALSE)
+						settings = calcfc.args$settings, tracing=FALSE)[[1]]
 
 	return(pt.fc)
 
