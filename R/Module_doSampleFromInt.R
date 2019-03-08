@@ -41,7 +41,8 @@ return(int.out)
 sampleFromStats <- function(average, q, p=0.9, n=1000){
 
 	sd.val <- (q-average)/qnorm(p)
-	res <- rnorm(n, average, sd.val)
+	#take a large sample, then will resample postitive values:
+	res <- rnorm(min(c(n*10, 1e6)), average, sd.val)
 	sample.stats <- quantile(res, probs = c(0.1, .5, .9))
 
 	#res.bounded vector has zero as lower bound (but sample.stats values are taken from full distribution)
