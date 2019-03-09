@@ -4,10 +4,22 @@
 
 #' @title Convert from raw data structure
 #'
-#' @param datafile datafile is a csv file in either the old format (withage differs from withoutage) or the new format (all files have the same basic format)
-#' @param out.labels out.labels = "v1" to match what the old code uses for N1,N3,N5. "v2" to match what old code uses for SIMPLESIBREG, SIMPLELOGPOWER. This is necessary to retain old functions where possible. Over the long-term, should fix this!
+#' @param datafile datafile is a csv file in either the old format (withage
+#'   differs from withoutage) or the new format (all files have the same basic
+#'   format)
+#' @param out.labels out.labels = "v1" to match what the old code uses for
+#'   N1,N3,N5. "v2" to match what old code uses for SIMPLESIBREG,
+#'   SIMPLELOGPOWER. This is necessary to retain old functions where possible.
+#'   Over the long-term, should fix this!
 #'
-#' @description  This function takes replicates the steps from two functions datalist.XYZ.pre() datalist.XYZ(). NOTES datafile_extract_age_class() from  simple sibreg does the same as the datalist.XYZ() from the naive models and the pre=code for that which is now in a new function	 datalist.XYZ.pre(). However for SimpleSibReg (and SimpleLogPower?) the labels are different => handling all this in the new prepData() module, with an options on the labels. it also incorporates a new data converter function for old and new data formats
+#' @description  This function takes replicates the steps from two functions
+#'   datalist.XYZ.pre() datalist.XYZ(). NOTES datafile_extract_age_class() from
+#'   simple sibreg does the same as the datalist.XYZ() from the naive models and
+#'   the pre=code for that which is now in a new function	 datalist.XYZ.pre().
+#'   However for SimpleSibReg (and SimpleLogPower?) the labels are different =>
+#'   handling all this in the new prepData() module, with an options on the
+#'   labels. it also incorporates a new data converter function for old and new
+#'   data formats
 #'
 #' @details
 #'
@@ -20,10 +32,10 @@ prepData <- function(datafile,out.labels = "v1"){
 # required columns:
 # Run_Year
 
-# optional columns:
-# Age_Class : This can include just numbers, or numbers and "Total". Both cases are handled.
-# Brood_Year: can either incl BY data, or NA (without age data, or Total rows in withage data)
-# Cov_SomeLabel: As many covariates as you like, all must have the prefix "Cov_" and no other "_"
+# optional columns: Age_Class : This can include just numbers, or numbers and
+# "Total". Both cases are handled. Brood_Year: can either incl BY data, or NA
+# (without age data, or Total rows in withage data) Cov_SomeLabel: As many
+# covariates as you like, all must have the prefix "Cov_" and no other "_"
 
 
 # Check file to identify format
@@ -37,6 +49,7 @@ if(!has.age.data){ file.type <- "WithoutAge"}
 
 cov.list <- names(datafile)[grep("Cov_",names(datafile))]
 #print(cov.list)
+predictor.list <- names(datafile)[grep("pred_",tolower(names(datafile)))]
 
 
 
@@ -67,12 +80,11 @@ if(file.type == "WithoutAge"){
 
 datafile_new <- NA
 
-tmpsub <-  datafile[,c("Run_Year",paste("Average_",stockabundance,sep=""),cov.list)]
-names(tmpsub) <- c("Run_Year","Total",cov.list)
+tmpsub <-  datafile[,c("Run_Year",paste("Average_",stockabundance,sep=""),cov.list, predictor.list)]
+names(tmpsub) <- c("Run_Year","Total",cov.list, predictor.list)
 
 # merge into data obj
-data.obj <- list(data=list(Total=tmpsub) , output.pre = datafile_new,specs = list(stockabundance=stockabundance,
-						stockname=stockname, stockspecies=stockspecies , forecastingyear=forecastingyear))
+data.obj <- list(data=list(Total=tmpsub) , output.pre = datafile_new,specs = list(stockabundance=stockabundance, stockname=stockname, stockspecies=stockspecies , forecastingyear=forecastingyear))
 
 
 }#END file without age classes
@@ -107,7 +119,7 @@ extract_names <- c(year.labels,paste(age.col.prefix,extract_ages,sep=""))
 	#dimnames(tmpsub[[i]])[[2]] <- c(year.labels[2],paste(age.col.prefix,extract_ages[i], sep=""))
 
 tmpsub <- lapply(extract_ages, FUN=function(age, datafile, year.labels){
-	dat.tmp <- datafile[datafile$Age_Class==age, c(year.labels,paste0("Average","_",stockabundance),cov.list)]
+	dat.tmp <- datafile[datafile$Age_Class==age, c(year.labels,paste0("Average","_",stockabundance),cov.list, predictor.list)]
 	colnames(dat.tmp)[3] <- paste0(age.col.prefix, age)
 	return(dat.tmp)
 }, datafile, year.labels)
@@ -152,10 +164,18 @@ datafile_new <- cbind(datafile_new,Total = rowSums(datafile_new, na.rm = TRUE))
 # 	names(tmpsub[[idx.use]])[1] <- year.labels[1]
 # 	}
 
-
+#MF: recombining to a single data frame:
+data.original <- lapply(tmpsub, function(x){
+	y.colname <- colnames(x)[3]
+	x$age <- as.integer(substr(y.colname, nchar(y.colname), nchar(y.colname)))
+	colnames(x)[3] <- "value"
+	return(x)
+	})
+data.original <- do.call('rbind', data.original)
+rownames(data.original) <- NULL
 
 # merge into data obj
-data.obj <- list(data=tmpsub , output.pre = datafile_new,specs = list(stockabundance=stockabundance, stockname=stockname, stockspecies=stockspecies , forecastingyear=forecastingyear))
+data.obj <- list(data=tmpsub, data.original=data.original, output.pre = datafile_new,specs = list(stockabundance=stockabundance, stockname=stockname, stockspecies=stockspecies , forecastingyear=forecastingyear))
 
 }#END if(file.type == "OldWithAge")
 
