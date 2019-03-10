@@ -82,6 +82,7 @@ for(model.name in names(settings.list) ){
 
 	model.fitted <- fitModel(model= model.use, data = dat.prepped$data, settings = settings.use,tracing=FALSE)
 
+	
 	fc.calc <- calcFC(fit.obj= model.fitted,data = dat.prepped$data, fc.yr= dat.prepped$specs$forecastingyear,
 					settings = settings.use, tracing=tracing)
 

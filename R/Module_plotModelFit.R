@@ -47,8 +47,12 @@ if(options$age.which %in% c("all","total")){
 		if(any(grepl("Age",names(fit.obj)))){ ages.list <- names(fit.obj)[grepl("Age",names(fit.obj))]}
 
 		if(!any(grepl("Age",names(fit.obj)))){ ages.list <- "Total" }
+		
+		
 		}
 
+
+		
 if(!(options$age.which %in% c("all","total"))){ages.list <- options$age.which}
 
 if(length(ages.list)==1){mfrow.use <- c(1,1)}
@@ -335,6 +339,20 @@ if(options$plot.which %in% c("all","modeldiagnostic","precheck.report")){
 if(!options$plot.add){par(mfrow=mfrow.use)}
 
 
+
+
+# sib reg only apply if have more than 1 age class
+ages.check <-  length(ages.list) > 1
+
+if(!ages.check){
+
+		# for now don't have any diagnostics yet, so just produce empy plot
+		plot(1:10,1:10,bty="n",type="n",xlab="",ylab="",axes = FALSE);text(5,5,"N/A")
+
+	} # end if have no age data
+
+if(ages.check){
+
 # blank plots for others (none yet)
 if(fit.obj[[2]]$model.type!="SibRegKalman"){
 
@@ -380,6 +398,10 @@ if(kf.have ){
 
 
 } # end if doing SIbRegKalman
+
+
+} # end if have age classes
+
 
 
 } # end if doing modeldiagnostic

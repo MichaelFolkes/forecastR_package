@@ -53,7 +53,11 @@ data.booted <- createBoots(data, boot.type= args.boot$boot.type, boot.n=args.boo
 # lapply(data.booted,  fitModelandcalcFC,fitmodel.args =list(model= "SibRegLogPower", settings = NULL),
 #							calcfc.args = list(fc.yr= 2018,  settings = NULL))
 
-out.mat <- matrix(NA, ncol= length(data$data)+1 ,nrow = length(data.booted), dimnames = list( 1:length(data.booted),c(names(data$data),"Total")))
+
+if(length(names(data$data)) == 1){out.mat.cols <- names(data$data)}
+if(length(names(data$data)) > 1 ){out.mat.cols <- c(names(data$data),"Total")}
+
+out.mat <- matrix(NA, ncol= length(out.mat.cols) ,nrow = length(data.booted), dimnames = list( 1:length(data.booted),out.mat.cols))
 
 
 for(i in 1:length(data.booted)){
@@ -61,6 +65,7 @@ for(i in 1:length(data.booted)){
 }
 
 out.mat <- as.data.frame(round(out.mat))
+
 
 if(plot.out){
 	box.plot(as.list(out.mat),y.lab = "Forecast Abundance",fill.vec = "lightblue" ,border.vec= "darkblue", labels=TRUE,violin=TRUE,y.lim=c(0,max(out.mat)),labels.angle = 0,labels.adj=c(0.5,2))

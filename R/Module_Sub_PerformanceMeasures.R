@@ -4,6 +4,9 @@ resids.pm <- function(input.obj,type="fitted"){
 # if type = "retro", then the input obj has to be the output of doRetro()
 # Details on the wiki: https://github.com/avelez-espino/forecastR_phase4/wiki/App-2-Perf.-Eval.-Details
 
+#NOTE : THIS IS CALLED INSIDE of fitModel(), so inout object only includes 1 element for each age class
+
+
 # To Do:
 # consider adding AIC/BIC: use AIC(lm.fit.obj) for the Sibregs and it's already part of the auto.arima output
 
@@ -50,6 +53,66 @@ for(age.do in ages.list){
   
 
 }
+
+
+# for data files with age, the fit obj does not include fitted and obs values for TOTAL (b/c no model is fitted to the total)
+#  need to construct this here, so that still get PM for the total 
+# WARNING: THIS IS A PATCH FOR NOW, BUT NEED TO RETHINK THE FLOW
+
+if(length(ages.list)>1){
+
+
+out.mat <- cbind(out.mat,Total=rep(NA,6))
+
+# line up all the resids across age classes by run.yrs
+#fit.test.sub <- input.obj[grepl("Age",names(input.obj))] # don't need this, b/c called inside fitModel before fitted.pm element added
+all.yrs <- sort(unique(unlist(lapply(input.obj,function(x){return(x$run.yrs)}))))
+
+age.resids.mat <-  matrix(NA,nrow=length(all.yrs),ncol=length(ages.list),
+						dimnames= list(all.yrs,c(ages.list)))
+
+age.obs.mat <- age.resids.mat
+
+			
+				
+for(age.do in ages.list){
+	
+	resids.age <- input.obj[[age.do]]$fitted.values - input.obj[[age.do]]$obs.values 						
+	resids.yrs <- input.obj[[age.do]]$run.yrs
+	obs.age <- input.obj[[age.do]]$obs.values 
+
+	
+	age.resids.mat[as.character(resids.yrs),age.do] <- resids.age 
+	age.obs.mat[as.character(resids.yrs),age.do] <- obs.age 
+
+	} # end looping through ages
+
+
+# calculate the total resids and total obs as rowSums
+total.resids <- rowSums(age.resids.mat)
+total.obs <- rowSums(age.obs.mat)
+
+keep.idx <- !is.na(total.resids) & !is.na(total.obs)
+
+
+
+# then do the PM calcs on the resids and obs
+# this is replicated code, need to convert into subroutine
+
+	resids.use <- total.resids[keep.idx]
+	obs.use <- total.obs[keep.idx]
+	num.obs <- length(resids.use)
+
+	out.mat["MRE","Total"] <- round(sum(resids.use)/num.obs,2)
+	out.mat["MAE","Total"] <- round(sum(abs(resids.use))/num.obs,2)
+	out.mat["MPE","Total"] <- round(sum(resids.use/obs.use)/num.obs,2)
+	out.mat["MAPE","Total"] <- round(sum(abs(resids.use)/obs.use)/num.obs,2)
+	out.mat["MASE","Total"] <- round(mean(abs(resids.use/mean(abs(diff(obs.use)), na.rm = TRUE)), na.rm = TRUE),2)
+	out.mat["RMSE","Total"] <- round(sqrt(sum(resids.use^2)/num.obs),2)
+
+	
+} # end doing total if more than 1 age class
+
 
 
 
