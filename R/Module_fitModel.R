@@ -22,7 +22,7 @@
 #' @export
 #'
 #' @examples
-fitModel <- function(model= c("Naive","SibRegSimple","SibRegKalman","SibRegLogPower","TimeSeriesArima","TimeSeriesExpSmooth"), data = NULL, settings = NULL,tracing=FALSE){
+fitModel <- function(model= c("Naive", "Mechanistic", "SibRegSimple","SibRegKalman","SibRegLogPower","TimeSeriesArima","TimeSeriesExpSmooth"), data = NULL, settings = NULL,tracing=FALSE){
 # Check inputs
 model <- match.arg(model)
 
@@ -84,6 +84,10 @@ if(!any(is.na(ages))){  # if have age classes, loop through them
 
 } # end if naive variation
 
+
+if(model %in%  c("Mechanistic")){
+
+}#END mechanistic
 
 
 #SIBLING REGRESSION VARIATIONS

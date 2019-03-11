@@ -7,27 +7,42 @@ data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_cov
 
 
 
-forecastMechanistic <- function(data, BYstart){
-browser
+fit.rate <- function(data, BYstart, predictor.colname, method=c("mean", "median")){
+browser()
+	method <- match.arg(method)
 	data.original <- data$data.original
-	predictor.cols <- grep(pattern = "pred_", tolower(colnames(data.original)))
+	#predictor.cols <- grep(pattern = "pred_", tolower(colnames(data.original)))
+	#predictor.colnames <- tolower(colnames(data.original)[predictor.cols])
+	data.original$rate <- data.original$value/data.original[,predictor.colname]
 
-	predictor.colnames <- tolower(colnames(data.original)[predictor.cols])
-	data[predictor.colnames] <- data$value/data.original[,predictor.cols]
-	data.sub <- data[data$Brood_Year>=BYstart, c("age", predictor.colnames)]
+	#data.long <- reshape(data.original[,c("Run_Year", "Brood_Year", "age", "value",  predictor.colname, "rate")], direction = "long", v.names="rate", timevar="variable")
 
-	data.sub.long <- reshape(data.sub, direction = "long", varying=(predictor.colnames), v.names="rate", timevar="variable", times = predictor.colnames)
+	data.sub <- data.original[data.original$Brood_Year>=BYstart, ]
 
-	average.df <- aggregate(rate~age+variable, data = data.sub.long, mean)
-	colnames(average.df)[colnames(average.df)=="rate"] <- "statistic"
+	#data.sub.long <- reshape(data.sub, direction = "long", varying=(predictor.colnames), v.names="rate", timevar="variable", times = predictor.colnames)
 
-	median.df <- aggregate(rate~age+variable, data = data.sub.long, median)
-	colnames(median.df)[colnames(median.df)=="rate"] <- "statistic"
+	stats.df <- aggregate(rate~age, data = data.sub, method)
+	colnames(stats.df)[colnames(stats.df)=="rate"] <- "statistic"
 
-	rate.stats <- list(BYstart=BYstart, stats=list(average=average.df, median=median.df))
+	# median.df <- aggregate(rate~age+variable, data = data.sub.long, median)
+	# colnames(median.df)[colnames(median.df)=="rate"] <- "statistic"
+
+	data.original <- merge(data.original, stats.df)
+	head(data.original)
+
+	data.original$fitted.values <- data.original$statistic * data.original[,predictor.colname]
+	data.original$residuals <- data.original$fitted.values - data.original$value
+
+	#c("Run_Year", "Brood_Year", "age", "value",  predictor.colname, "rate")
+	rate.stats <- list(BYstart=BYstart, stats=list(method=method, stats.df=stats.df))
+  return(rate.stats)
+}#END fit.rate
 
 
-	fc.year <- data.working$specs$forecastingyear
+
+
+forecast.rate <- function(fit.obj, fc.year){
+	#fc.year <- data.working$specs$forecastingyear
 
 	predictors <- lapply(unique(data.working$data$age), function(age,fc.year, data){
 
@@ -55,10 +70,11 @@ browser
 
 	}, predictors.long)
 
-}#END forecastMechanistic
+}#END forecast.rate
+
 
 
 
 data.working <- prepData(data.withage.raw,out.labels="v2")
 BYstart <- 2000
-forecastMechanistic(data = data.working, BYstart = BYstart)
+fit.rate(data = data.working, BYstart = BYstart)
