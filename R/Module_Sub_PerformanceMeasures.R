@@ -20,6 +20,7 @@ resids.pm <- function(input.obj,type="fitted"){
 
 
 # Should streamline the actual calculations between the two options (reorg the inputs first?)
+# AND NEED TO REMOVE THE REPLICATION OF THE ACTUAL PM CALCS
 
 if(type=="fitted"){
 # need to extract from each age class
@@ -40,7 +41,7 @@ for(age.do in ages.list){
 	# because for some models that's in different units (e.g. logpower model)
 	
 	obs.use <- input.obj[[age.do]]$obs.values
-	num.obs <- length(resids.use)
+	num.obs <- sum(!is.na(resids.use))
 
 	out.mat["MRE",age.do] <- round(sum(resids.use)/num.obs,2)
 	out.mat["MAE",age.do] <- round(sum(abs(resids.use))/num.obs,2)
@@ -101,7 +102,7 @@ keep.idx <- !is.na(total.resids) & !is.na(total.obs)
 
 	resids.use <- total.resids[keep.idx]
 	obs.use <- total.obs[keep.idx]
-	num.obs <- length(resids.use)
+	num.obs <- sum(!is.na(resids.use))
 
 	out.mat["MRE","Total"] <- round(sum(resids.use)/num.obs,2)
 	out.mat["MAE","Total"] <- round(sum(abs(resids.use))/num.obs,2)
@@ -126,6 +127,7 @@ if(grepl("retro",type)){
 
 		
 	if(type=="retro1"){  # use all of the retrospective residuals (based on variable number of years used in model fit)
+						# (i.e. min.yrs for the youngest age class
 		resids.use <- input.obj$retro.resids	
 		obs.use <- input.obj$retro.obs
 		}
@@ -134,40 +136,51 @@ if(grepl("retro",type)){
 		resids.use <- input.obj$retro.resids	
 		obs.use <- input.obj$retro.obs
 			num.ages <- dim(input.obj$retro.resids)[2]-1
-			for(i in 1:num.ages){
-					resids.use[1:i,i] <- NA
-					obs.use[1:i,i] <- NA 
-					resids.use[1:i,"Total"] <- NA # once more for the total column
-					obs.use[1:i,"Total"] <- NA  
+			for(i in 2:num.ages){
+					resids.use[1:(i-1),i] <- NA
+					obs.use[1:(i-1),i] <- NA 
+					resids.use[1:(i-1),"Total"] <- NA # once more for the total column
+					obs.use[1:(i-1),"Total"] <- NA  
 					}
 					
 		} 
 		
 			
-	if(type=="retro3"){  # use only years with full data complement AFTER min.yrs
-		idx.use <- dim(input.obj$retro.resids)[2]:dim(input.obj$retro.resids)[1]
+	if(type=="retro3"){  # use only years with full data complement AFTER min.yrs (i.e. min.years for the oldes age class)
+		idx.use <- (dim(input.obj$retro.resids)[2]-1):dim(input.obj$retro.resids)[1] # need the -1 to account for the total
+		
+		
 		resids.use  <-  input.obj$retro.resids[idx.use,,drop=FALSE]  
 		obs.use  <-  input.obj$retro.obs[idx.use,,drop=FALSE]  
 		}		
 	
+	#print("------------------")
+	#print(type)
+	#print(resids.use)
+	#print(obs.use)
 	
-	
-	
-	
-	num.yrs <- dim(resids.use)[1]
+
+	num.yrs <- apply(resids.use,MARGIN=2,FUN=function(x){sum(!is.na(x))})
 	out.mat <- matrix(NA, nrow=6,ncol= dim(resids.use)[2],
 					dimnames = list(c("MRE","MAE","MPE","MAPE","MASE","RMSE"),
-									dimnames(resids.use)[[2]])
-									)
-	
-	out.mat["MRE",] <- round(colSums(resids.use,na.rm=TRUE)/num.yrs,2)
-	out.mat["MAE",] <- round(colSums(abs(resids.use),na.rm=TRUE)/num.yrs,2)
-	out.mat["MPE",] <- round(colSums(resids.use/obs.use,na.rm=TRUE)/num.yrs,2)
-	out.mat["MAPE",] <- round(colSums(abs(resids.use)/obs.use,na.rm=TRUE)/num.yrs,2)
-	out.mat["MASE",] <- round(mean(abs(resids.use/mean(abs(diff(obs.use)), na.rm = TRUE)), na.rm = TRUE),2)
-	out.mat["RMSE",] <- round(sqrt(colSums(resids.use^2,na.rm=TRUE)/num.yrs),2)
+									dimnames(resids.use)[[2]]))
+		
+
 
 	
+	for(i in 1:dim(resids.use)[2]){
+	
+	#print(sum(resids.use[,i],na.rm=TRUE))
+	#print(num.yrs[i])
+	
+	out.mat["MRE",i] <- round(sum(resids.use[,i],na.rm=TRUE)/num.yrs[i],2)
+	out.mat["MAE",i] <- round(sum(abs(resids.use[,i]),na.rm=TRUE)/num.yrs[i],2)
+	out.mat["MPE",i] <- round(sum(resids.use[,i]/obs.use,na.rm=TRUE)/num.yrs[i],2)
+	out.mat["MAPE",i] <- round(sum(abs(resids.use[,i])/obs.use,na.rm=TRUE)/num.yrs[i],2)
+	out.mat["MASE",i] <- round(mean(abs(resids.use[,i]/mean(abs(diff(obs.use[,i])), na.rm = TRUE)), na.rm = TRUE),2)
+	out.mat["RMSE",i] <- round(sqrt(sum(resids.use[,i]^2,na.rm=TRUE)/num.yrs[i]),2)
+
+	} # end loopign through columns
 	
 	}
 	
