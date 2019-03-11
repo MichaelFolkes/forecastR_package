@@ -22,7 +22,7 @@
 #'   list(model.type="Naive",settings=list(avg.yrs=1)), SibRegSimple =
 #'   list(model.type="SibRegSimple",settings=NULL))}
 #'
-#' @return A list is produced. If argument out.type = "short" and do.retro = FALSE, 
+#' @return A list is produced. If argument out.type = "short" and do.retro = FALSE,
 #' then only generate a summary table of point forecasts.
 #'   If out.type = "short" and do.retro= TRUE, then generate 3 versions of
 #'   retrospective summary and array of fitted performance measures. If out.type
@@ -32,8 +32,7 @@
 #' @export
 #'
 #' @examples
-multiFC <- function(data.file, settings.list, do.retro = FALSE, retro.min.yrs=15, out.type=c("short", "full"), 
-			int.type = "None", int.n = 100, boot.type = "meboot", tracing=FALSE){
+multiFC <- function(data.file, settings.list, do.retro = FALSE, retro.min.yrs=15, out.type=c("short", "full"), int.type = "None", int.n = 100, boot.type = "meboot", tracing=FALSE){
 
 ## NEED TO FIX
 # Settings.list -> fit.settings
@@ -55,15 +54,15 @@ ages.list <- names(dat.prepped$data )
 # this way the GUI can still grab the empty array for display
 
 			if(length(ages.list)>1){
-			int.array <- array(NA, dim= c(length(model.list),5,length(ages.list)+1), 
+			int.array <- array(NA, dim= c(length(model.list),5,length(ages.list)+1),
 										dimnames=list(model.list,paste0("p",c(10,25,50,75,90)),c(ages.list,"Total"))
 									)}
-							
+
 			if(length(ages.list)==1){  # for no age data
-			int.array <- array(NA, dim= c(length(model.list),5,1), 
+			int.array <- array(NA, dim= c(length(model.list),5,1),
 										dimnames=list(model.list,paste0("p",c(10,25,50,75,90)),"Total")
-									)}						
-						
+									)}
+
 
 
 for(model.name in names(settings.list) ){
@@ -82,40 +81,40 @@ for(model.name in names(settings.list) ){
 
 	model.fitted <- fitModel(model= model.use, data = dat.prepped$data, settings = settings.use,tracing=FALSE)
 
-	
+
 	fc.calc <- calcFC(fit.obj= model.fitted,data = dat.prepped$data, fc.yr= dat.prepped$specs$forecastingyear,
 					settings = settings.use, tracing=tracing)
 
 	out.list[[model.name]] <- fc.calc
 
-	
-	
+
+
 	if(int.type=="Prediction"){
-	
+
 			int.quants <- doSampleFromInt(fc.obj=fc.calc, interval.n=int.n,interval.quants=TRUE)
-			
+
 			if(tracing){
 			print("prediction quants")
 			print(int.quants)
 			}
 		} # end if prediction interval
-	
-	
+
+
 
 	if(do.retro){
 
-	
-	
+
+
 	 retro.out  <- 	doRetro(model= model.use, data = dat.prepped$data,
 				retro.settings = list(min.yrs=retro.min.yrs),
 				fit.settings = settings.use,
 				fc.settings = settings.use,
 				tracing=tracing,out.type=out.type,
-				interval.n = int.n, 
+				interval.n = int.n,
 				interval.quants = TRUE,
 				pt.fc.in = fc.calc)
-				
-				
+
+
 		if(int.type=="Retrospective"){
 			int.quants <- retro.out$retro.interval
 
@@ -123,20 +122,20 @@ for(model.name in names(settings.list) ){
 				print("retrospective quants")
 				print(int.quants)
 				}
-			
+
 			}
-			
+
 			out.list[[model.name]] <- c(out.list[[model.name]],list(retro=retro.out ))
 
-		
-		
-		
+
+
+
 			} # end if retro interval
 
 
 		if(int.type=="Bootstrap"){
 
-			
+
 			boot.int <- doBoot(data= dat.prepped, args.fitmodel= list(model= model.use, settings = settings.use),
 						args.calcfc = list(fc.yr= dat.prepped$specs$forecastingyear,  settings = settings.use),
 						args.boot = list(boot.type=boot.type, boot.n= int.n , plot.diagnostics=FALSE),
@@ -148,13 +147,13 @@ for(model.name in names(settings.list) ){
 				print("bootstrap quants")
 				print(int.quants)
 				}
-						
-			
+
+
 			} # end if bootstrap interval
 
-			
-if(int.type != "None"){ int.array[model.name,,] <- as.matrix(int.quants) }			
-								
+
+if(int.type != "None"){ int.array[model.name,,] <- as.matrix(int.quants) }
+
 
 }  # end looping through models
 

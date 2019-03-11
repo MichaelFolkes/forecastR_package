@@ -28,16 +28,6 @@ A list of data frames. Each data frame represents the results of each
 \description{
 Calculate age-specific and overall model rank.
 }
-\details{
-Ranking output can be produced in two forms: ordinal (default) and
-  scaled. This is chosen using the argument 'relative.bol'. Ordinal ranking
-  produces estimates, by column, in the form: (first, second, third, ...).
-  Scaled ranking produces values based on relative distance between input
-  data (i.e. performance metric values). Using relative ranking, the best
-  rank value equals zero and the last rank value equals the number of data
-  points being ranked. This approach may better represent results, especially
-  once ranks are averaged to an overall rank estimate.
-}
 \examples{
 \dontrun{
 dat.rank <- apply(dat.arr, 3, function(x){

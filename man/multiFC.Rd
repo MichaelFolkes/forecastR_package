@@ -4,8 +4,9 @@
 \alias{multiFC}
 \title{Process multiple models and produce forecasts with summaries}
 \usage{
-multiFC(data.file, settings.list, do.retro = FALSE, do.boot = FALSE,
-  out.type = c("short", "full"), retro.min.yrs = 15, tracing = FALSE)
+multiFC(data.file, settings.list, do.retro = FALSE, retro.min.yrs = 15,
+  out.type = c("short", "full"), int.type = "None", int.n = 100,
+  boot.type = "meboot", tracing = FALSE)
 }
 \arguments{
 \item{data.file}{The data file read in with \code{read.csv}.}
@@ -14,23 +15,26 @@ multiFC(data.file, settings.list, do.retro = FALSE, do.boot = FALSE,
 
 \item{do.retro}{A Boolean (default is FALSE). Run a retrospective}
 
-\item{do.boot}{A Boolean (default is FALSE). Calculate bootstrap intervals
-(only for the current forecast, not for each retro year).}
+\item{retro.min.yrs}{An integer of length one. Default is 15.}
 
 \item{out.type}{A character vector of length one. The choices are: "short" or
 "full". See value for details.}
 
-\item{retro.min.yrs}{An integer of length one. Default is 15.}
+\item{int.type}{Either "None","Retrospective","Prediction", or "Bootstrap"}
+
+\item{int.n}{number of samples used for the interval calculations}
+
+\item{boot.type}{= "meboot" or "stlboot", only applies if int.type = "Bootstrap"}
 
 \item{tracing}{A Boolean (default is FALSE)}
 }
 \value{
-A list is produced. If argument out.type = "short" and do.boot and
-  do.retro are FALSE, then only generate a summary table of point forecasts.
+A list is produced. If argument out.type = "short" and do.retro = FALSE,
+then only generate a summary table of point forecasts.
   If out.type = "short" and do.retro= TRUE, then generate 3 versions of
   retrospective summary and array of fitted performance measures. If out.type
   ="full" and do.retro= TRUE, then also store the model fits for each retro
-  year. If out.type ="short" and do.boot= TRUE, then TBD. If out.type ="full"
+  year. If out.type ="short" and = TRUE, then TBD. If out.type ="full"
   and do.boot= TRUE, then TBD
 }
 \description{
