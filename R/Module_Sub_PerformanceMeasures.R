@@ -125,18 +125,40 @@ if(grepl("retro",type)){
 # details at https://github.com/avelez-espino/forecastR_phase4/wiki/App-2-Perf.-Eval.-Details
 		
 
+ages.list <- dim(input.obj$retro.resids)[2]
+
+#print(ages.list)
+
+if(length(ages.list)==1){ # if have only 1 1 age class, then all the variations are identical
+			
+					
+		resids.use <- input.obj$retro.resids	
+		obs.use <- input.obj$retro.obs
+				
+		}
+
+
+
+if(length(ages.list)>1){ # if have more than 1 age class, then get alternative options
+		
 		
 	if(type=="retro1"){  # use all of the retrospective residuals (based on variable number of years used in model fit)
 						# (i.e. min.yrs for the youngest age class
+					
 		resids.use <- input.obj$retro.resids	
 		obs.use <- input.obj$retro.obs
+				
 		}
 	
 	if(type=="retro2"){  # for each age class, use all of the retrospective residuals with the constant num input yrs
 		resids.use <- input.obj$retro.resids	
 		obs.use <- input.obj$retro.obs
-			num.ages <- dim(input.obj$retro.resids)[2]-1
-			for(i in 2:num.ages){
+		
+	
+		
+		
+		num.ages <- dim(input.obj$retro.resids)[2]-1
+		for(i in 2:num.ages){
 					resids.use[1:(i-1),i] <- NA
 					obs.use[1:(i-1),i] <- NA 
 					resids.use[1:(i-1),"Total"] <- NA # once more for the total column
@@ -153,6 +175,8 @@ if(grepl("retro",type)){
 		resids.use  <-  input.obj$retro.resids[idx.use,,drop=FALSE]  
 		obs.use  <-  input.obj$retro.obs[idx.use,,drop=FALSE]  
 		}		
+	
+	} # end if have ages
 	
 	#print("------------------")
 	#print(type)
@@ -181,6 +205,9 @@ if(grepl("retro",type)){
 	out.mat["RMSE",i] <- round(sqrt(sum(resids.use[,i]^2,na.rm=TRUE)/num.yrs[i]),2)
 
 	} # end loopign through columns
+	
+
+	
 	
 	}
 	
