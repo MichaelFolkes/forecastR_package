@@ -122,6 +122,8 @@ getRanks <- function(dat,columnToRank=NULL, relative.bol=FALSE){
 #'   getRanks(dat.arr[,,1], columnToRank = 1)
 #' }
 rankModels <- function(dat,columnToRank=NULL, relative.bol=FALSE){
+  
+  
   dat.ranks <- apply(dat,3, function(dat.df){
   colnames(dat.df) <- toupper(colnames(dat.df))
   if(is.null(columnToRank)) columnToRank <- 1:ncol(dat.df)
@@ -161,11 +163,24 @@ return(data.frame(dat.df, dat.ranks))
   age.avg <- lapply(dat.ranks, "[[", "rank.avg")
   age.avg.df <- do.call("cbind", age.avg)
   colnames(age.avg.df) <- paste(colnames(age.avg.df), "rank")
-  rank.sum <- rowSums(age.avg.df)
-  cumulativerank <- data.frame(age.avg.df, rank.sum=rank.sum)
-  cumulativerank <- round(cumulativerank,2)
-  rownames(cumulativerank) <- rownames(dat.ranks[[1]])
+  
+# if have more than 1 column AND 1 of those columns is "Total.rank"
+# then exclude the total column
+if(dim(age.avg.df)[2]>1 & "Total rank" %in% dimnames(age.avg.df)[[2]]){
+				col.excl.idx	<- 	dimnames(age.avg.df)[[2]] == "Total rank"
+				rank.sum <- rowSums(age.avg.df[,!col.excl.idx])
+				} else { rank.sum <- rowSums(age.avg.df)}
+						
 
+
+
+cumulativerank <- data.frame(age.avg.df, rank.sum=rank.sum)
+
+
+
+			cumulativerank <- round(cumulativerank,2)
+  rownames(cumulativerank) <- rownames(dat.ranks[[1]])
+  print(cumulativerank)
   dat.ranks$cumulativerank <- cumulativerank
 
 #find the best model in each age class:
