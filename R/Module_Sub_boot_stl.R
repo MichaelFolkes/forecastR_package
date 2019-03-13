@@ -126,40 +126,44 @@ stlboot <- function (ts, k = 1, test.season = c(TRUE, FALSE), outplot = c(FALSE,
 }
 
 
-#' Seasonal plots with simplistic trend/season tests
+#' @title Seasonal plots with simplistic trend/season tests
 #'
-#' Construct seasonal plots of various styles for a given time series. The series can automatically detrended as needed.
+#' @description Construct seasonal plots of various styles for a given time
+#'   series. The series can automatically detrended as needed.
 #'
 #' @param y input time series. Can be \code{ts} object.
-#' @param m seasonal period. If \code{y} is a \code{ts} object then the default is its frequency.
-#' @param s starting period in the season. If \code{y} is a \code{ts} object then this is picked up from \code{y}.
-#' @param trend if \code{TRUE}, then presence of trend is assumed and removed. If \code{FALSE} no trend is assumed. Use \code{NULL} to identify automatically.
+#' @param m seasonal period. If \code{y} is a \code{ts} object then the default
+#'   is its frequency.
+#' @param s starting period in the season. If \code{y} is a \code{ts} object
+#'   then this is picked up from \code{y}.
+#' @param trend if \code{TRUE}, then presence of trend is assumed and removed.
+#'   If \code{FALSE} no trend is assumed. Use \code{NULL} to identify
+#'   automatically.
 #' @param colour single colour override for plots.
 #' @param alpha significance level for statistical tests.
-#' @param outplot type of seasonal plot
-#' \itemize{
-#' \item{0}{: none.}
-#' \item{1}{: seasonal diagram.}
-#' \item{2}{: seasonal boxplots.}
-#' \item{3}{: seasonal subseries.}
-#' \item{4}{: seasonal distribution.}
-#' \item{5}{: seasonal density.}
-#' }
-#' @param decomposition type of seasonal decomposition. This can be \code{"multiplicative"}, \code{"additive"} or \code{"auto"}. If \code{y} contains non-positive values then this is forced to \code{"additive"}.
-#' @param cma input precalculated level/trend for the analysis. This overrides \code{trend=NULL}.
-#' @param labels external labels for the seasonal periods. Use \code{NULL} for none. If \code{length(labels) < m}, then this input is ignored.
-#' @param ... additional arguments passed to plotting functions. For example, use \code{main=""} to replace the title.
+#' @param outplot type of seasonal plot \itemize{ \item{0}{: none.} \item{1}{:
+#'   seasonal diagram.} \item{2}{: seasonal boxplots.} \item{3}{: seasonal
+#'   subseries.} \item{4}{: seasonal distribution.} \item{5}{: seasonal
+#'   density.} }
+#' @param decomposition type of seasonal decomposition. This can be
+#'   \code{"multiplicative"}, \code{"additive"} or \code{"auto"}. If \code{y}
+#'   contains non-positive values then this is forced to \code{"additive"}.
+#' @param cma input precalculated level/trend for the analysis. This overrides
+#'   \code{trend=NULL}.
+#' @param labels external labels for the seasonal periods. Use \code{NULL} for
+#'   none. If \code{length(labels) < m}, then this input is ignored.
+#' @param ... additional arguments passed to plotting functions. For example,
+#'   use \code{main=""} to replace the title.
 #'
-#' @return An object of class \code{seasexpl} containing:
-#' \itemize{
-#' \item{\code{season}}{: matrix of (detrended) seasonal elements.}
-#' \item{\code{season.exist}}{: \code{TRUE}/\code{FALSE} results of seasonality test.}
-#' \item{\code{season.pval}}{: p-value of seasonality test (Friedman test).}
-#' \item{\code{trend}}{: CMA estimate (using \code{\link{cmav}}) or \code{NULL} if \code{trend=FALSE}.}
-#' \item{\code{trend.exist}}{: \code{TRUE}/\code{FALSE} results of trend test.}
-#' \item{\code{trend.pval}}{: p-value of trend test (Cox-Stuart).}
-#' \item{\code{decomposition}}{: type of decomposition used.}
-#' }
+#' @return An object of class \code{seasexpl} containing: \itemize{
+#'   \item{\code{season}}{: matrix of (detrended) seasonal elements.}
+#'   \item{\code{season.exist}}{: \code{TRUE}/\code{FALSE} results of
+#'   seasonality test.} \item{\code{season.pval}}{: p-value of seasonality test
+#'   (Friedman test).} \item{\code{trend}}{: CMA estimate (using
+#'   \code{cmav}) or \code{NULL} if \code{trend=FALSE}.}
+#'   \item{\code{trend.exist}}{: \code{TRUE}/\code{FALSE} results of trend
+#'   test.} \item{\code{trend.pval}}{: p-value of trend test (Cox-Stuart).}
+#'   \item{\code{decomposition}}{: type of decomposition used.} }
 #'
 #' @author Nikolaos Kourentzes, \email{nikolaos@kourentzes.com}.
 #'
@@ -168,8 +172,11 @@ stlboot <- function (ts, k = 1, test.season = c(TRUE, FALSE), outplot = c(FALSE,
 #' @examples
 #'
 #' @keywords internal
-#' seasplot(referrals,outplot=1)
 #'
+#' @example
+#' \dontrun{
+#' seasplot(referrals,outplot=1)
+#' }
 seasplot <- function(y,m=NULL,s=NULL,trend=NULL,colour=NULL,alpha=0.05,
 										 outplot=c(1,0,2,3,4,5),decomposition=c("multiplicative","additive","auto"),
 										 cma=NULL,labels=NULL,...)
