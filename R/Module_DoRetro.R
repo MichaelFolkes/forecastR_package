@@ -65,8 +65,8 @@ if(option=="retro"){
 #' @export
 #'
 #' @examples
-doRetro <- function(model= NULL, data = NULL, retro.settings = NULL, fit.settings = NULL, 
-		fc.settings = NULL, tracing=FALSE,out.type = c("short", "full") , interval.n = 500, 
+doRetro <- function(model= NULL, data = NULL, retro.settings = NULL, fit.settings = NULL,
+		fc.settings = NULL, tracing=FALSE,out.type = c("short", "full") , interval.n = 500,
 		interval.quants = TRUE,pt.fc.in = NULL){
 # this function runs through a retrospective test
 # (i.e. dynamic retrospective, see https://github.com/avelez-espino/forecastR_phase4/wiki/App-2-Perf.-Eval.-Details)
@@ -141,20 +141,22 @@ for(fc.yr.retro in retro.yrs){
 	#sd.est <-  lapply(as.data.frame(retro.mat.resids),sd,na.rm=TRUE)
 	#errors.sample <- as.data.frame(lapply(sd.est,function(x){sample.raw <- rnorm(interval.n *1.1,0,x);sample.out <- sample.raw[sample.raw<=quantile(sample.raw,probs=0.9)] }))
 	#int.sample <- errors.sample + unlist(lapply(pt.fc.in$pt.fc,FUN=function(x){rep(x,interval.n)})) # creates a vector with n replicates of the pt fc
-	
+
 	# VERSION WITH LOGNORMAL ERRORS (NEED TO DIG INTO BIAS CORRECTION!)
 	sd.est <-  lapply(as.data.frame(log.resids),sd,na.rm=TRUE)
 	errors.sample <- as.data.frame(lapply(sd.est,function(x){sample.raw <- rnorm(interval.n *1.1,0,x);sample.out <- sample.raw[sample.raw<=quantile(sample.raw,probs=0.9)] }))
 	#bias.correction <- lapply(sd.est,FUN=function(x){bias.corr <- (x^2 * ((interval.n-2)/interval.n)) / 2})
 	#errors.corr	 <- errors.sample + unlist(lapply(bias.correction,FUN=function(x){rep(x,interval.n)}))
-	
+
+
+
 	int.sample <- expm1(errors.sample + log1p(unlist(lapply(pt.fc.in$pt.fc,FUN=function(x){rep(x,interval.n)})))) # creates a vector with n replicates of the pt fc
 	int.sample <- round(int.sample)
-	
+
 	# set all negative to 0
-	
+
 	int.sample[int.sample < 0 ] <-  0
-	
+
 	if(interval.quants){ int.out <- as.data.frame(lapply(int.sample,function(x){quantile(x,probs=c(0.1,0.25,0.5,0.75,0.9))}))}
 	if(!interval.quants){  int.out <- int.sample }
 
