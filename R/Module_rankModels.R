@@ -180,7 +180,7 @@ cumulativerank <- data.frame(age.avg.df, rank.sum=rank.sum)
 
 			cumulativerank <- round(cumulativerank,2)
   rownames(cumulativerank) <- rownames(dat.ranks[[1]])
-  print(cumulativerank)
+  #print(cumulativerank)
   dat.ranks$cumulativerank <- cumulativerank
 
 #find the best model in each age class:
