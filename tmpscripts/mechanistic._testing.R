@@ -1,63 +1,9 @@
-# require(forecastR)
+ require(forecastR)
 #
 # data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates.csv", stringsAsFactors = FALSE)
-data.withoutage.raw <- read.csv("inst/extdata/FinalSampleFile_WithoutAge.csv", stringsAsFactors = FALSE)
-
 
 
 #### MECHANISTIC (RATE) ####
-
-# rate.fit <- function(data.use,avg.yrs = 3,method = "classic" ){
-# 	# data.use is named vector of abundances, with names corresponding to run years
-# 	# avg.yrs  is the running avg that gets used (1 = like last year, 3 = avg of last 3 years)
-# 	# method is either:
-# 	#        - "classic":  fitted values are just the running averages, residuals calculated from there
-# 	#        - "lm" : use the lm.fit() function applied to the "data ~ (offset rng avg)"   -> Conceptual idea, Needs review and discussion
-# 	#        - "fcpack" : use the naive() function from the forecast package
-#
-# 	# NOTE: this assumes that the data has already been checked for missing years in naive.datacheck() before
-# 	# being fed into this subroutine.
-#
-# 	# running avg calc is the same for methods "classic" and "lm"
-#
-# 	yrs.in <- as.numeric(names(data.use))
-# 	rng.avg.vals <- stats::filter(data.use, filter=rep(1/avg.yrs,avg.yrs),side=1) # side = 1 means "past-looking rng avg"
-#
-# 	names(rng.avg.vals) <- yrs.in +1
-# 	#print(rng.avg.vals)
-# 	#rng.avg.vals <-  rng.avg.vals[1:(length(rng.avg.vals)-1)] # drop the last element (b/c would be fitted value for yr after data set)
-#
-#
-# 	yrs.out <- yrs.in[yrs.in %in% (yrs.in + avg.yrs)]  # only leave years where you have a rng avg for the year before
-#
-# 	filter.coeff <- avg.yrs
-# 	names(filter.coeff) <- "filter.coeff"
-#
-# 	if(method == "classic"){
-# 		fits.out <-   list(coefficients = filter.coeff, obs.values = data.use[as.character(yrs.out)] ,fitted.values.raw = rng.avg.vals[as.character(yrs.out)],
-# 											 data = data.use, residuals= data.use[as.character(yrs.out)]-rng.avg.vals[as.character(yrs.out)],
-# 											 run.yrs = yrs.out)
-# 	} # end if classic
-#
-# 	if(method == "lm"){
-# 		fits.out <-   list(obs.values = NA ,fitted.values.raw = NA, data = data.use, residuals= NA,
-# 											 run.yrs = yrs.out)
-# 		warning("naive.fit with method = lm not implemented yet")
-# 	} # end if lm()
-#
-#
-# 	if(method == "fcpack"){
-# 		fits.out <-   list(obs.values = NA ,fitted.values.raw = NA, data = data.use, residuals= NA,
-# 											 run.yrs = yrs.out)
-# 		warning("naive.fit with method = fcpack not implemented yet")
-# 	} # end if fcpack
-#
-#
-#
-#
-# 	return(fits.out)
-#
-# }#END rate.fit
 
 
 
@@ -119,82 +65,66 @@ naive.list <- list(estimator = naive.est, datacheck= naive.datacheck, pt.fc =nai
 
 
 
+fit.rate <- function(model.data, BYstart, predictor.colname, method=c("mean", "median")){
+
+ 	method <- match.arg(method)
+
+ 	agecol.ind <- grep(pattern = "Age", colnames(model.data))
+ 	model.data$rate <- model.data[,agecol.ind]/model.data[,predictor.colname]
+
+ 	data.sub <- model.data[model.data$Brood_Year>=BYstart, ]
+
+ 	statistic <- do.call(method, list(data.sub$rate))
+
+ 	model.data$fitted.values <- statistic * model.data[,predictor.colname]
+ 	model.data$residuals <- model.data$fitted.values - model.data[,agecol.ind]
+
+ 	results <- list(model.type = "Mechanistic",formula=paste0(statistic,"*", predictor.colname),var.names = predictor.colname, est.fn = paste0(method,"(rate[BYstart>=", BYstart, "])"), model.fit=statistic, fitted.values = model.data$fitted.values, residuals=model.data$residuals)
+   return(results)
+ }#END fit.rate
 
 
 
-#
-#
-#
-#
-#
-# fit.rate <- function(data, BYstart, predictor.colname, method=c("mean", "median")){
-# browser()
-# 	method <- match.arg(method)
-# 	data.original <- data$data.original
-# 	#predictor.cols <- grep(pattern = "pred_", tolower(colnames(data.original)))
-# 	#predictor.colnames <- tolower(colnames(data.original)[predictor.cols])
-# 	data.original$rate <- data.original$value/data.original[,predictor.colname]
-#
-# 	#data.long <- reshape(data.original[,c("Run_Year", "Brood_Year", "age", "value",  predictor.colname, "rate")], direction = "long", v.names="rate", timevar="variable")
-#
-# 	data.sub <- data.original[data.original$Brood_Year>=BYstart, ]
-#
-# 	#data.sub.long <- reshape(data.sub, direction = "long", varying=(predictor.colnames), v.names="rate", timevar="variable", times = predictor.colnames)
-#
-# 	stats.df <- aggregate(rate~age, data = data.sub, method)
-# 	colnames(stats.df)[colnames(stats.df)=="rate"] <- "statistic"
-#
-# 	# median.df <- aggregate(rate~age+variable, data = data.sub.long, median)
-# 	# colnames(median.df)[colnames(median.df)=="rate"] <- "statistic"
-#
-# 	data.original <- merge(data.original, stats.df)
-# 	head(data.original)
-#
-# 	data.original$fitted.values <- data.original$statistic * data.original[,predictor.colname]
-# 	data.original$residuals <- data.original$fitted.values - data.original$value
-#
-# 	#c("Run_Year", "Brood_Year", "age", "value",  predictor.colname, "rate")
-# 	rate.stats <- list(BYstart=BYstart, stats=list(method=method, stats.df=stats.df))
-#   return(rate.stats)
-# }#END fit.rate
-#
-#
-#
-#
-# forecast.rate <- function(fit.obj, fc.year){
-# 	#fc.year <- data.working$specs$forecastingyear
-#
-# 	predictors <- lapply(unique(data.working$data$age), function(age,fc.year, data){
-#
-# 		broodyear <- fc.year-age
-# 		predictor.cols <- grep(pattern = "pred_", tolower(colnames(data)))
-# 		predictors <- data[data$Brood_Year==broodyear, predictor.cols]
-#
-# 		if(nrow(predictors)==0) predictors[1,1:ncol(predictors)] <- NA
-# 		predictors$age <- age
-# 		predictors[1,]
-#
-# 	}, fc.year, data.working$data)
-#
-# 	predictors.df <- do.call("rbind", predictors)
-# 	colnames(predictors.df) <- tolower(colnames(predictors.df))
-# 	predictors.long <- reshape(predictors.df, direction = "long", varying = list(predictor.colnames), timevar="variable", times = predictor.colnames,  v.names="value")
-# 	predictors.long <- subset(predictors.long, select = -id)
-#
-# 	lapply(rate.stats$stats, function(x, predictors.long){
-#
-# 		dat.tmp <- merge(x, predictors.long)
-# 		dat.tmp$forecast <- dat.tmp$statistic* dat.tmp$value
-# 		dat.tmp.wide <- reshape(dat.tmp[,c("variable", "age", "forecast")], direction = 'wide', timevar = 'variable', idvar = "age")
-# 		return(list(forecast.wide=dat.tmp.wide, forecast.long=dat.tmp))
-#
-# 	}, predictors.long)
-#
-# }#END forecast.rate
-#
-#
-#
 
-# data.working <- prepData(data.withage.raw,out.labels="v2")
-# BYstart <- 2000
-# fit.rate(data = data.working, BYstart = BYstart)
+ forecast.rate <- function(fit.obj, fc.year){
+ 	#fc.year <- data.working$specs$forecastingyear
+
+ 	predictors <- lapply(unique(data.working$data$age), function(age,fc.year, data){
+
+ 		broodyear <- fc.year-age
+ 		predictor.cols <- grep(pattern = "pred_", tolower(colnames(data)))
+ 		predictors <- data[data$Brood_Year==broodyear, predictor.cols]
+
+ 		if(nrow(predictors)==0) predictors[1,1:ncol(predictors)] <- NA
+ 		predictors$age <- age
+ 		predictors[1,]
+
+ 	}, fc.year, data.working$data)
+
+ 	predictors.df <- do.call("rbind", predictors)
+ 	colnames(predictors.df) <- tolower(colnames(predictors.df))
+ 	predictors.long <- reshape(predictors.df, direction = "long", varying = list(predictor.colnames), timevar="variable", times = predictor.colnames,  v.names="value")
+ 	predictors.long <- subset(predictors.long, select = -id)
+
+ 	lapply(rate.stats$stats, function(x, predictors.long){
+
+ 		dat.tmp <- merge(x, predictors.long)
+ 		dat.tmp$forecast <- dat.tmp$statistic* dat.tmp$value
+ 		dat.tmp.wide <- reshape(dat.tmp[,c("variable", "age", "forecast")], direction = 'wide', timevar = 'variable', idvar = "age")
+ 		return(list(forecast.wide=dat.tmp.wide, forecast.long=dat.tmp))
+
+ 	}, predictors.long)
+
+ }#END forecast.rate
+
+
+
+data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates.csv", stringsAsFactors = FALSE)
+
+#FinalSampleFile_WithAge_exclTotal_covariates.csv
+
+data.working <- prepData(data.withage.raw,out.labels="v2")
+BYstart <- 2000
+predictor.colname <- "Pred_Juv_Outmigrants"
+lapply(data.working$data, function(x, BYstart, predictor.colname){fit.rate(model.data = x, BYstart = BYstart, predictor.colname = predictor.colname)}, BYstart, predictor.colname)
+
