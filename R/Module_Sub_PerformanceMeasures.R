@@ -129,8 +129,7 @@ ages.list <- dim(input.obj$retro.resids)[2]
 
 #print(ages.list)
 
-if(length(ages.list)==1){ # if have only 1 1 age class, then all the variations are identical
-			
+if(ages.list==1){ # if have only  1 age class, then all the variations are identical
 					
 		resids.use <- input.obj$retro.resids	
 		obs.use <- input.obj$retro.obs
@@ -139,12 +138,14 @@ if(length(ages.list)==1){ # if have only 1 1 age class, then all the variations 
 
 
 
-if(length(ages.list)>1){ # if have more than 1 age class, then get alternative options
+if(ages.list>1){ # if have more than 1 age class, then get alternative options
 		
+		#print("ages > 1")
 		
 	if(type=="retro1"){  # use all of the retrospective residuals (based on variable number of years used in model fit)
 						# (i.e. min.yrs for the youngest age class
-					
+			
+		#print("r1")
 		resids.use <- input.obj$retro.resids	
 		obs.use <- input.obj$retro.obs
 				
@@ -154,7 +155,7 @@ if(length(ages.list)>1){ # if have more than 1 age class, then get alternative o
 		resids.use <- input.obj$retro.resids	
 		obs.use <- input.obj$retro.obs
 		
-	
+		#print("r2")
 		
 		
 		num.ages <- dim(input.obj$retro.resids)[2]-1
@@ -171,6 +172,7 @@ if(length(ages.list)>1){ # if have more than 1 age class, then get alternative o
 	if(type=="retro3"){  # use only years with full data complement AFTER min.yrs (i.e. min.years for the oldes age class)
 		idx.use <- (dim(input.obj$retro.resids)[2]-1):dim(input.obj$retro.resids)[1] # need the -1 to account for the total
 		
+		#print("r3")
 		
 		resids.use  <-  input.obj$retro.resids[idx.use,,drop=FALSE]  
 		obs.use  <-  input.obj$retro.obs[idx.use,,drop=FALSE]  
@@ -199,8 +201,8 @@ if(length(ages.list)>1){ # if have more than 1 age class, then get alternative o
 	
 	out.mat["MRE",i] <- round(sum(resids.use[,i],na.rm=TRUE)/num.yrs[i],2)
 	out.mat["MAE",i] <- round(sum(abs(resids.use[,i]),na.rm=TRUE)/num.yrs[i],2)
-	out.mat["MPE",i] <- round(sum(resids.use[,i]/obs.use,na.rm=TRUE)/num.yrs[i],2)
-	out.mat["MAPE",i] <- round(sum(abs(resids.use[,i])/obs.use,na.rm=TRUE)/num.yrs[i],2)
+	out.mat["MPE",i] <- round(sum(resids.use[,i]/obs.use[,i],na.rm=TRUE)/num.yrs[i],2)
+	out.mat["MAPE",i] <- round(sum(abs(resids.use[,i])/obs.use[,i],na.rm=TRUE)/num.yrs[i],2)
 	out.mat["MASE",i] <- round(mean(abs(resids.use[,i]/mean(abs(diff(obs.use[,i])), na.rm = TRUE)), na.rm = TRUE),2)
 	out.mat["RMSE",i] <- round(sqrt(sum(resids.use[,i]^2,na.rm=TRUE)/num.yrs[i]),2)
 
