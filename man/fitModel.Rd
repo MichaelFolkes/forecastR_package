@@ -4,9 +4,10 @@
 \alias{fitModel}
 \title{General Model Fitting Functon}
 \usage{
-fitModel(model = c("Naive", "SibRegSimple", "SibRegKalman",
-  "SibRegLogPower", "TimeSeriesArima", "TimeSeriesExpSmooth"),
-  data = NULL, settings = NULL, tracing = FALSE)
+fitModel(model = c("Naive", "Mechanistic", "SibRegSimple",
+  "SibRegKalman", "SibRegLogPower", "TimeSeriesArima",
+  "TimeSeriesExpSmooth"), data = NULL, settings = NULL,
+  tracing = FALSE)
 }
 \arguments{
 \item{model}{A character vector of length one. The name of a model, it has to

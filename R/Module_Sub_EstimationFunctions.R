@@ -144,8 +144,8 @@ naive.pt.fc <- function(fit.obj=NULL, data,settings=NULL){
 								pt.fc.out <- mean(data,na.rm=FALSE)
 								pt.fc.out <- c( pt.fc.out, pt.fc.out * c(0.5,1.5))
 							}
-							
-			return(pt.fc.out)				
+
+			return(pt.fc.out)
 
 } # end naive.pt.fc
 
@@ -154,6 +154,13 @@ naive.pt.fc <- function(fit.obj=NULL, data,settings=NULL){
 # Merge object
 
 naive.list <- list(estimator = naive.est, datacheck= naive.datacheck, pt.fc =naive.pt.fc )
+
+
+
+
+
+
+#### MECHANISTIC (RATE) ####
 
 
 
@@ -205,7 +212,7 @@ sibreg.simple.est <- function(model.data,settings=NULL,tracing=FALSE){
 # Note: settings argument doesn't do anything for now, but it needs to be a placeholder because of the way
 # generic calls are set up to alternative SIbReg models, and the Kalman filter Sib Reg needs settings.
 
-# NOTE: This fits a linear regression through the origin 
+# NOTE: This fits a linear regression through the origin
 # (i.e. intercept set to 0 by specifying "y ~ -1 + x")
 
 if(tracing){print("Starting sibreg.simple.est()")}
@@ -348,7 +355,7 @@ if(!is.null(settings)){
 	if(is.na(settings$int.avg)){ settings$int.avg <- 5 } # if getting NA from GUI, set to same default as NULL would use
 	}
 if(is.null(settings)){ settings$int.avg <- 5  }
-	
+
 
 if(tracing){print("Starting sibreg.kalman.est()")}
 
@@ -372,7 +379,7 @@ a.vec <- output$smoothe.mean.a[(num.a-settings$int.avg+1):num.a]
 var.vec <- output$smoothe.var.a[(num.a-settings$int.avg+1):num.a]
 
 # Using mean a and mean variance across the user-specified time period
-#a.sampled <- quantile(rnorm(1000,mean(a.vec),sqrt(mean(var.vec))),probs=c(0.1,0.9)) 
+#a.sampled <- quantile(rnorm(1000,mean(a.vec),sqrt(mean(var.vec))),probs=c(0.1,0.9))
 #a.lower <- a.sampled[1]
 #a.upper <- a.sampled[2]
 
@@ -421,9 +428,9 @@ sibreg.kalman.pt.fc <- function(fit.obj, data, settings=NULL){
 
 	# don't understand why unlist() is needed here, but without it this
 	# messes up the storage matrix in sub.pt.fc()
-	
+
 	# Need to figure out how to get prediction intervals from the a and b mean and var
-	
+
 	pt.fc <-  c(unlist(fit.obj$coefficients["a.kf"] + fit.obj$coefficients["b"] * data	),
 				unlist(fit.obj$coefficients["a.lower"] + fit.obj$coefficients["b"] * data	),
 				unlist(fit.obj$coefficients["a.upper"] + fit.obj$coefficients["b"] * data	))
@@ -482,7 +489,7 @@ logpower.simple.est <- function(model.data, settings = NULL, tracing=FALSE){
 # Note: settings argument doesn't do anything for now, but it needs to be a placeholder because of the way
 # generic calls are set up to alternative SIbReg models, and the Kalman filter Sib Reg needs settings.
 
-# NOTE: This fits a linear regression WITHOUT forcing the line through the origin 
+# NOTE: This fits a linear regression WITHOUT forcing the line through the origin
 # (i.e. specifying model as "y ~ 1 + x")  (the +1 is just for notation consistency with the simple sib reg model
 
 if(tracing){print("Starting logpower.simple.est()")}
@@ -597,7 +604,7 @@ arima.pt.fc <- function(fit.obj, data ,settings=list(BoxCox=FALSE)){
 	# pt.fc <- as.numeric(predict(fit.obj,n.ahead=1,lambda=lambda.use)$pred  )
 
 	# do it via forecast(), which is the same approach used for exp smooth fc via ets()
-	
+
 	fc.out <- forecast::forecast(fit.obj, h=1,lambda=lambda.use,biasadj=TRUE,level=80)
 	pt.fc <-  as.numeric(c(fc.out$mean,fc.out$lower, fc.out$upper))
 
@@ -684,8 +691,8 @@ if(!settings$BoxCox){lambda.use <- NULL }
 
     fc.out <- forecast::forecast(fit.obj, h=1,lambda=lambda.use,biasadj=TRUE,level=80)
 	pt.fc <-  as.numeric(c(fc.out$mean,fc.out$lower, fc.out$upper))
-	 
-	 
+
+
 	#why still need to back convert? The forecast() call already uses lambda???
 	#if(settings$BoxCox){pt.fc <- InvBoxCox(pt.fc,lambda.use) }
 

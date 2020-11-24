@@ -12,48 +12,52 @@ seasplot(y, m = NULL, s = NULL, trend = NULL, colour = NULL,
 \arguments{
 \item{y}{input time series. Can be \code{ts} object.}
 
-\item{m}{seasonal period. If \code{y} is a \code{ts} object then the default is its frequency.}
+\item{m}{seasonal period. If \code{y} is a \code{ts} object then the default
+is its frequency.}
 
-\item{s}{starting period in the season. If \code{y} is a \code{ts} object then this is picked up from \code{y}.}
+\item{s}{starting period in the season. If \code{y} is a \code{ts} object
+then this is picked up from \code{y}.}
 
-\item{trend}{if \code{TRUE}, then presence of trend is assumed and removed. If \code{FALSE} no trend is assumed. Use \code{NULL} to identify automatically.}
+\item{trend}{if \code{TRUE}, then presence of trend is assumed and removed.
+If \code{FALSE} no trend is assumed. Use \code{NULL} to identify
+automatically.}
 
 \item{colour}{single colour override for plots.}
 
 \item{alpha}{significance level for statistical tests.}
 
-\item{outplot}{type of seasonal plot
-\itemize{
-\item{0}{: none.}
-\item{1}{: seasonal diagram.}
-\item{2}{: seasonal boxplots.}
-\item{3}{: seasonal subseries.}
-\item{4}{: seasonal distribution.}
-\item{5}{: seasonal density.}
-}}
+\item{outplot}{type of seasonal plot \itemize{ \item{0}{: none.} \item{1}{:
+seasonal diagram.} \item{2}{: seasonal boxplots.} \item{3}{: seasonal
+subseries.} \item{4}{: seasonal distribution.} \item{5}{: seasonal
+density.} }}
 
-\item{decomposition}{type of seasonal decomposition. This can be \code{"multiplicative"}, \code{"additive"} or \code{"auto"}. If \code{y} contains non-positive values then this is forced to \code{"additive"}.}
+\item{decomposition}{type of seasonal decomposition. This can be
+\code{"multiplicative"}, \code{"additive"} or \code{"auto"}. If \code{y}
+contains non-positive values then this is forced to \code{"additive"}.}
 
-\item{cma}{input precalculated level/trend for the analysis. This overrides \code{trend=NULL}.}
+\item{cma}{input precalculated level/trend for the analysis. This overrides
+\code{trend=NULL}.}
 
-\item{labels}{external labels for the seasonal periods. Use \code{NULL} for none. If \code{length(labels) < m}, then this input is ignored.}
+\item{labels}{external labels for the seasonal periods. Use \code{NULL} for
+none. If \code{length(labels) < m}, then this input is ignored.}
 
-\item{...}{additional arguments passed to plotting functions. For example, use \code{main=""} to replace the title.}
+\item{...}{additional arguments passed to plotting functions. For example,
+use \code{main=""} to replace the title.}
 }
 \value{
-An object of class \code{seasexpl} containing:
-\itemize{
-\item{\code{season}}{: matrix of (detrended) seasonal elements.}
-\item{\code{season.exist}}{: \code{TRUE}/\code{FALSE} results of seasonality test.}
-\item{\code{season.pval}}{: p-value of seasonality test (Friedman test).}
-\item{\code{trend}}{: CMA estimate (using \code{\link{cmav}}) or \code{NULL} if \code{trend=FALSE}.}
-\item{\code{trend.exist}}{: \code{TRUE}/\code{FALSE} results of trend test.}
-\item{\code{trend.pval}}{: p-value of trend test (Cox-Stuart).}
-\item{\code{decomposition}}{: type of decomposition used.}
-}
+An object of class \code{seasexpl} containing: \itemize{
+  \item{\code{season}}{: matrix of (detrended) seasonal elements.}
+  \item{\code{season.exist}}{: \code{TRUE}/\code{FALSE} results of
+  seasonality test.} \item{\code{season.pval}}{: p-value of seasonality test
+  (Friedman test).} \item{\code{trend}}{: CMA estimate (using
+  \code{cmav}) or \code{NULL} if \code{trend=FALSE}.}
+  \item{\code{trend.exist}}{: \code{TRUE}/\code{FALSE} results of trend
+  test.} \item{\code{trend.pval}}{: p-value of trend test (Cox-Stuart).}
+  \item{\code{decomposition}}{: type of decomposition used.} }
 }
 \description{
-Construct seasonal plots of various styles for a given time series. The series can automatically detrended as needed.
+Construct seasonal plots of various styles for a given time
+  series. The series can automatically detrended as needed.
 }
 \examples{
 
@@ -62,5 +66,4 @@ Construct seasonal plots of various styles for a given time series. The series c
 Nikolaos Kourentzes, \email{nikolaos@kourentzes.com}.
 }
 \keyword{internal}
-\keyword{seasplot(referrals,outplot=1)}
 \keyword{ts}

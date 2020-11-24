@@ -142,8 +142,8 @@ out.mat <-  matrix(NA,nrow=1,ncol=length(names(data)),dimnames = list(paste("FC"
 						names(data)  ))
 
 out.mat.lower <- out.mat.upper <- out.mat
-						
-						
+
+
 # loop through the age classes
 
 for(age.use in names(data)){
@@ -172,7 +172,7 @@ for(age.use in names(data)){
 
 
 #### TEMPORARY! See https://github.com/avelez-espino/forecastR_phase4/issues/121
-### 
+###
 
 	out.mat[out.mat < 0] <- 0
 	out.mat.lower[out.mat.lower < 0] <- 0
@@ -181,10 +181,10 @@ for(age.use in names(data)){
 # add total if have more than 1 age class (1 "age class" typically = "Total")
 # NOTE: simply adding up lower and upper bounds for now (See https://github.com/avelez-espino/forecastR_phase4/issues/124)
 if(length(names(data))>1) {
-		out.mat <- cbind(out.mat,Total=rowSums(out.mat)) 
-		out.mat.lower <- cbind(out.mat.lower,Total=rowSums(out.mat.lower)) 
-		out.mat.upper <- cbind(out.mat.upper,Total=rowSums(out.mat.upper)) 		
-		
+		out.mat <- cbind(out.mat,Total=rowSums(out.mat))
+		out.mat.lower <- cbind(out.mat.lower,Total=rowSums(out.mat.lower))
+		out.mat.upper <- cbind(out.mat.upper,Total=rowSums(out.mat.upper))
+
 		}
 
 return(list(pt.fc = out.mat, lower = out.mat.lower, upper = out.mat.upper))
@@ -197,6 +197,15 @@ return(list(pt.fc = out.mat, lower = out.mat.lower, upper = out.mat.upper))
 
 
 
+#' yrs.extract
+#'
+#' @param mat.in
+#' @param col.use
+#'
+#' @return
+#' @export
+#'
+#' @examples
 yrs.extract <- function(mat.in,col.use="Run_Year"){
 	# used inside of retrospective piece
 			range.out <- range(mat.in[,col.use])

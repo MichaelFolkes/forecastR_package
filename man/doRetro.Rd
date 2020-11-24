@@ -7,7 +7,7 @@
 doRetro(model = NULL, data = NULL, retro.settings = NULL,
   fit.settings = NULL, fc.settings = NULL, tracing = FALSE,
   out.type = c("short", "full"), interval.n = 500,
-  interval.quants = TRUE, pt.fc = NULL)
+  interval.quants = TRUE, pt.fc.in = NULL)
 }
 \arguments{
 \item{model}{A character vector of length one. It is the model name and must match one of the model names in the \code{estimation.functions} list object.}
