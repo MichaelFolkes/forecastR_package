@@ -117,14 +117,15 @@
 #'   str(dat.rank)
 #'
 #'   #rank by column name
-#'   getRanks(dat.arr[,,1], columnToRank = "MRE")
+#'   rankModels(dat.arr[,,1], columnToRank = "MRE")
 #'   #rank by column index
-#'   getRanks(dat.arr[,,1], columnToRank = 1)
+#'   rankModels(dat.arr[,,1], columnToRank = 1)
 #' }
 rankModels <- function(dat,columnToRank=NULL, relative.bol=FALSE){
-  
-  
+
+
   dat.ranks <- apply(dat,3, function(dat.df){
+
   colnames(dat.df) <- toupper(colnames(dat.df))
   if(is.null(columnToRank)) columnToRank <- 1:ncol(dat.df)
 
@@ -164,7 +165,7 @@ return(data.frame(dat.df, dat.ranks))
   age.avg.df <- do.call("cbind", age.avg)
   colnames(age.avg.df) <- paste(colnames(age.avg.df), "rank")
 
-  
+
 # if have more than 1 column AND 1 of those columns is "Total.rank"
 # then exclude the total column
 if(dim(age.avg.df)[2]>1 & "Total rank" %in% dimnames(age.avg.df)[[2]]){

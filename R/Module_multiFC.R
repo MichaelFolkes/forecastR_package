@@ -32,7 +32,7 @@
 #' @export
 #'
 #' @examples
-multiFC <- function(data.file, settings.list, do.retro = FALSE, retro.min.yrs=15, out.type=c("short", "full"), int.type = "None", int.n = 100, boot.type = "meboot", tracing=FALSE){
+multiFC <- function(data.file, settings.list, do.retro = FALSE, retro.min.yrs=15, out.type=c("short", "full"), int.type = c("None","Retrospective","Prediction", "Bootstrap"), int.n = 100, boot.type = "meboot", tracing=FALSE){
 
 ## NEED TO FIX
 # Settings.list -> fit.settings
@@ -156,6 +156,7 @@ if(int.type != "None"){ int.array[model.name,,] <- as.matrix(int.quants) }
 
 
 }  # end looping through models
+
 
 
 # create a summary array of all the point forecasts and quantiles

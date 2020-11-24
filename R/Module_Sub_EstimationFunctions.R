@@ -139,9 +139,9 @@ naive.pt.fc <- function(fit.obj=NULL, data,settings=NULL){
 
 # How to get prediction intervals for naive? See https://github.com/avelez-espino/forecastR_phase4/issues/125
 
-			if(length(data)>1){	pt.fc.out <- c(mean(data,na.rm=FALSE),unlist(quantile(data,probs=c(0.1,0.9),na.rm=FALSE)) ) }
+			if(length(data)>1){	pt.fc.out <- c(mean(data,na.rm=TRUE),unlist(quantile(data,probs=c(0.1,0.9),na.rm=TRUE)) ) }
 			if(length(data)==1){
-								pt.fc.out <- mean(data,na.rm=FALSE)
+								pt.fc.out <- mean(data,na.rm=TRUE)
 								pt.fc.out <- c( pt.fc.out, pt.fc.out * c(0.5,1.5))
 							}
 
@@ -220,6 +220,7 @@ if(tracing){print("Starting sibreg.simple.est()")}
 
 sibreg.formula <-  paste(names(model.data)[1], " ~ -1 + ",names(model.data)[2])
 model.fit <- lm.fit(formula.use = sibreg.formula ,data.use=model.data)
+
 return(c(list(model.type = "SibRegSimple",formula=sibreg.formula,var.names = names(model.data)[2],  est.fn = "lm()"),
 					model.fit,list(fitted.values = model.fit$fitted.values.raw) ))
 

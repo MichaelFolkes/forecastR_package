@@ -1,7 +1,7 @@
 
 data.extract <- function(data,yrs,option="obs"){
 # should merge this with the data.sub() routine
-
+#browser()
 if(option=="obs"){
 # extracts observed values for the resid calcs
 # in this case, yrs is a vector with all the years to be included ("Run_Year")
@@ -41,7 +41,7 @@ if(option=="retro"){
 } # end if option = "retro"
 
 
-
+#browser()
 	return(out.obj)
 }
 
@@ -127,7 +127,7 @@ for(fc.yr.retro in retro.yrs){
 
   retro.mat.fc[paste("FC",fc.yr.retro,sep=""),] <- fc.calc$pt.fc
  }
-
+#browser()
 	retro.mat.obs <- data.extract(data = data ,yrs = retro.yrs,option="obs" )
 
 	retro.mat.resids <- retro.mat.fc - retro.mat.obs
@@ -141,7 +141,7 @@ for(fc.yr.retro in retro.yrs){
 	#sd.est <-  lapply(as.data.frame(retro.mat.resids),sd,na.rm=TRUE)
 	#errors.sample <- as.data.frame(lapply(sd.est,function(x){sample.raw <- rnorm(interval.n *1.1,0,x);sample.out <- sample.raw[sample.raw<=quantile(sample.raw,probs=0.9)] }))
 	#int.sample <- errors.sample + unlist(lapply(pt.fc.in$pt.fc,FUN=function(x){rep(x,interval.n)})) # creates a vector with n replicates of the pt fc
-
+#browser()
 	# VERSION WITH LOGNORMAL ERRORS (NEED TO DIG INTO BIAS CORRECTION!)
 	sd.est <-  lapply(as.data.frame(log.resids),sd,na.rm=TRUE)
 	errors.sample <- as.data.frame(lapply(sd.est,function(x){sample.raw <- rnorm(interval.n *1.1,0,x);sample.out <- sample.raw[sample.raw<=quantile(sample.raw,probs=0.9)] }))
