@@ -16,6 +16,9 @@ N1,N3,N5. "v2" to match what old code uses for SIMPLESIBREG,
 SIMPLELOGPOWER. This is necessary to retain old functions where possible.
 Over the long-term, should fix this!}
 }
+\value{
+
+}
 \description{
 This function takes replicates the steps from two functions
   datalist.XYZ.pre() datalist.XYZ(). NOTES datafile_extract_age_class() from

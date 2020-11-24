@@ -36,5 +36,6 @@ Imports: forecast,
     rmarkdown,
     stringi   
 VignetteBuilder: knitr
+Encoding: UTF-8
 Date: 2019-02-18 17:11:41 PDT
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.1
