@@ -4,11 +4,17 @@
 \alias{plotModelFit}
 \title{Plot a model fit...}
 \usage{
-plotModelFit(fit.obj, options = list(plot.which = "all", age.which =
-  "all", plot.add = FALSE), fc.add = NULL)
+plotModelFit(
+  fit.obj,
+  options = list(plot.which = "all", age.which = "all", plot.add = FALSE),
+  fc.add = NULL
+)
 }
 \arguments{
 \item{fc.add}{}
+}
+\value{
+
 }
 \description{
 Plot a model fit...

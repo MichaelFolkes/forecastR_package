@@ -4,11 +4,27 @@
 \alias{bootSeries}
 \title{Create bootstrap matrix from a single series}
 \usage{
-bootSeries(series, boot.type = c("meboot", "stlboot"), boot.n = 1000,
-  plot.diagnostics = FALSE, plot.type = c("all", "sample"))
+bootSeries(
+  series,
+  boot.type = c("meboot", "stlboot"),
+  boot.n = 1000,
+  plot.diagnostics = FALSE,
+  plot.type = c("all", "sample")
+)
 }
 \arguments{
-\item{plot.type}{}
+\item{series}{some text}
+
+\item{boot.type}{some text}
+
+\item{boot.n}{some text}
+
+\item{plot.diagnostics}{some text}
+
+\item{plot.type}{some text}
+}
+\value{
+
 }
 \description{
 Create bootstrap matrix from a single series
