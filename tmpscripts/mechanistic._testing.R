@@ -14,7 +14,7 @@ rate.datacheck <- function(model.data,tracing=FALSE){
 	if(tracing){print("Starting mechanistic.datacheck() - Placeholder only for now")}
 
 
-	# NA values a problem? -> don't think see, need to test
+	# NA values a problem? -> don't think, need to test
 	# Missing years a problem? -> not likely
 	# Zero values a problem? -> if in denominator yes!
 
@@ -45,7 +45,7 @@ rate.pt.fc <- function(fit.obj=NULL, data,settings=NULL){
 	# data = vector of N years, as pre-filtered by the sub.fcdata() subroutine
 	# current setting: if ANY of the input values are NA, then the pt fc is NA
 
-	# How to get prediction intervals for naive? See https://github.com/avelez-espino/forecastR_phase4/issues/125
+	# How to get prediction intervals for rate model? See https://github.com/avelez-espino/forecastR_phase4/issues/125
 
 	if(length(data)>1){	pt.fc.out <- c(mean(data,na.rm=FALSE),unlist(quantile(data,probs=c(0.1,0.9),na.rm=FALSE)) ) }
 	if(length(data)==1){
@@ -61,11 +61,11 @@ rate.pt.fc <- function(fit.obj=NULL, data,settings=NULL){
 
 # Merge object
 
-naive.list <- list(estimator = naive.est, datacheck= naive.datacheck, pt.fc =naive.pt.fc )
+rate.list <- list(estimator = rate.est, datacheck= rate.datacheck, pt.fc =rate.pt.fc )
 
 
 
-fit.rate <- function(model.data, BYstart, predictor.colname, method=c("mean", "median")){
+rate.fit <- function(model.data, BYstart, predictor.colname, method=c("mean", "median")){
 
  	method <- match.arg(method)
 
@@ -82,6 +82,11 @@ fit.rate <- function(model.data, BYstart, predictor.colname, method=c("mean", "m
  	results <- list(model.type = "Mechanistic",formula=paste0(statistic,"*", predictor.colname),var.names = predictor.colname, est.fn = paste0(method,"(rate[BYstart>=", BYstart, "])"), model.fit=statistic, fitted.values = model.data$fitted.values, residuals=model.data$residuals)
    return(results)
  }#END fit.rate
+
+
+
+
+################################################
 
 
 
@@ -126,5 +131,5 @@ data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_cov
 data.working <- prepData(data.withage.raw,out.labels="v2")
 BYstart <- 2000
 predictor.colname <- "Pred_Juv_Outmigrants"
-lapply(data.working$data, function(x, BYstart, predictor.colname){fit.rate(model.data = x, BYstart = BYstart, predictor.colname = predictor.colname)}, BYstart, predictor.colname)
+lapply(data.working$data, function(x, BYstart, predictor.colname){rate.fit(model.data = x, BYstart = BYstart, predictor.colname = predictor.colname)}, BYstart, predictor.colname)
 

@@ -139,6 +139,8 @@ naive.pt.fc <- function(fit.obj=NULL, data,settings=NULL){
 
 # How to get prediction intervals for naive? See https://github.com/avelez-espino/forecastR_phase4/issues/125
 
+# Shouldn't this use predict() and fitobj? See https://github.com/MichaelFolkes/forecastR_package/issues/5
+
 			if(length(data)>1){	pt.fc.out <- c(mean(data,na.rm=FALSE),unlist(quantile(data,probs=c(0.1,0.9),na.rm=FALSE)) ) }
 			if(length(data)==1){
 								pt.fc.out <- mean(data,na.rm=FALSE)
