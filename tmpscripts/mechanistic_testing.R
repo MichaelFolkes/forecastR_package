@@ -7,7 +7,7 @@
 
 
 
-rate.datacheck <- function(model.data,tracing=FALSE){
+rate.datacheck <- function(data.use,tracing=FALSE){
 	# verify that all the required components are there
 	# and check for any special values that might crash the estimate
 
@@ -19,22 +19,29 @@ rate.datacheck <- function(model.data,tracing=FALSE){
 	# Zero values a problem? -> if in denominator yes!
 
 	# just a placholder step
-	tmp.out <- range(model.data)
+	tmp.out <- range(data.use)
 
 	return(tmp.out)
 
 }#END rate.datacheck
 
 
-rate.est <- function(model.data,avg.yrs, method=c("mean", "median"), tracing=FALSE){
+rate.est <- function(data.use,avg.yrs, method=c("mean", "median"), tracing=FALSE){
 	# do the estimation (1 instance)
-	# model.data format required as per preamble in naive.fit() subroutine above
+	# data.use format required as per preamble in naive.fit() subroutine above
 
 	if(tracing){print("Starting rate.est()")}
 
-	model.fit <- rate.fit(data.use=model.data,avg.yrs = avg.yrs, method = method)
+	model.fit <- rate.fit(data.use=data.use,avg.yrs = avg.yrs, method = method)
 
 	return(c(list(model.type = "Mechanistic",formula=paste("y = avg(y in",avg.yrs,"previous years)"), var.names = "abd" , est.fn = "classic"), model.fit,list(fitted.values = model.fit$fitted.values.raw) ))
+
+	results <- c()
+
+ c(list(model.type = "Naive",formula=paste("y = avg(y in",avg.yrs,"previous years)"), var.names = "abd" , est.fn = "classic"), model.fit,list(fitted.values = model.fit$fitted.values.raw) )
+
+	return(results)
+
 
 }#END rate.est
 
@@ -65,33 +72,47 @@ rate.list <- list(estimator = rate.est, datacheck= rate.datacheck, pt.fc =rate.p
 
 
 
+<<<<<<< HEAD
 rate.fit <- function(model.data, BYstart, predictor.colname, method=c("mean", "median")){
 
+#browser()
+
  	method <- match.arg(method)
+ 	yrs.out <- NA
 
- 	agecol.ind <- grep(pattern = "Age", colnames(model.data))
- 	model.data$rate <- model.data[,agecol.ind]/model.data[,predictor.colname]
+ 	agecol.ind <- grep(pattern = "Age", colnames(data.use))
+ 	data.use$rate <- data.use[,agecol.ind]/data.use[,predictor.colname]
 
- 	data.sub <- model.data[model.data$Brood_Year>=BYstart, ]
+ 	data.sub <- data.use[data.use$Brood_Year>=BYstart, ]
 
  	statistic <- do.call(method, list(data.sub$rate))
 
- 	model.data$fitted.values <- statistic * model.data[,predictor.colname]
- 	model.data$residuals <- model.data$fitted.values - model.data[,agecol.ind]
+ 	data.use$fitted.values <- statistic * data.use[,predictor.colname]
+ 	data.use$residuals <- data.use$fitted.values - data.use[,agecol.ind]
 
- 	results <- list(model.type = "Mechanistic",formula=paste0(statistic,"*", predictor.colname),var.names = predictor.colname, est.fn = paste0(method,"(rate[BYstart>=", BYstart, "])"), model.fit=statistic, fitted.values = model.data$fitted.values, residuals=model.data$residuals)
-   return(results)
- }#END fit.rate
+ 	model.fit <- list(coefficients = statistic, obs.values = data.use[,agecol.ind] ,fitted.values.raw = data.use$fitted.values, data = data.use, residuals= data.use$residuals, run.yrs = yrs.out)
+
+ 	results <- c(list(model.type = "Mechanistic",formula=paste0(statistic,"*", predictor.colname),var.names = predictor.colname, est.fn = paste0(method,"(rate[BYstart>=", BYstart, "])")), model.fit=model.fit, list(fitted.values = data.use$fitted.values))
+
+ 		#c(list(model.type = "Naive",formula=paste("y = avg(y in",avg.yrs,"previous years)"), var.names = "abd" , est.fn = "classic"), model.fit,list(fitted.values = model.fit$fitted.values.raw) )
+
+ 	return(results)
+ }#END rate.fit
+
 
 
 
 
 ################################################
+# USE THIS AS THE STARTING POINT, BUT BUILD IT INTO fitModel() and calcFC() functions
 
 
 
+# forecast.rate <- function(fit.obj, fc.year){
 
- forecast.rate <- function(fit.obj, fc.year){
+
+forecast.rate <- function(fit.obj, data, data.settings=NULL){
+
  	#fc.year <- data.working$specs$forecastingyear
 
  	predictors <- lapply(unique(data.working$data$age), function(age,fc.year, data){
@@ -123,7 +144,7 @@ rate.fit <- function(model.data, BYstart, predictor.colname, method=c("mean", "m
  }#END forecast.rate
 
 
-
+require(forecastR)
 data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates.csv", stringsAsFactors = FALSE)
 
 #FinalSampleFile_WithAge_exclTotal_covariates.csv
@@ -131,5 +152,16 @@ data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_cov
 data.working <- prepData(data.withage.raw,out.labels="v2")
 BYstart <- 2000
 predictor.colname <- "Pred_Juv_Outmigrants"
+
 lapply(data.working$data, function(x, BYstart, predictor.colname){rate.fit(model.data = x, BYstart = BYstart, predictor.colname = predictor.colname)}, BYstart, predictor.colname)
+
+
+fit.obj <- fit.rate(data.use = data.working$data$`Age 3`, BYstart = BYstart, predictor.colname = predictor.colname)
+
+forecastR:::sub.fcdata(fit = fit.obj, data = data.working$data$`Age 3`, fc.yr = 2017)
+tail(data.working$data$`Age 3`)
+forecast.rate(fit.obj = fit.obj, fc.year = data.working$specs$forecastingyear)
+
+lapply(data.working$data, function(x, BYstart, predictor.colname){fit.rate(data.use = x, BYstart = BYstart, predictor.colname = predictor.colname)}, BYstart, predictor.colname)
+
 

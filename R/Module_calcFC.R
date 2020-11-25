@@ -160,6 +160,7 @@ for(age.use in names(data)){
 	#print(model.type)
 	#print(data[[age.use]])
 	#print(fit.settings)
+#	browser()
 	pt.fc.tmp <-  estimation.functions[[model.type]]$pt.fc(fit.obj=fit.obj, data = data[[age.use]],settings=fit.settings)
 
 	#print(pt.fc.tmp)
