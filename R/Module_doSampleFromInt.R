@@ -23,7 +23,10 @@ for(age.use in age.classes){
 	int.sample[[age.use]] <- results$results
 	}
 
-int.sample <- round(as.data.frame(int.sample))
+#int.sample <- round(as.data.frame(int.sample))
+int.sample <- (as.data.frame(int.sample))
+
+
 
 if(interval.quants){
 	int.out <- as.data.frame(lapply(int.sample,function(x){quantile(x,probs=c(0.1,0.25,0.5,0.75,0.9))}))
