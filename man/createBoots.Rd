@@ -4,11 +4,24 @@
 \alias{createBoots}
 \title{Bootstrap and reformat raw data}
 \usage{
-createBoots(dat.prepped, boot.type = c("meboot", "stlboot"),
-  boot.n = 1000, plot.diagnostics = FALSE)
+createBoots(
+  dat.prepped,
+  boot.type = c("meboot", "stlboot"),
+  boot.n = 1000,
+  plot.diagnostics = FALSE
+)
 }
 \arguments{
-\item{plot.diagnostics}{}
+\item{dat.prepped}{some text}
+
+\item{boot.type}{some text}
+
+\item{boot.n}{some text}
+
+\item{plot.diagnostics}{some text}
+}
+\value{
+
 }
 \description{
 Bootstrap and reformat raw data

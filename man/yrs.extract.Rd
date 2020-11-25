@@ -9,6 +9,9 @@ yrs.extract(mat.in, col.use = "Run_Year")
 \arguments{
 \item{col.use}{}
 }
+\value{
+
+}
 \description{
 yrs.extract
 }

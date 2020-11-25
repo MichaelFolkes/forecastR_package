@@ -26,7 +26,10 @@ A list of data frames. Each data frame represents the results of each
   performance metric and overall average.
 }
 \description{
-Calculate age-specific and overall model rank.
+
+}
+\details{
+
 }
 \examples{
 \dontrun{

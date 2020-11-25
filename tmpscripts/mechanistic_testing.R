@@ -14,7 +14,7 @@ rate.datacheck <- function(data.use,tracing=FALSE){
 	if(tracing){print("Starting mechanistic.datacheck() - Placeholder only for now")}
 
 
-	# NA values a problem? -> don't think see, need to test
+	# NA values a problem? -> don't think, need to test
 	# Missing years a problem? -> not likely
 	# Zero values a problem? -> if in denominator yes!
 
@@ -52,7 +52,7 @@ rate.pt.fc <- function(fit.obj=NULL, data,settings=NULL){
 	# data = vector of N years, as pre-filtered by the sub.fcdata() subroutine
 	# current setting: if ANY of the input values are NA, then the pt fc is NA
 
-	# How to get prediction intervals for naive? See https://github.com/avelez-espino/forecastR_phase4/issues/125
+	# How to get prediction intervals for rate model? See https://github.com/avelez-espino/forecastR_phase4/issues/125
 
 	if(length(data)>1){	pt.fc.out <- c(mean(data,na.rm=FALSE),unlist(quantile(data,probs=c(0.1,0.9),na.rm=FALSE)) ) }
 	if(length(data)==1){
@@ -68,12 +68,15 @@ rate.pt.fc <- function(fit.obj=NULL, data,settings=NULL){
 
 # Merge object
 
-naive.list <- list(estimator = naive.est, datacheck= naive.datacheck, pt.fc =naive.pt.fc )
+rate.list <- list(estimator = rate.est, datacheck= rate.datacheck, pt.fc =rate.pt.fc )
 
 
 
-fit.rate <- function(data.use, BYstart, predictor.colname, method=c("mean", "median")){
+<<<<<<< HEAD
+rate.fit <- function(model.data, BYstart, predictor.colname, method=c("mean", "median")){
+
 #browser()
+
  	method <- match.arg(method)
  	yrs.out <- NA
 
@@ -94,12 +97,22 @@ fit.rate <- function(data.use, BYstart, predictor.colname, method=c("mean", "med
  		#c(list(model.type = "Naive",formula=paste("y = avg(y in",avg.yrs,"previous years)"), var.names = "abd" , est.fn = "classic"), model.fit,list(fitted.values = model.fit$fitted.values.raw) )
 
  	return(results)
- }#END fit.rate
+ }#END rate.fit
 
 
+
+
+
+################################################
+# USE THIS AS THE STARTING POINT, BUT BUILD IT INTO fitModel() and calcFC() functions
+
+
+
+# forecast.rate <- function(fit.obj, fc.year){
 
 
 forecast.rate <- function(fit.obj, data, data.settings=NULL){
+
  	#fc.year <- data.working$specs$forecastingyear
 
  	predictors <- lapply(unique(data.working$data$age), function(age,fc.year, data){
@@ -140,6 +153,9 @@ data.working <- prepData(data.withage.raw,out.labels="v2")
 BYstart <- 2000
 predictor.colname <- "Pred_Juv_Outmigrants"
 
+lapply(data.working$data, function(x, BYstart, predictor.colname){rate.fit(model.data = x, BYstart = BYstart, predictor.colname = predictor.colname)}, BYstart, predictor.colname)
+
+
 fit.obj <- fit.rate(data.use = data.working$data$`Age 3`, BYstart = BYstart, predictor.colname = predictor.colname)
 
 forecastR:::sub.fcdata(fit = fit.obj, data = data.working$data$`Age 3`, fc.yr = 2017)
@@ -147,4 +163,5 @@ tail(data.working$data$`Age 3`)
 forecast.rate(fit.obj = fit.obj, fc.year = data.working$specs$forecastingyear)
 
 lapply(data.working$data, function(x, BYstart, predictor.colname){fit.rate(data.use = x, BYstart = BYstart, predictor.colname = predictor.colname)}, BYstart, predictor.colname)
+
 

@@ -5,11 +5,11 @@
 
 #' @title Create bootstrap matrix from a single series
 #'
-#' @param series
-#' @param boot.type
-#' @param boot.n
-#' @param plot.diagnostics
-#' @param plot.type
+#' @param series some text
+#' @param boot.type some text
+#' @param boot.n some text
+#' @param plot.diagnostics some text
+#' @param plot.type some text
 #'
 #' @return
 #' @export
@@ -91,10 +91,10 @@ return(list(series.original = series, series.boot = mat.out))
 
 #' Bootstrap and reformat raw data
 #'
-#' @param dat.prepped
-#' @param boot.type
-#' @param boot.n
-#' @param plot.diagnostics
+#' @param dat.prepped some text
+#' @param boot.type some text
+#' @param boot.n some text
+#' @param plot.diagnostics some text
 #'
 #' @return
 #' @export

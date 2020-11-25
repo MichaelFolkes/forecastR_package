@@ -4,8 +4,13 @@
 \alias{calcFC}
 \title{Calculate a forecast from a single statistical model}
 \usage{
-calcFC(fit.obj = NULL, data = NULL, fc.yr = NULL, settings = NULL,
-  tracing = FALSE)
+calcFC(
+  fit.obj = NULL,
+  data = NULL,
+  fc.yr = NULL,
+  settings = NULL,
+  tracing = FALSE
+)
 }
 \arguments{
 \item{fit.obj}{A list, created by \code{\link{fitModel}}, with model fitting
@@ -19,6 +24,9 @@ details for each age class.}
 \item{settings}{A list. The model-specific list of settings used in \code{\link{fitModel}}.}
 
 \item{tracing}{A Boolean. Default is FALSE}
+}
+\value{
+
 }
 \description{
 Calculate a forecast from a single statistical model

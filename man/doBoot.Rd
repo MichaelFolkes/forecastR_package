@@ -4,10 +4,15 @@
 \alias{doBoot}
 \title{Bootstrap to get a forecast interval}
 \usage{
-doBoot(data, args.fitmodel = list(model = "Naive", settings =
-  list(avg.yrs = 3)), args.calcfc = list(fc.yr = NULL, settings = NULL),
-  args.boot = list(boot.type = c("meboot", "stlboot"), boot.n = 100,
-  plot.diagnostics = FALSE), full.out = FALSE, plot.out = FALSE)
+doBoot(
+  data,
+  args.fitmodel = list(model = "Naive", settings = list(avg.yrs = 3)),
+  args.calcfc = list(fc.yr = NULL, settings = NULL),
+  args.boot = list(boot.type = c("meboot", "stlboot"), boot.n = 100, plot.diagnostics =
+    FALSE),
+  full.out = FALSE,
+  plot.out = FALSE
+)
 }
 \arguments{
 \item{data}{A list. Output of the function \code{\link{prepData}}.}

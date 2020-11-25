@@ -4,9 +4,17 @@
 \alias{multiFC}
 \title{Process multiple models and produce forecasts with summaries}
 \usage{
-multiFC(data.file, settings.list, do.retro = FALSE, retro.min.yrs = 15,
-  out.type = c("short", "full"), int.type = "None", int.n = 100,
-  boot.type = "meboot", tracing = FALSE)
+multiFC(
+  data.file,
+  settings.list,
+  do.retro = FALSE,
+  retro.min.yrs = 15,
+  out.type = c("short", "full"),
+  int.type = "None",
+  int.n = 100,
+  boot.type = "meboot",
+  tracing = FALSE
+)
 }
 \arguments{
 \item{data.file}{The data file read in with \code{read.csv}.}
