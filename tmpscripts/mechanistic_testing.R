@@ -47,6 +47,8 @@ rate.est <- function(data.use,avg.yrs, method=c("mean", "median"), tracing=FALSE
 
 
 
+
+
 rate.pt.fc <- function(fit.obj=NULL, data,settings=NULL){
 	# don't need any coefficients, because just averaging the years fed in by the previous step
 	# data = vector of N years, as pre-filtered by the sub.fcdata() subroutine
@@ -72,39 +74,68 @@ rate.list <- list(estimator = rate.est, datacheck= rate.datacheck, pt.fc =rate.p
 
 
 
-<<<<<<< HEAD
+############
+# TEsting
+
+require(forecastR)
+data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates.csv", stringsAsFactors = FALSE)
+data.withoutage.raw <- read.csv("inst/extdata/FinalSampleFile_WithoutAge_covariates.csv", stringsAsFactors = FALSE)
+
+
+data.withage <- prepData(data.withage.raw,out.labels="v2")
+data.withoutage <- prepData(data.withoutage.raw,out.labels="v2")
+
+
+
 rate.fit <- function(model.data, BYstart, predictor.colname, method=c("mean", "median")){
 
-#browser()
+	#method <- match.arg(method)
+	#yrs.out <- NA
 
- 	method <- match.arg(method)
- 	yrs.out <- NA
+	agecol.ind <- grep(pattern = "Age", colnames(data.use))
+	data.use$rate <- data.use[,agecol.ind]/data.use[,predictor.colname]
 
- 	agecol.ind <- grep(pattern = "Age", colnames(data.use))
- 	data.use$rate <- data.use[,agecol.ind]/data.use[,predictor.colname]
+	data.sub <- data.use[data.use$Brood_Year>=BYstart, ]
 
- 	data.sub <- data.use[data.use$Brood_Year>=BYstart, ]
+	statistic <- do.call(method, list(data.sub$rate))
 
- 	statistic <- do.call(method, list(data.sub$rate))
+	data.use$fitted.values <- statistic * data.use[,predictor.colname]
+	data.use$residuals <- data.use$fitted.values - data.use[,agecol.ind]
 
- 	data.use$fitted.values <- statistic * data.use[,predictor.colname]
- 	data.use$residuals <- data.use$fitted.values - data.use[,agecol.ind]
+	model.fit <- list(coefficients = statistic, obs.values = data.use[,agecol.ind] ,fitted.values.raw = data.use$fitted.values, data = data.use, residuals= data.use$residuals, run.yrs = yrs.out)
 
- 	model.fit <- list(coefficients = statistic, obs.values = data.use[,agecol.ind] ,fitted.values.raw = data.use$fitted.values, data = data.use, residuals= data.use$residuals, run.yrs = yrs.out)
+	results <- c(list(model.type = "Mechanistic",formula=paste0(statistic,"*", predictor.colname),
+										var.names = predictor.colname,
+										est.fn = paste0(method,"(rate[BYstart>=", BYstart, "])")),
+							 model.fit=model.fit,
+							 list(fitted.values = data.use$fitted.values))
 
- 	results <- c(list(model.type = "Mechanistic",formula=paste0(statistic,"*", predictor.colname),var.names = predictor.colname, est.fn = paste0(method,"(rate[BYstart>=", BYstart, "])")), model.fit=model.fit, list(fitted.values = data.use$fitted.values))
 
- 		#c(list(model.type = "Naive",formula=paste("y = avg(y in",avg.yrs,"previous years)"), var.names = "abd" , est.fn = "classic"), model.fit,list(fitted.values = model.fit$fitted.values.raw) )
+	return(results)
+}#END rate.fit
 
- 	return(results)
- }#END rate.fit
+test.fit.fn <- rate.fit
+
+test.est.fn <- rate.list[["estimator"]]
+
+
+
+	#test.fm <- fitModel(model= "Naive", data = data.withage$data,
+	#								 settings = list(avg.yrs=3),tracing=FALSE)
+
+
+
+
 
 
 
 
 
 ################################################
+# OLD DRAFT CODE
 # USE THIS AS THE STARTING POINT, BUT BUILD IT INTO fitModel() and calcFC() functions
+
+
 
 
 
@@ -146,6 +177,8 @@ forecast.rate <- function(fit.obj, data, data.settings=NULL){
 
 require(forecastR)
 data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates.csv", stringsAsFactors = FALSE)
+
+
 
 #FinalSampleFile_WithAge_exclTotal_covariates.csv
 
