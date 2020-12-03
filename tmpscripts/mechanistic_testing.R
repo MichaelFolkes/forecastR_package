@@ -87,7 +87,10 @@ data.withoutage <- prepData(data.withoutage.raw,out.labels="v2")
 
 
 
-rate.fit <- function(model.data, BYstart, predictor.colname, method=c("mean", "median")){
+rate.fit <- function(data.use, predictor.colname, avg=c("mean", "wtmean", "median","geomean")){
+	# data.use is named vector of abundances, with names corresponding to run years
+	# predictor.colname is the label for the column used to calculate the rate
+	# avg is the type of average to use for the rate
 
 	#method <- match.arg(method)
 	#yrs.out <- NA
