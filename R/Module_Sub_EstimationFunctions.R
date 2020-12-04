@@ -60,9 +60,12 @@ filter.coeff <- avg.yrs
 names(filter.coeff) <- "filter.coeff"
 
 if(method == "classic"){
-	fits.out <-   list(coefficients = filter.coeff, obs.values = data.use[as.character(yrs.out)] ,fitted.values.raw = rng.avg.vals[as.character(yrs.out)],
-					data = data.use, residuals= data.use[as.character(yrs.out)]-rng.avg.vals[as.character(yrs.out)],
-					run.yrs = yrs.out)
+	fits.out <-   list(coefficients = filter.coeff,
+										 obs.values = data.use[as.character(yrs.out)] ,
+										 fitted.values.raw = rng.avg.vals[as.character(yrs.out)],
+											data = data.use,
+										 residuals= data.use[as.character(yrs.out)]-rng.avg.vals[as.character(yrs.out)],
+										run.yrs = yrs.out)
 } # end if classic
 
 if(method == "lm"){

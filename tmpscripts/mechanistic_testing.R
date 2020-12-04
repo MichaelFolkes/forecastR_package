@@ -87,25 +87,34 @@ data.withoutage <- prepData(data.withoutage.raw,out.labels="v2")
 
 
 
-rate.fit <- function(data.use, predictor.colname, avg=c("mean", "wtmean", "median","geomean")){
-	# data.use is named vector of abundances, with names corresponding to run years
-	# predictor.colname is the label for the column used to calculate the rate
+rate.fit <- function(data.use, avg="wtmean"){
+	# data.use is a data frame with 2 columns: abundance, predictor
 	# avg is the type of average to use for the rate
 
-	#method <- match.arg(method)
-	#yrs.out <- NA
 
-	agecol.ind <- grep(pattern = "Age", colnames(data.use))
-	data.use$rate <- data.use[,agecol.ind]/data.use[,predictor.colname]
 
-	data.sub <- data.use[data.use$Brood_Year>=BYstart, ]
+	data.use$rate <- data.use$abundance/data.use$predictor
 
-	statistic <- do.call(method, list(data.sub$rate))
 
-	data.use$fitted.values <- statistic * data.use[,predictor.colname]
-	data.use$residuals <- data.use$fitted.values - data.use[,agecol.ind]
+	if(avg == "wtmean"){  data.use <- na.omit(data.use)
+												rate.use <- sum(data.use$abundance) / sum(data.use$predictor)
+												}
 
-	model.fit <- list(coefficients = statistic, obs.values = data.use[,agecol.ind] ,fitted.values.raw = data.use$fitted.values, data = data.use, residuals= data.use$residuals, run.yrs = yrs.out)
+	if(avg == "mean"){ rate.use <- mean(data.use$rate,na.rm=TRUE) }
+	if(avg == "median"){ rate.use <- mean(data.use$rate,na.rm=TRUE) }
+	if(avg == "geomean"){ rate.use <- mean(data.use$rate,na.rm=TRUE) }
+
+
+#"min","max","p10","p90"
+
+
+
+	model.fit <- list(coefficients = statistic,
+										obs.values =  ,
+										fitted.values = ,
+										data = data.use,
+										residuals= data.use$residuals,
+										)
 
 	results <- c(list(model.type = "Mechanistic",formula=paste0(statistic,"*", predictor.colname),
 										var.names = predictor.colname,
