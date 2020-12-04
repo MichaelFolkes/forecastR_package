@@ -47,6 +47,8 @@ rate.est <- function(data.use,avg.yrs, method=c("mean", "median"), tracing=FALSE
 
 
 
+
+
 rate.pt.fc <- function(fit.obj=NULL, data,settings=NULL){
 	# don't need any coefficients, because just averaging the years fed in by the previous step
 	# data = vector of N years, as pre-filtered by the sub.fcdata() subroutine
@@ -72,39 +74,80 @@ rate.list <- list(estimator = rate.est, datacheck= rate.datacheck, pt.fc =rate.p
 
 
 
-<<<<<<< HEAD
-rate.fit <- function(model.data, BYstart, predictor.colname, method=c("mean", "median")){
+############
+# TEsting
 
-#browser()
+require(forecastR)
+data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates.csv", stringsAsFactors = FALSE)
+data.withoutage.raw <- read.csv("inst/extdata/FinalSampleFile_WithoutAge_covariates.csv", stringsAsFactors = FALSE)
 
- 	method <- match.arg(method)
- 	yrs.out <- NA
 
- 	agecol.ind <- grep(pattern = "Age", colnames(data.use))
- 	data.use$rate <- data.use[,agecol.ind]/data.use[,predictor.colname]
+data.withage <- prepData(data.withage.raw,out.labels="v2")
+data.withoutage <- prepData(data.withoutage.raw,out.labels="v2")
 
- 	data.sub <- data.use[data.use$Brood_Year>=BYstart, ]
 
- 	statistic <- do.call(method, list(data.sub$rate))
 
- 	data.use$fitted.values <- statistic * data.use[,predictor.colname]
- 	data.use$residuals <- data.use$fitted.values - data.use[,agecol.ind]
+rate.fit <- function(data.use, avg="wtmean"){
+	# data.use is a data frame with 2 columns: abundance, predictor
+	# avg is the type of average to use for the rate
 
- 	model.fit <- list(coefficients = statistic, obs.values = data.use[,agecol.ind] ,fitted.values.raw = data.use$fitted.values, data = data.use, residuals= data.use$residuals, run.yrs = yrs.out)
 
- 	results <- c(list(model.type = "Mechanistic",formula=paste0(statistic,"*", predictor.colname),var.names = predictor.colname, est.fn = paste0(method,"(rate[BYstart>=", BYstart, "])")), model.fit=model.fit, list(fitted.values = data.use$fitted.values))
 
- 		#c(list(model.type = "Naive",formula=paste("y = avg(y in",avg.yrs,"previous years)"), var.names = "abd" , est.fn = "classic"), model.fit,list(fitted.values = model.fit$fitted.values.raw) )
+	data.use$rate <- data.use$abundance/data.use$predictor
 
- 	return(results)
- }#END rate.fit
+
+	if(avg == "wtmean"){  data.use <- na.omit(data.use)
+												rate.use <- sum(data.use$abundance) / sum(data.use$predictor)
+												}
+
+	if(avg == "mean"){ rate.use <- mean(data.use$rate,na.rm=TRUE) }
+	if(avg == "median"){ rate.use <- mean(data.use$rate,na.rm=TRUE) }
+	if(avg == "geomean"){ rate.use <- mean(data.use$rate,na.rm=TRUE) }
+
+
+#"min","max","p10","p90"
+
+
+
+	model.fit <- list(coefficients = statistic,
+										obs.values =  ,
+										fitted.values = ,
+										data = data.use,
+										residuals= data.use$residuals,
+										)
+
+	results <- c(list(model.type = "Mechanistic",formula=paste0(statistic,"*", predictor.colname),
+										var.names = predictor.colname,
+										est.fn = paste0(method,"(rate[BYstart>=", BYstart, "])")),
+							 model.fit=model.fit,
+							 list(fitted.values = data.use$fitted.values))
+
+
+	return(results)
+}#END rate.fit
+
+test.fit.fn <- rate.fit
+
+test.est.fn <- rate.list[["estimator"]]
+
+
+
+	#test.fm <- fitModel(model= "Naive", data = data.withage$data,
+	#								 settings = list(avg.yrs=3),tracing=FALSE)
+
+
+
+
 
 
 
 
 
 ################################################
+# OLD DRAFT CODE
 # USE THIS AS THE STARTING POINT, BUT BUILD IT INTO fitModel() and calcFC() functions
+
+
 
 
 
@@ -146,6 +189,8 @@ forecast.rate <- function(fit.obj, data, data.settings=NULL){
 
 require(forecastR)
 data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates.csv", stringsAsFactors = FALSE)
+
+
 
 #FinalSampleFile_WithAge_exclTotal_covariates.csv
 
