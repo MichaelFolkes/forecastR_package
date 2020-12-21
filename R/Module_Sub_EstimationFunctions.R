@@ -129,7 +129,8 @@ if(tracing){print("Starting naive.est()")}
 
 
 model.fit <- naive.fit(data.use=model.data,avg.yrs = avg.yrs,method = "classic" )
-return(c(list(model.type = "Naive",formula=paste("y = avg(y in",avg.yrs,"previous years)"), var.names = "abd" , est.fn = "classic"), model.fit,list(fitted.values = model.fit$fitted.values.raw) ))
+return(c(list(model.type = "Naive",formula=paste("y = avg(y in",avg.yrs,"previous years)"), var.names = "abd" , est.fn = "classic"),
+				 model.fit,list(fitted.values = model.fit$fitted.values.raw) ))
 
 } # end naive.est
 

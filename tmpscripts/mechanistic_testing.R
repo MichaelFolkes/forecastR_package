@@ -1,4 +1,5 @@
  require(forecastR)
+ library(tidyverse)
 #
 # data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates.csv", stringsAsFactors = FALSE)
 
@@ -46,7 +47,8 @@ rate.fit <- function(data.use, avg="wtmean", pred.label = NULL, last.n  = NULL){
 
 	data.orig <- data.use # for later
 
-	if(is.null(pred.label)){ pred.label <-  names(data.use)[grep("Pred_",names(data.use))]}
+	if(is.null(pred.label)){ pred.label <-  names(data.use)[min(grep("Pred_",names(data.use)))]} # pick the first one, if none specified
+	print(pred.label)
 
 	last.year <- max(data.use[[1]])
   if(!is.null(last.n)){ data.use <- data.use[data.use[[1]] > (last.year -last.n), ]}
@@ -66,21 +68,21 @@ rate.fit <- function(data.use, avg="wtmean", pred.label = NULL, last.n  = NULL){
 	if(avg == "p90"){ rate.use <- quantile(data.use$rate,prob=0.9) }
 
 
-	fits <- data.use[[pred.label]] * rate.use
+	fits <- data.orig[[pred.label]] * rate.use
 
 
 	model.fit <- list(coefficients = rate.use,
 										obs.values = data.orig[[2]] ,
 										fitted.values = fits,
-										data = data.use,
-										residuals= data.orig[[2]] - fits,
-	)
+										data = data.orig,
+										data.used = data.use,
+										residuals= data.orig[[2]] - fits	)
 
 	results <- c(list(model.type = "Mechanistic",formula=paste0(names(data.orig)[2],"* return rate based on last",last.n,"yrs of", pred.label),
 										var.names = pred.label,
 										est.fn = paste0(avg," of (rate[last", last.n,"yrs])"),
 							 model.fit=model.fit,
-							 list(fitted.values = data.use$fitted.values)))
+							 fitted.values = fits))
 
 
 	return(results)
@@ -167,9 +169,11 @@ data.withoutage <- prepData(data.withoutage.raw,out.labels="v2")
 
 rate.datacheck(data.use = data.withage$data$`Age 3`, pred.label = "Pred_Juv_Outmigrants", tracing=TRUE)
 
+rate.fit(data.withage$data$`Age 3` %>% select(Run_Year, Age_3,Pred_Juv_Outmigrants, Pred_Hat_Releases),
+				 avg="wtmean", pred.label = NULL, last.n  = NULL)
 
-
-
+rate.fit(data.withage$data$`Age 3` %>% select(Run_Year, Age_3,Pred_Juv_Outmigrants, Pred_Hat_Releases),
+				 avg="wtmean", pred.label = NULL, last.n  = 5)
 
 
 
