@@ -60,9 +60,12 @@ filter.coeff <- avg.yrs
 names(filter.coeff) <- "filter.coeff"
 
 if(method == "classic"){
-	fits.out <-   list(coefficients = filter.coeff, obs.values = data.use[as.character(yrs.out)] ,fitted.values.raw = rng.avg.vals[as.character(yrs.out)],
-					data = data.use, residuals= data.use[as.character(yrs.out)]-rng.avg.vals[as.character(yrs.out)],
-					run.yrs = yrs.out)
+	fits.out <-   list(coefficients = filter.coeff,
+										 obs.values = data.use[as.character(yrs.out)] ,
+										 fitted.values.raw = rng.avg.vals[as.character(yrs.out)],
+											data = data.use,
+										 residuals= data.use[as.character(yrs.out)]-rng.avg.vals[as.character(yrs.out)],
+										run.yrs = yrs.out)
 } # end if classic
 
 if(method == "lm"){
@@ -126,7 +129,8 @@ if(tracing){print("Starting naive.est()")}
 
 
 model.fit <- naive.fit(data.use=model.data,avg.yrs = avg.yrs,method = "classic" )
-return(c(list(model.type = "Naive",formula=paste("y = avg(y in",avg.yrs,"previous years)"), var.names = "abd" , est.fn = "classic"), model.fit,list(fitted.values = model.fit$fitted.values.raw) ))
+return(c(list(model.type = "Naive",formula=paste("y = avg(y in",avg.yrs,"previous years)"), var.names = "abd" , est.fn = "classic"),
+				 model.fit,list(fitted.values = model.fit$fitted.values.raw) ))
 
 } # end naive.est
 
@@ -139,7 +143,11 @@ naive.pt.fc <- function(fit.obj=NULL, data,settings=NULL){
 
 # How to get prediction intervals for naive? See https://github.com/avelez-espino/forecastR_phase4/issues/125
 
+# Shouldn't this use predict() and fitobj? See https://github.com/MichaelFolkes/forecastR_package/issues/5
+
+
 			if(length(data)>1){	pt.fc.out <- c(mean(data,na.rm=TRUE),unlist(quantile(data,probs=c(0.1,0.9),na.rm=TRUE)) ) }
+
 			if(length(data)==1){
 								pt.fc.out <- mean(data,na.rm=TRUE)
 								pt.fc.out <- c( pt.fc.out, pt.fc.out * c(0.5,1.5))
