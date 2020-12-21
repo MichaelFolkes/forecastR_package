@@ -44,18 +44,21 @@ rate.fit <- function(data.use, avg="wtmean", pred.label = NULL, last.n  = NULL){
 	# pred.label is the column label for the predictor variable. If NULL, function picks the first one
 	# last.n determines the number of years to use for the rate calc. If NULL, use all years
 
+	data.orig <- data.use # for later
 
 	if(is.null(pred.label)){ pred.label <-  names(data.use)[grep("Pred_",names(data.use))]}
 
+	last.year <- max(data.use[[1]])
+  if(!is.null(last.n)){ data.use <- data.use[data.use[[1]] > (last.year -last.n), ]}
 
-	data.use$rate <- data.use$abundance/data.use[[pred.label]]
+	data.use$rate <- data.use[[2]]/data.use[[pred.label]]
 
-	if(avg == "wtmean"){  data.use <- na.omit(data.use); rate.use <- sum(data.use$abundance) / sum(data.use[[pred.label]])	}
+	if(avg == "wtmean"){  data.use <- na.omit(data.use); rate.use <- sum(data.use[[1]]) / sum(data.use[[pred.label]])	}
 	if(avg == "mean"){ rate.use <- mean(data.use$rate,na.rm=TRUE) }
 	if(avg == "median"){ rate.use <- median(data.use$rate,na.rm=TRUE) }
 
 	# see https://github.com/MichaelFolkes/forecastR_package/issues/11
-	if(avg == "geomean"){ data.use <- data.use %>% dplyr::filter(rate > 0) ;  rate.use <- mean(data.use$rate,na.rm=TRUE) }
+	if(avg == "geomean"){ data.use <- data.use %>% dplyr::filter(rate > 0) ;  rate.use <- exp(mean(log(data.use$rate,na.rm=TRUE))) }
 
 	if(avg == "min"){ rate.use <- min(data.use$rate,na.rm=TRUE) }
 	if(avg == "max"){ rate.use <- max(data.use$rate,na.rm=TRUE) }
@@ -63,19 +66,21 @@ rate.fit <- function(data.use, avg="wtmean", pred.label = NULL, last.n  = NULL){
 	if(avg == "p90"){ rate.use <- quantile(data.use$rate,prob=0.9) }
 
 
+	fits <- data.use[[pred.label]] * rate.use
+
 
 	model.fit <- list(coefficients = rate.use,
-										obs.values =  ,
-										fitted.values = ,
+										obs.values = data.orig[[2]] ,
+										fitted.values = fits,
 										data = data.use,
-										residuals= data.use$residuals,
+										residuals= data.orig[[2]] - fits,
 	)
 
-	results <- c(list(model.type = "Mechanistic",formula=paste0(statistic,"*", predictor.colname),
-										var.names = predictor.colname,
-										est.fn = paste0(method,"(rate[BYstart>=", BYstart, "])")),
+	results <- c(list(model.type = "Mechanistic",formula=paste0(names(data.orig)[2],"* return rate based on last",last.n,"yrs of", pred.label),
+										var.names = pred.label,
+										est.fn = paste0(avg," of (rate[last", last.n,"yrs])"),
 							 model.fit=model.fit,
-							 list(fitted.values = data.use$fitted.values))
+							 list(fitted.values = data.use$fitted.values)))
 
 
 	return(results)
