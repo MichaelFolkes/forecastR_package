@@ -5,8 +5,8 @@
 
 #### MECHANISTIC (RATE) ####
 
-
-
+#----------------------------------------------------------------------------------------
+# DONE
 rate.datacheck <- function(data.use, pred.label = NULL, tracing=FALSE){
 	# verify that all the required components are there
 	# and check for any special values that might crash the estimate
@@ -32,6 +32,71 @@ rate.datacheck <- function(data.use, pred.label = NULL, tracing=FALSE){
 	return(tmp.out)
 
 }#END rate.datacheck
+
+
+
+#----------------------------------------------------------------------------------------
+#
+
+rate.fit <- function(data.use, avg="wtmean", pred.label = NULL, last.n  = NULL){
+	# data.use is a data frame with at least 3 columns: first column is run year, second is abd, remaining are Pred
+	# avg is the type of average to use for the rate
+	# pred.label is the column label for the predictor variable. If NULL, function picks the first one
+	# last.n determines the number of years to use for the rate calc. If NULL, use all years
+
+
+	if(is.null(pred.label)){ pred.label <-  names(data.use)[grep("Pred_",names(data.use))]}
+
+
+	data.use$rate <- data.use$abundance/data.use[[pred.label]]
+
+	if(avg == "wtmean"){  data.use <- na.omit(data.use); rate.use <- sum(data.use$abundance) / sum(data.use[[pred.label]])	}
+	if(avg == "mean"){ rate.use <- mean(data.use$rate,na.rm=TRUE) }
+	if(avg == "median"){ rate.use <- median(data.use$rate,na.rm=TRUE) }
+
+	# see https://github.com/MichaelFolkes/forecastR_package/issues/11
+	if(avg == "geomean"){ data.use <- data.use %>% dplyr::filter(rate > 0) ;  rate.use <- mean(data.use$rate,na.rm=TRUE) }
+
+	if(avg == "min"){ rate.use <- min(data.use$rate,na.rm=TRUE) }
+	if(avg == "max"){ rate.use <- max(data.use$rate,na.rm=TRUE) }
+	if(avg == "p10"){ rate.use <- quantile(data.use$rate,prob=0.1) }
+	if(avg == "p90"){ rate.use <- quantile(data.use$rate,prob=0.9) }
+
+
+
+	model.fit <- list(coefficients = rate.use,
+										obs.values =  ,
+										fitted.values = ,
+										data = data.use,
+										residuals= data.use$residuals,
+	)
+
+	results <- c(list(model.type = "Mechanistic",formula=paste0(statistic,"*", predictor.colname),
+										var.names = predictor.colname,
+										est.fn = paste0(method,"(rate[BYstart>=", BYstart, "])")),
+							 model.fit=model.fit,
+							 list(fitted.values = data.use$fitted.values))
+
+
+	return(results)
+}#END rate.fit
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 rate.est <- function(data.use,avg.yrs, method=c("mean", "median"), tracing=FALSE){
@@ -103,60 +168,19 @@ rate.datacheck(data.use = data.withage$data$`Age 3`, pred.label = "Pred_Juv_Outm
 
 
 
+#test.fit.fn <- rate.fit
+#test.est.fn <- rate.list[["estimator"]]
+
+
+
+#test.fm <- fitModel(model= "Naive", data = data.withage$data,
+#								 settings = list(avg.yrs=3),tracing=FALSE)
 
 
 
 
 
 
-
-rate.fit <- function(data.use, avg="wtmean"){
-	# data.use is a data frame with 2 columns: abundance, predictor
-	# avg is the type of average to use for the rate
-
-
-
-	data.use$rate <- data.use$abundance/data.use$predictor
-
-
-	if(avg == "wtmean"){  data.use <- na.omit(data.use)
-												rate.use <- sum(data.use$abundance) / sum(data.use$predictor)
-												}
-
-	if(avg == "mean"){ rate.use <- mean(data.use$rate,na.rm=TRUE) }
-	if(avg == "median"){ rate.use <- mean(data.use$rate,na.rm=TRUE) }
-	if(avg == "geomean"){ rate.use <- mean(data.use$rate,na.rm=TRUE) }
-
-
-#"min","max","p10","p90"
-
-
-
-	model.fit <- list(coefficients = statistic,
-										obs.values =  ,
-										fitted.values = ,
-										data = data.use,
-										residuals= data.use$residuals,
-										)
-
-	results <- c(list(model.type = "Mechanistic",formula=paste0(statistic,"*", predictor.colname),
-										var.names = predictor.colname,
-										est.fn = paste0(method,"(rate[BYstart>=", BYstart, "])")),
-							 model.fit=model.fit,
-							 list(fitted.values = data.use$fitted.values))
-
-
-	return(results)
-}#END rate.fit
-
-test.fit.fn <- rate.fit
-
-test.est.fn <- rate.list[["estimator"]]
-
-
-
-	#test.fm <- fitModel(model= "Naive", data = data.withage$data,
-	#								 settings = list(avg.yrs=3),tracing=FALSE)
 
 
 
