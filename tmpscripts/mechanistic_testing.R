@@ -37,9 +37,9 @@ rate.datacheck <- function(data.use, pred.label = NULL, tracing=FALSE){
 
 
 #----------------------------------------------------------------------------------------
-#
+# DONE
 
-rate.fit <- function(data.use, avg="wtmean", pred.label = NULL, last.n  = NULL){
+rate.est <- function(data.use, avg="wtmean", pred.label = NULL, last.n  = NULL){
 	# data.use is a data frame with at least 3 columns: first column is run year, second is abd, remaining are Pred
 	# avg is the type of average to use for the rate
 	# pred.label is the column label for the predictor variable. If NULL, function picks the first one
@@ -62,16 +62,28 @@ rate.fit <- function(data.use, avg="wtmean", pred.label = NULL, last.n  = NULL){
 	# see https://github.com/MichaelFolkes/forecastR_package/issues/11
 	if(avg == "geomean"){ data.use <- data.use %>% dplyr::filter(rate > 0) ;  rate.use <- exp(mean(log(data.use$rate,na.rm=TRUE))) }
 
-	if(avg == "min"){ rate.use <- min(data.use$rate,na.rm=TRUE) }
-	if(avg == "max"){ rate.use <- max(data.use$rate,na.rm=TRUE) }
-	if(avg == "p10"){ rate.use <- quantile(data.use$rate,prob=0.1) }
-	if(avg == "p90"){ rate.use <- quantile(data.use$rate,prob=0.9) }
+	#if(avg == "min"){ rate.use <- min(data.use$rate,na.rm=TRUE) }
+	#if(avg == "max"){ rate.use <- max(data.use$rate,na.rm=TRUE) }
+
+	#use these for the prediction interval in pt.fc fn
+
+	if(dim(data.use)[1]>1){
+		lower.rate.use <- quantile(data.use$rate,prob=0.1)
+		upper.rate.use <- quantile(data.use$rate,prob=0.9)
+	}
+
+	if(dim(data.use)[1]==1){
+		lower.rate.use <- rate.use *0.5
+		upper.rate.use <- rate.use *1.5
+	}
 
 
 	fits <- data.orig[[pred.label]] * rate.use
 
 
 	model.fit <- list(coefficients = rate.use,
+										lower.coeff = lower.rate.use,
+										upper.coeff = upper.rate.use,
 										obs.values = data.orig[[2]] ,
 										fitted.values = fits,
 										data = data.orig,
@@ -86,65 +98,27 @@ rate.fit <- function(data.use, avg="wtmean", pred.label = NULL, last.n  = NULL){
 
 
 	return(results)
-}#END rate.fit
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-rate.est <- function(data.use,avg.yrs, method=c("mean", "median"), tracing=FALSE){
-	# do the estimation (1 instance)
-	# data.use format required as per preamble in naive.fit() subroutine above
-
-	if(tracing){print("Starting rate.est()")}
-
-	model.fit <- rate.fit(data.use=data.use,avg.yrs = avg.yrs, method = method)
-
-	return(c(list(model.type = "Mechanistic",formula=paste("y = avg(y in",avg.yrs,"previous years)"), var.names = "abd" , est.fn = "classic"), model.fit,list(fitted.values = model.fit$fitted.values.raw) ))
-
-	results <- c()
-
- c(list(model.type = "Naive",formula=paste("y = avg(y in",avg.yrs,"previous years)"), var.names = "abd" , est.fn = "classic"), model.fit,list(fitted.values = model.fit$fitted.values.raw) )
-
-	return(results)
-
-
 }#END rate.est
 
 
-
-
-
+#-------------------------------------------------------------------------
+# DONE
 rate.pt.fc <- function(fit.obj=NULL, data,settings=NULL){
-	# don't need any coefficients, because just averaging the years fed in by the previous step
-	# data = vector of N years, as pre-filtered by the sub.fcdata() subroutine
-	# current setting: if ANY of the input values are NA, then the pt fc is NA
+	# fit.obj = object created from fitModel()
+	# data = data frame with one element of the list created by sub.fcdata() (VERIFY)
 
-	# How to get prediction intervals for rate model? See https://github.com/avelez-espino/forecastR_phase4/issues/125
+	# How to get prediction intervals for rate model? See https://github.com/MichaelFolkes/forecastR_package/issues/12
+	# lower/upper step is in rate.est, here using only the resulting coeff
 
-	if(length(data)>1){	pt.fc.out <- c(mean(data,na.rm=FALSE),unlist(quantile(data,probs=c(0.1,0.9),na.rm=FALSE)) ) }
-	if(length(data)==1){
-		pt.fc.out <- mean(data,na.rm=FALSE)
-		pt.fc.out <- c( pt.fc.out, pt.fc.out * c(0.5,1.5))
-	}
+		pt.fc.out <- c(data * fit.obj$model.fit$coefficient,
+																		 data * fit.obj$model.fit$lower.coeff,
+																		 data * fit.obj$model.fit$upper.coeff)
+
+
 
 	return(pt.fc.out)
 
-}#END rate.pt.fc
+} #END rate.pt.fc
 
 
 
@@ -169,10 +143,10 @@ data.withoutage <- prepData(data.withoutage.raw,out.labels="v2")
 
 rate.datacheck(data.use = data.withage$data$`Age 3`, pred.label = "Pred_Juv_Outmigrants", tracing=TRUE)
 
-rate.fit(data.withage$data$`Age 3` %>% select(Run_Year, Age_3,Pred_Juv_Outmigrants, Pred_Hat_Releases),
+rate.est(data.withage$data$`Age 3` %>% select(Run_Year, Age_3,Pred_Juv_Outmigrants, Pred_Hat_Releases),
 				 avg="wtmean", pred.label = NULL, last.n  = NULL)
 
-rate.fit(data.withage$data$`Age 3` %>% select(Run_Year, Age_3,Pred_Juv_Outmigrants, Pred_Hat_Releases),
+rate.est(data.withage$data$`Age 3` %>% select(Run_Year, Age_3,Pred_Juv_Outmigrants, Pred_Hat_Releases),
 				 avg="wtmean", pred.label = NULL, last.n  = 5)
 
 
