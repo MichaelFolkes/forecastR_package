@@ -7,19 +7,27 @@
 
 
 
-rate.datacheck <- function(data.use,tracing=FALSE){
+rate.datacheck <- function(data.use, pred.label = NULL, tracing=FALSE){
 	# verify that all the required components are there
 	# and check for any special values that might crash the estimate
 
-	if(tracing){print("Starting mechanistic.datacheck() - Placeholder only for now")}
+	if(tracing){print("Starting mechanistic.datacheck()")}
 
 
 	# NA values a problem? -> don't think, need to test
-	# Missing years a problem? -> not likely
+	# Missing years a problem? -> maybe
 	# Zero values a problem? -> if in denominator yes!
 
-	# just a placholder step
-	tmp.out <- range(data.use)
+	if(!is.null((pred.label))){
+		pred.check <- pred.label %in% names(data.use)
+	}
+
+
+	yrs.check <-   sum(!(min(data.use$Run_Year):max(data.use$Run_Year) %in% data.use$Run_Year)) == 0
+
+	tmp.out <- list(Predictor = paste("User-selected predictor variable in data set:", pred.check),
+									Years = paste("Complete years:", yrs.check)
+	)
 
 	return(tmp.out)
 
@@ -84,6 +92,21 @@ data.withoutage.raw <- read.csv("inst/extdata/FinalSampleFile_WithoutAge_covaria
 
 data.withage <- prepData(data.withage.raw,out.labels="v2")
 data.withoutage <- prepData(data.withoutage.raw,out.labels="v2")
+
+
+
+rate.datacheck(data.use = data.withage$data$`Age 3`, pred.label = "Pred_Juv_Outmigrants", tracing=TRUE)
+
+
+
+
+
+
+
+
+
+
+
 
 
 
