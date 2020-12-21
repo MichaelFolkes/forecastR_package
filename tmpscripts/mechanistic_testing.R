@@ -37,7 +37,7 @@ rate.datacheck <- function(data.use, pred.label = NULL, tracing=FALSE){
 
 
 #----------------------------------------------------------------------------------------
-#
+# DONE
 
 rate.est <- function(data.use, avg="wtmean", pred.label = NULL, last.n  = NULL){
 	# data.use is a data frame with at least 3 columns: first column is run year, second is abd, remaining are Pred
@@ -101,7 +101,8 @@ rate.est <- function(data.use, avg="wtmean", pred.label = NULL, last.n  = NULL){
 }#END rate.est
 
 
-
+#-------------------------------------------------------------------------
+# DONE
 rate.pt.fc <- function(fit.obj=NULL, data,settings=NULL){
 	# fit.obj = object created from fitModel()
 	# data = data frame with one element of the list created by sub.fcdata() (VERIFY)
