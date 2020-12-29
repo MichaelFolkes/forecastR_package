@@ -17,7 +17,7 @@
 
 
 ############
-# Testing  Estimation Functions
+# Testing  Estimation Functions (with Age data)
 
 rate.datacheck(data.use = data.withage$data$`Age 3`, pred.label = "Pred_Juv_Outmigrants", tracing=TRUE)
  rate.datacheck(data.use = data.withage$data$`Age 3`, pred.label = NULL, tracing=TRUE)
@@ -47,24 +47,43 @@ rate.pt.fc(fit.obj=fit.test.allyr.juv, data = data.withage$data$`Age 3` %>% dply
 
 
 ####################
-# TEsting the wrapper functions
+# TEsting the wrapper functions (withage data)
 
 source("R/Module_fitModel.R")
 source("R/Module_Sub_PerformanceMeasures.R")
+
+
+# fit the model
 rate.fitmodel.out <- fitModel(model= "Rate", data = data.withage$data,
 															settings = list(avg="wtmean", pred.label = "Pred_Juv_Outmigrants", last.n = NULL),tracing=FALSE)
 
 names(rate.fitmodel.out )
 rate.fitmodel.out$fitted.pm
+names(rate.fitmodel.out$"Age 3")
 
+# plot the model fit
+source("R/Module_plotModelFit.R")
+plotModelFit(rate.fitmodel.out, options= list(plot.which = "all",age.which="all",plot.add=FALSE),fc.add = NULL, tracing = TRUE)
+
+
+
+
+
+
+# calculate the forecast
+arimafc.withage.nobc <- calcFC(fit.obj= arimafit.withage.nobc ,data =data.withage$data, fc.yr= data.withage$specs$forecastingyear,  settings = list(BoxCox=FALSE), tracing=TRUE)
 
 
 ?calcFC
-?fitModel
+
+
+# plot model fit and forecast
+
+
 ?multiFC
 ?doBoot
 ?rankModels
-?plotModelFit
+
 
 
 
