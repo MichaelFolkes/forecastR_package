@@ -4,150 +4,34 @@
 # data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates.csv", stringsAsFactors = FALSE)
 
 
-#### MECHANISTIC (RATE) ####
-
-#----------------------------------------------------------------------------------------
-# DONE
-rate.datacheck <- function(data.use, pred.label = NULL, tracing=FALSE){
-	# verify that all the required components are there
-	# and check for any special values that might crash the estimate
-
-	if(tracing){print("Starting mechanistic.datacheck()")}
+ require(forecastR)
+ data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates.csv", stringsAsFactors = FALSE)
+ data.withoutage.raw <- read.csv("inst/extdata/FinalSampleFile_WithoutAge_covariates.csv", stringsAsFactors = FALSE)
 
 
-	# NA values a problem? -> don't think, need to test
-	# Missing years a problem? -> maybe
-	# Zero values a problem? -> if in denominator yes!
-
-	if(!is.null((pred.label))){
-		pred.check <- pred.label %in% names(data.use)
-	}
-
-
-	yrs.check <-   sum(!(min(data.use$Run_Year):max(data.use$Run_Year) %in% data.use$Run_Year)) == 0
-
-	tmp.out <- list(Predictor = paste("User-selected predictor variable in data set:", pred.check),
-									Years = paste("Complete years:", yrs.check)
-	)
-
-	return(tmp.out)
-
-}#END rate.datacheck
-
-
-
-#----------------------------------------------------------------------------------------
-# DONE
-
-rate.est <- function(data.use, avg="wtmean", pred.label = NULL, last.n  = NULL){
-	# data.use is a data frame with at least 3 columns: first column is run year, second is abd, remaining are Pred
-	# avg is the type of average to use for the rate
-	# pred.label is the column label for the predictor variable. If NULL, function picks the first one
-	# last.n determines the number of years to use for the rate calc. If NULL, use all years
-
-	data.orig <- data.use # for later
-
-	if(is.null(pred.label)){ pred.label <-  names(data.use)[min(grep("Pred_",names(data.use)))]} # pick the first one, if none specified
-	print(pred.label)
-
-	last.year <- max(data.use[[1]])
-  if(!is.null(last.n)){ data.use <- data.use[data.use[[1]] > (last.year -last.n), ]}
-
-	data.use$rate <- data.use[[2]]/data.use[[pred.label]]
-
-	if(avg == "wtmean"){  data.use <- na.omit(data.use); rate.use <- sum(data.use[[1]]) / sum(data.use[[pred.label]])	}
-	if(avg == "mean"){ rate.use <- mean(data.use$rate,na.rm=TRUE) }
-	if(avg == "median"){ rate.use <- median(data.use$rate,na.rm=TRUE) }
-
-	# see https://github.com/MichaelFolkes/forecastR_package/issues/11
-	if(avg == "geomean"){ data.use <- data.use %>% dplyr::filter(rate > 0) ;  rate.use <- exp(mean(log(data.use$rate,na.rm=TRUE))) }
-
-	#if(avg == "min"){ rate.use <- min(data.use$rate,na.rm=TRUE) }
-	#if(avg == "max"){ rate.use <- max(data.use$rate,na.rm=TRUE) }
-
-	#use these for the prediction interval in pt.fc fn
-
-	if(dim(data.use)[1]>1){
-		lower.rate.use <- quantile(data.use$rate,prob=0.1)
-		upper.rate.use <- quantile(data.use$rate,prob=0.9)
-	}
-
-	if(dim(data.use)[1]==1){
-		lower.rate.use <- rate.use *0.5
-		upper.rate.use <- rate.use *1.5
-	}
-
-
-	fits <- data.orig[[pred.label]] * rate.use
-
-
-	model.fit <- list(coefficients = rate.use,
-										lower.coeff = lower.rate.use,
-										upper.coeff = upper.rate.use,
-										obs.values = data.orig[[2]] ,
-										fitted.values = fits,
-										data = data.orig,
-										data.used = data.use,
-										residuals= data.orig[[2]] - fits	)
-
-	results <- c(list(model.type = "Mechanistic",formula=paste0(names(data.orig)[2],"* return rate based on last",last.n,"yrs of", pred.label),
-										var.names = pred.label,
-										est.fn = paste0(avg," of (rate[last", last.n,"yrs])"),
-							 model.fit=model.fit,
-							 fitted.values = fits))
-
-
-	return(results)
-}#END rate.est
-
-
-#-------------------------------------------------------------------------
-# DONE
-rate.pt.fc <- function(fit.obj=NULL, data,settings=NULL){
-	# fit.obj = object created from fitModel()
-	# data = data frame with one element of the list created by sub.fcdata() (VERIFY)
-
-	# How to get prediction intervals for rate model? See https://github.com/MichaelFolkes/forecastR_package/issues/12
-	# lower/upper step is in rate.est, here using only the resulting coeff
-
-		pt.fc.out <- c(data * fit.obj$model.fit$coefficient,
-																		 data * fit.obj$model.fit$lower.coeff,
-																		 data * fit.obj$model.fit$upper.coeff)
-
-
-
-	return(pt.fc.out)
-
-} #END rate.pt.fc
-
-
-
-# Merge object
-
-rate.list <- list(estimator = rate.est, datacheck= rate.datacheck, pt.fc =rate.pt.fc )
+ data.withage <- prepData(data.withage.raw,out.labels="v2")
+ data.withoutage <- prepData(data.withoutage.raw,out.labels="v2")
 
 
 
 ############
-# TEsting
-
-require(forecastR)
-data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates.csv", stringsAsFactors = FALSE)
-data.withoutage.raw <- read.csv("inst/extdata/FinalSampleFile_WithoutAge_covariates.csv", stringsAsFactors = FALSE)
-
-
-data.withage <- prepData(data.withage.raw,out.labels="v2")
-data.withoutage <- prepData(data.withoutage.raw,out.labels="v2")
-
-
+# Testing  Estimation Functions
 
 rate.datacheck(data.use = data.withage$data$`Age 3`, pred.label = "Pred_Juv_Outmigrants", tracing=TRUE)
 
-rate.est(data.withage$data$`Age 3` %>% select(Run_Year, Age_3,Pred_Juv_Outmigrants, Pred_Hat_Releases),
-				 avg="wtmean", pred.label = NULL, last.n  = NULL)
+fit.test.allyr.juv <- rate.est(data.withage$data$`Age 3` %>% select(Run_Year, Age_3,Pred_Juv_Outmigrants, Pred_Hat_Releases),
+				 avg="wtmean", pred.label = NULL, last.n  = NULL) # if pred.label = NULL, pick the first pred column -> discuss
 
-rate.est(data.withage$data$`Age 3` %>% select(Run_Year, Age_3,Pred_Juv_Outmigrants, Pred_Hat_Releases),
+fit.test.last5.juv <-rate.est(data.withage$data$`Age 3` %>% select(Run_Year, Age_3,Pred_Juv_Outmigrants, Pred_Hat_Releases),
 				 avg="wtmean", pred.label = NULL, last.n  = 5)
+
+
+
+# input is more convoluted here than it would usually be...
+rate.pt.fc(fit.obj=fit.test.allyr.juv, data = data.withage$data$`Age 3` %>% dplyr::filter(Run_Year == 2015) %>% select(Pred_Juv_Outmigrants) %>% unlist(),
+					    settings=NULL)
+
+
 
 
 
@@ -169,74 +53,5 @@ rate.est(data.withage$data$`Age 3` %>% select(Run_Year, Age_3,Pred_Juv_Outmigran
 
 
 
-
-
-
-
-################################################
-# OLD DRAFT CODE
-# USE THIS AS THE STARTING POINT, BUT BUILD IT INTO fitModel() and calcFC() functions
-
-
-
-
-
-# forecast.rate <- function(fit.obj, fc.year){
-
-
-forecast.rate <- function(fit.obj, data, data.settings=NULL){
-
- 	#fc.year <- data.working$specs$forecastingyear
-
- 	predictors <- lapply(unique(data.working$data$age), function(age,fc.year, data){
-
- 		broodyear <- fc.year-age
- 		predictor.cols <- grep(pattern = "pred_", tolower(colnames(data)))
- 		predictors <- data[data$Brood_Year==broodyear, predictor.cols]
-
- 		if(nrow(predictors)==0) predictors[1,1:ncol(predictors)] <- NA
- 		predictors$age <- age
- 		predictors[1,]
-
- 	}, fc.year, data.working$data)
-
- 	predictors.df <- do.call("rbind", predictors)
- 	colnames(predictors.df) <- tolower(colnames(predictors.df))
- 	predictors.long <- reshape(predictors.df, direction = "long", varying = list(predictor.colnames), timevar="variable", times = predictor.colnames,  v.names="value")
- 	predictors.long <- subset(predictors.long, select = -id)
-
- 	lapply(rate.stats$stats, function(x, predictors.long){
-
- 		dat.tmp <- merge(x, predictors.long)
- 		dat.tmp$forecast <- dat.tmp$statistic* dat.tmp$value
- 		dat.tmp.wide <- reshape(dat.tmp[,c("variable", "age", "forecast")], direction = 'wide', timevar = 'variable', idvar = "age")
- 		return(list(forecast.wide=dat.tmp.wide, forecast.long=dat.tmp))
-
- 	}, predictors.long)
-
- }#END forecast.rate
-
-
-require(forecastR)
-data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates.csv", stringsAsFactors = FALSE)
-
-
-
-#FinalSampleFile_WithAge_exclTotal_covariates.csv
-
-data.working <- prepData(data.withage.raw,out.labels="v2")
-BYstart <- 2000
-predictor.colname <- "Pred_Juv_Outmigrants"
-
-lapply(data.working$data, function(x, BYstart, predictor.colname){rate.fit(model.data = x, BYstart = BYstart, predictor.colname = predictor.colname)}, BYstart, predictor.colname)
-
-
-fit.obj <- fit.rate(data.use = data.working$data$`Age 3`, BYstart = BYstart, predictor.colname = predictor.colname)
-
-forecastR:::sub.fcdata(fit = fit.obj, data = data.working$data$`Age 3`, fc.yr = 2017)
-tail(data.working$data$`Age 3`)
-forecast.rate(fit.obj = fit.obj, fc.year = data.working$specs$forecastingyear)
-
-lapply(data.working$data, function(x, BYstart, predictor.colname){fit.rate(data.use = x, BYstart = BYstart, predictor.colname = predictor.colname)}, BYstart, predictor.colname)
 
 
