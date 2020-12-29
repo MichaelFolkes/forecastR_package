@@ -186,9 +186,16 @@ rate.datacheck <- function(data.use, pred.label = NULL, tracing=FALSE){
 	}
 
 
+	if(is.null((pred.label))){
+		pred.check <- sum(grepl("Pred_", names(data.use))) > 0
+	}
+
+
 	yrs.check <-   sum(!(min(data.use$Run_Year):max(data.use$Run_Year) %in% data.use$Run_Year)) == 0
 
-	tmp.out <- list(Predictor = paste("User-selected predictor variable in data set:", pred.check),
+	tmp.out <- list(var.check = pred.check,
+									yrs.check = yrs.check,
+									Predictor = paste("User-selected predictor variable in data set:", pred.check),
 									Years = paste("Complete years:", yrs.check)
 	)
 
@@ -206,7 +213,7 @@ rate.est <- function(data.use, avg="wtmean", pred.label = NULL, last.n  = NULL){
 	data.orig <- data.use # for later
 
 	if(is.null(pred.label)){ pred.label <-  names(data.use)[min(grep("Pred_",names(data.use)))]} # pick the first one, if none specified
-	print(pred.label)
+	#print(pred.label)
 
 	last.year <- max(data.use[[1]])
 	if(!is.null(last.n)){ data.use <- data.use[data.use[[1]] > (last.year -last.n), ]}
@@ -252,7 +259,9 @@ rate.est <- function(data.use, avg="wtmean", pred.label = NULL, last.n  = NULL){
 										var.names = pred.label,
 										est.fn = paste0(avg," of (rate[last", last.n,"yrs])"),
 										model.fit=model.fit,
-										fitted.values = fits))
+										fitted.values = fits,
+							      obs.values = data.orig[[2]])
+										)
 
 
 	return(results)

@@ -4,7 +4,7 @@ resids.pm <- function(input.obj,type="fitted"){
 # if type = "retro", then the input obj has to be the output of doRetro()
 # Details on the wiki: https://github.com/avelez-espino/forecastR_phase4/wiki/App-2-Perf.-Eval.-Details
 
-#NOTE : THIS IS CALLED INSIDE of fitModel(), so inout object only includes 1 element for each age class
+#NOTE : THIS IS CALLED INSIDE of fitModel(), so input object only includes 1 element for each age class
 
 
 # To Do:
@@ -42,6 +42,11 @@ for(age.do in ages.list){
 	
 	obs.use <- input.obj[[age.do]]$obs.values
 	num.obs <- sum(!is.na(resids.use))
+
+	#print("resids.use")
+	#print(resids.use)
+	#print("obs.use")
+	#print(obs.use)
 
 	out.mat["MRE",age.do] <- round(sum(resids.use)/num.obs,2)
 	out.mat["MAE",age.do] <- round(sum(abs(resids.use))/num.obs,2)
