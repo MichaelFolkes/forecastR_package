@@ -125,7 +125,7 @@ if(model %in%  c("Rate")){
 	# for now this handles the "noage" version, need to test to ensure robustness
 	# also: should be able to combine the 2 versions into 1 generic, but for now just make it work
 	if(any(is.na(ages))){
-		data.in <- data[["Total"]]
+		data.in <- data[["Total"]][,c("Run_Year","Total",pred.label.use)]
 
 		# check the data
 		dt.chk <- rate.datacheck(data.use = data.in, pred.label = pred.label.use, tracing=FALSE)

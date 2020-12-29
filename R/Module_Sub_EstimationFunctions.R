@@ -260,7 +260,9 @@ rate.est <- function(data.use, avg="wtmean", pred.label = NULL, last.n  = NULL){
 										est.fn = paste0(avg," of (rate[last", last.n,"yrs])"),
 										model.fit=model.fit,
 										fitted.values = fits,
-							      obs.values = data.orig[[2]])
+							      obs.values = data.orig[[2]],
+										residuals = data.orig[[2]] - fits,
+										run.yrs = data.orig[[1]] )
 										)
 
 
