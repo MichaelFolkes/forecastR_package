@@ -186,9 +186,16 @@ rate.datacheck <- function(data.use, pred.label = NULL, tracing=FALSE){
 	}
 
 
+	if(is.null((pred.label))){
+		pred.check <- sum(grepl("Pred_", names(data.use))) > 0
+	}
+
+
 	yrs.check <-   sum(!(min(data.use$Run_Year):max(data.use$Run_Year) %in% data.use$Run_Year)) == 0
 
-	tmp.out <- list(Predictor = paste("User-selected predictor variable in data set:", pred.check),
+	tmp.out <- list(var.check = pred.check,
+									yrs.check = yrs.check,
+									Predictor = paste("User-selected predictor variable in data set:", pred.check),
 									Years = paste("Complete years:", yrs.check)
 	)
 

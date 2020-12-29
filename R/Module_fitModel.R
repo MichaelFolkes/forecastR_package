@@ -22,7 +22,7 @@
 #' @export
 #'
 #' @examples
-fitModel <- function(model= c("Naive", "Mechanistic", "SibRegSimple","SibRegKalman","SibRegLogPower","TimeSeriesArima","TimeSeriesExpSmooth"), data = NULL, settings = NULL,tracing=FALSE){
+fitModel <- function(model= c("Naive", "Rate", "Mechanistic", "SibRegSimple","SibRegKalman","SibRegLogPower","TimeSeriesArima","TimeSeriesExpSmooth"), data = NULL, settings = NULL,tracing=FALSE){
 # Check inputs
 model <- match.arg(model)
 
@@ -85,9 +85,57 @@ if(!any(is.na(ages))){  # if have age classes, loop through them
 } # end if naive variation
 
 
-if(model %in%  c("Mechanistic")){
+if(model %in%  c("Rate")){
 
-}#END mechanistic
+
+	if(tracing){print("starting rate model")}
+
+	#check if there are settings
+	#replacing stop() with return(NULL) will stop the function, not put it into debug mode
+	if(is.null(settings)) {warning("required settings for rate model not specified. Using default values")}
+
+	if(!is.null(settings)){
+		  if(!("avg" %in% names(settings))){warning("avg for rate model not specified. Using default = wtmean")}
+			if(!("pred.label" %in% names(settings))){warning("pred.label for rate model not specified.Using default = first Pred_ column from left")}
+		  if(!("last.n" %in% names(settings)) ){	warning("last.n for rate model not specified.Using default = all years")}
+
+				# Need to decide how to handle last.n vs missing years, (as per https://github.com/MichaelFolkes/forecastR_package/issues/15)
+				# then build in check and warning accordingly
+
+				} # end checking settings
+
+	if(tracing){print("starting data reorg for rate fits")}
+
+	age.classes <- names(data)
+
+	ages <- as.numeric(gsub("\\D", "", age.classes)) # as per https://stat.ethz.ch/pipermail/r-help/2011-February/267946.html
+	age.prefix <- gsub(ages[1],"",age.classes[1])
+	#print(age.prefix)
+
+	# for now this handles the "noage" version, need to test to ensure robustness
+	# also: should be able to combine the 2 versions into 1 generic, but for now just make it work
+	if(any(is.na(ages))){
+		data.in <- data[["Total"]][,2] # FIX to dynamic col label
+		names(data.in) <- data[["Total"]][,1] # FIX to dynamic col label
+		out.list[["Total"]] <- estimation.functions[[model]]$estimator(model.data = data.in,avg.yrs=settings$avg.yrs)
+	} # end if no age classes
+
+
+	if(!any(is.na(ages))){  # if have age classes, loop through them
+		for(age.do in ages){
+			if(tracing){print(paste("starting age",age.do))}
+			data.in <- data[[paste(age.prefix,age.do,sep="")]][,3] # FIX to dynamic col label
+			names(data.in) <- data[[paste(age.prefix,age.do,sep="")]][,1] # FIX to dynamic col label
+			out.list[[paste(age.prefix,age.do,sep="")]] <- estimation.functions[[model]]$estimator(model.data = data.in,avg.yrs=settings$avg.yrs)
+		}} # end looping through age classes if have them
+
+
+
+
+
+
+
+}#END Rate
 
 
 #SIBLING REGRESSION VARIATIONS

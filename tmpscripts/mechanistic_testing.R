@@ -9,6 +9,8 @@
  data.withoutage.raw <- read.csv("inst/extdata/FinalSampleFile_WithoutAge_covariates.csv", stringsAsFactors = FALSE)
 
 
+ source("R/Module_Sub_EstimationFunctions.R")
+
  data.withage <- prepData(data.withage.raw,out.labels="v2")
  data.withoutage <- prepData(data.withoutage.raw,out.labels="v2")
 
@@ -33,15 +35,30 @@ rate.pt.fc(fit.obj=fit.test.allyr.juv, data = data.withage$data$`Age 3` %>% dply
 
 
 
+####################
+# TEsting the wrapper functions
+
+source("R/Module_fitModel.R")
+rate.fitmodel.out <- fitModel(model= "Rate", data = data.withage$data,
+															settings = list(avg="wtmean", pred.label = Pred_Juv_Outmigrants, last.n = NULL),tracing=FALSE)
 
 
-#test.fit.fn <- rate.fit
-#test.est.fn <- rate.list[["estimator"]]
+
+
+?calcFC
+?fitModel
+?multiFC
+?doBoot
+?rankModels
+?plotModelFit
 
 
 
-#test.fm <- fitModel(model= "Naive", data = data.withage$data,
-#								 settings = list(avg.yrs=3),tracing=FALSE)
+
+
+
+
+
 
 
 
