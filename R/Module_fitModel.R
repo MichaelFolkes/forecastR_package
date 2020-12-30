@@ -22,7 +22,7 @@
 #' @export
 #'
 #' @examples
-fitModel <- function(model= c("Naive", "Rate", "Mechanistic", "SibRegSimple","SibRegKalman","SibRegLogPower","TimeSeriesArima","TimeSeriesExpSmooth"), data = NULL, settings = NULL,tracing=FALSE){
+fitModel <- function(model= c("Naive", "ReturnRate", "Mechanistic", "SibRegSimple","SibRegKalman","SibRegLogPower","TimeSeriesArima","TimeSeriesExpSmooth"), data = NULL, settings = NULL,tracing=FALSE){
 # Check inputs
 model <- match.arg(model)
 
@@ -85,10 +85,10 @@ if(!any(is.na(ages))){  # if have age classes, loop through them
 } # end if naive variation
 
 
-if(model %in%  c("Rate")){
+if(model %in%  c("ReturnRate")){
 
 
-	if(tracing){print("starting rate model")}
+	if(tracing){print("starting return rate model")}
 
 	#check if there are settings
 	if(is.null(settings)) {warning("required settings avg, pred.label, and last.n for rate model not specified. Using default values")
