@@ -37,7 +37,7 @@ fit.test.allyr.juv$model.fit$fitted.values
 
 fit.test.last5.juv <-rate.est(data.withage$data$`Age 3` %>% select(Run_Year, Age_3,Pred_Juv_Outmigrants, Pred_Hat_Releases),
 				 avg="wtmean", pred.label = NULL, last.n  = 5)
-
+fit.test.last5.juv$model.fit$data.used
 
 
 # input is more convoluted here than it would usually be...
@@ -54,7 +54,7 @@ source("R/Module_Sub_PerformanceMeasures.R")
 
 
 # fit the model
-rate.fitmodel.out <- fitModel(model= "Rate", data = data.withage$data,
+rate.fitmodel.out <- fitModel(model= "ReturnRate", data = data.withage$data,
 															settings = list(avg="wtmean", pred.label = "Pred_Juv_Outmigrants", last.n = NULL),tracing=FALSE)
 
 names(rate.fitmodel.out )
@@ -67,11 +67,11 @@ plotModelFit(rate.fitmodel.out, options= list(plot.which = "all",age.which="all"
 
 
 
-
-
-
 # calculate the forecast
-arimafc.withage.nobc <- calcFC(fit.obj= arimafit.withage.nobc ,data =data.withage$data, fc.yr= data.withage$specs$forecastingyear,  settings = list(BoxCox=FALSE), tracing=TRUE)
+arimafc.withage.nobc <- calcFC(fit.obj= arimafit.withage.nobc ,
+															 data =data.withage$data,
+															 fc.yr= data.withage$specs$forecastingyear,
+															 settings = list(BoxCox=FALSE), tracing=TRUE)
 
 
 ?calcFC

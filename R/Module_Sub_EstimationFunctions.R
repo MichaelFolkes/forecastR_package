@@ -168,14 +168,14 @@ naive.list <- list(estimator = naive.est, datacheck= naive.datacheck, pt.fc =nai
 
 
 
-#### MECHANISTIC (RATE) ####
+#### MECHANISTIC (Return RATE) ####
 
 
 rate.datacheck <- function(data.use, pred.label = NULL, tracing=FALSE){
 	# verify that all the required components are there
 	# and check for any special values that might crash the estimate
 
-	if(tracing){print("Starting mechanistic.datacheck()")}
+	if(tracing){print("Starting rate.datacheck()")}
 
 	# NA values a problem? -> don't think, need to test
 	# Missing years a problem? -> maybe
@@ -255,7 +255,7 @@ rate.est <- function(data.use, avg="wtmean", pred.label = NULL, last.n  = NULL){
 										data.used = data.use,
 										residuals= data.orig[[2]] - fits	)
 
-	results <- c(list(model.type = "Mechanistic",formula=paste0(names(data.orig)[2],"* return rate based on last",last.n,"yrs of", pred.label),
+	results <- c(list(model.type = "ReturnRate",formula=paste0(names(data.orig)[2],"* return rate based on last",last.n,"yrs of", pred.label),
 										var.names = pred.label,
 										est.fn = paste0(avg," of (rate[last", last.n,"yrs])"),
 										model.fit=model.fit,
@@ -842,7 +842,7 @@ expsmooth.list <- list(estimator = expsmooth.est, datacheck= expsmooth.datacheck
 #### MERGING ALL THE MODELS ####
 
 estimation.functions <- list(Naive = naive.list,
-														 Rate = rate.list,
+														 ReturnRate = rate.list,
                              SibRegSimple = sibreg.simple.list,
                              SibRegKalman = sibreg.kalman.list,
                              SibRegLogPower = logpower.simple.list,
