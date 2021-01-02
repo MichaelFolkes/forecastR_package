@@ -5,14 +5,16 @@
 
 
  require(forecastR)
- data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates.csv", stringsAsFactors = FALSE)
- data.withoutage.raw <- read.csv("inst/extdata/FinalSampleFile_WithoutAge_covariates.csv", stringsAsFactors = FALSE)
+ data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates_Orig.csv", stringsAsFactors = FALSE)
+ tail(data.withage.raw)
+
+ #data.withoutage.raw <- read.csv("inst/extdata/FinalSampleFile_WithoutAge_covariates.csv", stringsAsFactors = FALSE)
 
 
  source("R/Module_Sub_EstimationFunctions.R")
 
  data.withage <- prepData(data.withage.raw,out.labels="v2")
- data.withoutage <- prepData(data.withoutage.raw,out.labels="v2")
+ #data.withoutage <- prepData(data.withoutage.raw,out.labels="v2")
 
 
 
@@ -33,11 +35,13 @@ fit.test.allyr.juv$obs.values
 fit.test.allyr.juv$fitted.values
 fit.test.allyr.juv$model.fit$obs.values
 fit.test.allyr.juv$model.fit$fitted.values
-
+fit.test.allyr.juv$num.obs.used
 
 fit.test.last5.juv <-rate.est(data.withage$data$`Age 3` %>% select(Run_Year, Age_3,Pred_Juv_Outmigrants, Pred_Hat_Releases),
 				 avg="wtmean", pred.label = NULL, last.n  = 5)
 fit.test.last5.juv$model.fit$data.used
+
+fit.test.last5.juv$num.obs.used
 
 
 # input is more convoluted here than it would usually be...
@@ -68,10 +72,10 @@ plotModelFit(rate.fitmodel.out, options= list(plot.which = "all",age.which="all"
 
 
 # calculate the forecast
-arimafc.withage.nobc <- calcFC(fit.obj= arimafit.withage.nobc ,
-															 data =data.withage$data,
-															 fc.yr= data.withage$specs$forecastingyear,
-															 settings = list(BoxCox=FALSE), tracing=TRUE)
+rate.calcFC.out<- calcFC(fit.obj= rate.fitmodel.out,
+                               data =data.withage$data,
+				 fc.yr= data.withage$specs$forecastingyear,
+				 settings = list(BoxCox=FALSE), tracing=TRUE)
 
 
 ?calcFC

@@ -1,7 +1,3 @@
-
-
-
-
 #' @title Convert from raw data structure
 #'
 #' @param datafile datafile is a csv file in either the old format (withage
@@ -85,6 +81,10 @@ names(tmpsub) <- c("Run_Year","Total",cov.list, predictor.list)
 
 # merge into data obj
 data.obj <- list(data=list(Total=tmpsub) , output.pre = datafile_new,specs = list(stockabundance=stockabundance, stockname=stockname, stockspecies=stockspecies , forecastingyear=forecastingyear))
+
+
+
+
 
 
 }#END file without age classes
@@ -184,6 +184,8 @@ return(data.obj)
 }# END prepData
 
 
+
+#############################################################
 
 prepData.off <- function(datafile,out.labels = "v1"){
 	# old format required columns: TBI
