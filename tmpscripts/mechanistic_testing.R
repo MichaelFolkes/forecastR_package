@@ -11,10 +11,19 @@
  #data.withoutage.raw <- read.csv("inst/extdata/FinalSampleFile_WithoutAge_covariates.csv", stringsAsFactors = FALSE)
 
 
- source("R/Module_Sub_EstimationFunctions.R")
+ #TEST WITH FinalSampleFile_WithAge_exclTotal.csv!!!!!!!!!!!!!
 
+ source("R/Module_Sub_EstimationFunctions.R")
+ source("R/Module_prepData.R")
  data.withage <- prepData(data.withage.raw,out.labels="v2")
  #data.withoutage <- prepData(data.withoutage.raw,out.labels="v2")
+ names(data.withage)
+
+
+
+
+
+
 
 
 

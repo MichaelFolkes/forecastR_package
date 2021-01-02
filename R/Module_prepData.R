@@ -43,10 +43,10 @@ if(has.age.col){has.age.data <-  any(tolower(unique(datafile$Age_Class)) != "tot
 if(has.age.data) { file.type <- "WithAge" }
 if(!has.age.data){ file.type <- "WithoutAge"}
 
-cov.list <- names(datafile)[grep("Cov_",names(datafile))]
-#print(cov.list)
+cov.list <- names(datafile)[grep("cov_",tolower(names(datafile)))]
+print(cov.list)
 predictor.list <- names(datafile)[grep("pred_",tolower(names(datafile)))]
-
+print(predictor.list)
 
 
 stockabundance <- gsub("[[:space:]]", "_", datafile$Stock_Abundance[1])
@@ -64,6 +64,12 @@ forecastingyear <- datafile$Forecasting_Year[1]
 # see https://github.com/avelez-espino/forecastR_phase4/issues/55
 # doing this here based on run year (rather than based on fcyear-age-1 vs brood year)
 # this should handle all the alternative file formats
+
+# NOTE: this also handles the issue of additional run years added to include covariates or predictors
+# use the original source below for extracting the covariates and/or predictors
+
+datafile.orig <- datafile
+
 datafile <- datafile[datafile$Run_Year < forecastingyear, ]
 
 
