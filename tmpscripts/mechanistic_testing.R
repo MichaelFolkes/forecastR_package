@@ -5,7 +5,7 @@
 
 
  require(forecastR)
- data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates_TEST.csv", stringsAsFactors = FALSE)
+ data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates_Orig.csv", stringsAsFactors = FALSE)
  tail(data.withage.raw)
 
  #data.withoutage.raw <- read.csv("inst/extdata/FinalSampleFile_WithoutAge_covariates.csv", stringsAsFactors = FALSE)
@@ -35,11 +35,13 @@ fit.test.allyr.juv$obs.values
 fit.test.allyr.juv$fitted.values
 fit.test.allyr.juv$model.fit$obs.values
 fit.test.allyr.juv$model.fit$fitted.values
-
+fit.test.allyr.juv$num.obs.used
 
 fit.test.last5.juv <-rate.est(data.withage$data$`Age 3` %>% select(Run_Year, Age_3,Pred_Juv_Outmigrants, Pred_Hat_Releases),
 				 avg="wtmean", pred.label = NULL, last.n  = 5)
 fit.test.last5.juv$model.fit$data.used
+
+fit.test.last5.juv$num.obs.used
 
 
 # input is more convoluted here than it would usually be...

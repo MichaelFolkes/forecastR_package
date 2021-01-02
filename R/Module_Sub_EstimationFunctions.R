@@ -216,7 +216,9 @@ rate.est <- function(data.use, avg="wtmean", pred.label = NULL, last.n  = NULL){
 	#print(pred.label)
 
 	last.year <- max(data.use[[1]])
-	if(!is.null(last.n)){ data.use <- data.use[data.use[[1]] > (last.year -last.n), ]}
+
+	# handling year filter as per https://github.com/MichaelFolkes/forecastR_package/issues/15
+	if(!is.null(last.n)){ data.use <- data.use[data.use[[1]] > (last.year -last.n), ] }
 
 	data.use$rate <- data.use[[2]]/data.use[[pred.label]]
 
@@ -262,7 +264,8 @@ rate.est <- function(data.use, avg="wtmean", pred.label = NULL, last.n  = NULL){
 										fitted.values = fits,
 							      obs.values = data.orig[[2]],
 										residuals = data.orig[[2]] - fits,
-										run.yrs = data.orig[[1]] )
+										run.yrs = data.orig[[1]],
+							      num.obs.used = sum(!is.na(data.use$rate))  )
 										)
 
 
