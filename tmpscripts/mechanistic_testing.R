@@ -5,7 +5,10 @@
 
 
  require(forecastR)
- data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates_Orig.csv", stringsAsFactors = FALSE)
+ # test the alternate input filr versions
+ #data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates_Orig.csv", stringsAsFactors = FALSE)
+ data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates_Test.csv", stringsAsFactors = FALSE)
+ #data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal.csv", stringsAsFactors = FALSE)
  tail(data.withage.raw)
 
  #data.withoutage.raw <- read.csv("inst/extdata/FinalSampleFile_WithoutAge_covariates.csv", stringsAsFactors = FALSE)
@@ -19,10 +22,10 @@
  #data.withoutage <- prepData(data.withoutage.raw,out.labels="v2")
  names(data.withage)
 
+ data.withage$covariates
+ data.withage$predictors
 
-
-
-
+ data.withage$data$`Age 3`
 
 
 
