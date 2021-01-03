@@ -207,7 +207,7 @@ rate.datacheck <- function(data.use, pred.label = NULL, tracing=FALSE){
 rate.est <- function(data.use, avg="wtmean", pred.label = NULL, last.n  = NULL){
 	# data.use is a data frame with at least 3 columns: first column is run year, second is abd, remaining are Pred
 	# avg is the type of average to use for the rate
-	# pred.label is the column label for the predictor variable. If NULL, function picks the first one
+	# pred.label is the column label for the predictor variable. If NULL, function picks the first one (Put this in the Documentation)
 	# last.n determines the number of years to use for the rate calc. If NULL, use all years
 
 	data.orig <- data.use # for later
