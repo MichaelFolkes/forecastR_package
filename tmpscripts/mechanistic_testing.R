@@ -40,6 +40,7 @@ fit.test.allyr.juv <- rate.est(data.withage$data$`Age 3` %>% select(Run_Year, Ag
 				 avg="wtmean", pred.label = NULL, last.n  = NULL) # if pred.label = NULL, pick the first pred column -> discuss
 
 names(fit.test.allyr.juv)
+fit.test.allyr.juv$model.type
 fit.test.allyr.juv$model.fit
 
 # should sort out this replication, but keeping it in for now (later dependencies...)
@@ -71,9 +72,15 @@ source("R/Module_Sub_PerformanceMeasures.R")
 
 # fit the model
 rate.fitmodel.out <- fitModel(model= "ReturnRate", data = data.withage$data,
-															settings = list(avg="wtmean", pred.label = "Pred_Juv_Outmigrants", last.n = NULL),tracing=FALSE)
+			      settings = list(avg="wtmean", pred.label = "Pred_Juv_Outmigrants", last.n = NULL),
+			      tracing=FALSE)
 
 names(rate.fitmodel.out )
+rate.fitmodel.out$'Age 3'$var.names
+names(rate.fitmodel.out$`Age 3` )
+names(rate.fitmodel.out$`Age 3`$model.fit)
+rate.fitmodel.out$`Age 3`$model.type
+rate.fitmodel.out$`Age 3`$model.fit$coefficients
 rate.fitmodel.out$fitted.pm
 names(rate.fitmodel.out$"Age 3")
 
@@ -83,14 +90,23 @@ plotModelFit(rate.fitmodel.out, options= list(plot.which = "all",age.which="all"
 
 
 
+
+
+
+
+
 # calculate the forecast
+source("R/Module_calcFC.R")
+source("R/Module_Sub_EstimationFunctions.R")
 rate.calcFC.out<- calcFC(fit.obj= rate.fitmodel.out,
                                data =data.withage$data,
 				 fc.yr= data.withage$specs$forecastingyear,
-				 settings = list(BoxCox=FALSE), tracing=TRUE)
+				 predictors =  data.withage$predictors,
+				 covariates = NULL,
+				 settings = NULL, tracing=TRUE)
 
-
-?calcFC
+rate.calcFC.out
+calcFC
 
 
 # plot model fit and forecast
