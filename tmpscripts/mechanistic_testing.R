@@ -57,14 +57,11 @@ fit.test.last5.juv$model.fit$data.used
 fit.test.last5.juv$num.obs.used
 
 
-# input is more convoluted here than it would usually be...
-rate.pt.fc(fit.obj=fit.test.allyr.juv, data = data.withage$data$`Age 3` %>% dplyr::filter(Run_Year == 2015) %>% select(Pred_Juv_Outmigrants) %>% unlist(),
-					    settings=NULL)
 
 
 
 ####################
-# TEsting the wrapper functions (withage data)
+# Testing the wrapper functions (withage data)
 
 source("R/Module_fitModel.R")
 source("R/Module_Sub_PerformanceMeasures.R")
@@ -109,13 +106,64 @@ rate.calcFC.out
 calcFC
 
 
-# plot model fit and forecast
+#########################################################################################
+# multiFC()
 
 
-?multiFC
-?doBoot
-?rankModels
 
+settings.use <- list(#Naive1 = list(model.type="Naive",settings=list(avg.yrs=1)),
+										 #Naive3 = list(model.type="Naive",settings=list(avg.yrs=3)),
+										 #Naive5 = list(model.type="Naive",settings=list(avg.yrs=5)),
+										 #SibRegSimple = list(model.type="SibRegSimple",settings=NULL),
+										 #SibRegLogPower =  list(model.type="SibRegLogPower",settings=NULL),
+										 #SibRegKalman =  list(model.type="SibRegKalman",settings=NULL),
+										 #TimeSeriesArimaBC = list(model.type="TimeSeriesArima",settings=list(BoxCox=TRUE)),
+										 #TimeSeriesArimaNoBC = list(model.type="TimeSeriesArima",settings=list(BoxCox=FALSE)),
+										 #TimeSeriesExpSmoothBC = list(model.type="TimeSeriesExpSmooth",settings=list(BoxCox=TRUE)),
+										 #TimeSeriesExpSmoothNoBC = list(model.type="TimeSeriesExpSmooth",settings=list(BoxCox=FALSE))
+										 ReturnRateJuvAllYr =  list(mode.type = "ReturnRate", settings = list(avg="wtmean", pred.label = "Pred_Juv_Outmigrants", last.n = NULL)),
+										 ReturnRateJuvLast5 =  list(mode.type = "ReturnRate", settings = list(avg="wtmean", pred.label = "Pred_Juv_Outmigrants", last.n = 5)),
+										 ReturnRateRelAllYr =  list(mode.type = "ReturnRate", settings = list(avg="wtmean", pred.label = "Pred_Hat_Releases", last.n = NULL)),
+										 ReturnRateRelLast5 =  list(mode.type = "ReturnRate", settings = list(avg="wtmean", pred.label = "Pred_Hat_Releases", last.n = 5))
+										 )
+
+
+source("R/Module_FitModel.R")
+multiresults.ptfconly <- multiFC(data.file=data.withage.raw,settings.list=settings.use,
+																 do.retro=FALSE,retro.min.yrs=15,
+																 out.type="short",
+																 int.type = "None", int.n = 100,
+																 boot.type = "meboot",
+																 tracing=FALSE)
+multiresults.ptfconly
+
+
+
+multiresults.retro <- multiFC(data.file=data.withage.raw,settings.list=settings.use,
+															do.retro=TRUE,retro.min.yrs=15,
+															out.type="short",
+															int.type = "None", int.n = 100,
+															boot.type = "meboot",
+															tracing=FALSE)
+
+# check the components of the multifc output
+names(multiresults.retro$retro.pm)
+
+# extract the fc table
+multiresults.retro$table.ptfc
+
+# extract 1 version of the retrospective performance summary
+multiresults.retro[["retro.pm"]][["retro.pm.bal"]]
+
+
+# do three alternative model rankings
+ranktest1 <- rankModels(multiresults.retro$retro.pm$retro.pm.bal)
+ranktest2 <- rankModels(multiresults.retro$retro.pm$retro.pm.bal, columnToRank = c("MRE","MAE") )
+ranktest3 <- rankModels(multiresults.retro$retro.pm$retro.pm.bal, relative.bol=TRUE )
+
+ranktest1$Total
+ranktest2$Total
+ranktest3$Total
 
 
 
