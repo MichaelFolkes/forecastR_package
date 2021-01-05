@@ -145,7 +145,7 @@ multiresults.ptfconly <- multiFC(data.file=data.withage.raw,settings.list=settin
 multiresults.ptfconly
 
 
-### RETRO STILL NEEDS DEBUGGING
+### RETROSPECTIVE
 source("R/Module_multiFC.R")
 source("R/Module_doRetro.R")
 multiresults.retro <- multiFC(data.file=data.withage.raw,settings.list=settings.use,
@@ -174,6 +174,43 @@ ranktest3 <- rankModels(multiresults.retro$retro.pm$retro.pm.bal, relative.bol=T
 ranktest1$Total
 ranktest2$Total
 ranktest3$Total
+
+
+#########################################################################################
+# Test the intervals
+
+
+source("R/Module_calcFC.R")
+source("R/Module_FitModel.R")
+source("R/Module_multiFC.R")
+source("R/Module_doRetro.R")
+
+# Prediction Interval NOT WORKING
+multiresults.int.pred <- multiFC(data.file=data.withage.raw,settings.list=settings.use,
+																 do.retro=FALSE,retro.min.yrs=15,
+																 out.type="short",
+																 int.type = "Prediction", int.n = 100,
+																 boot.type = "meboot",
+																 tracing=TRUE)
+
+
+# Retrospective Interval NOT WORKING
+multiresults.int.pred <- multiFC(data.file=data.withage.raw,settings.list=settings.use,
+																 do.retro=FALSE,retro.min.yrs=15,
+																 out.type="short",
+																 int.type = "Retrospective", int.n = 100,
+																 boot.type = "meboot",
+																 tracing=TRUE)
+
+
+# BootStrap Interval NOT WORKING
+multiresults.int.pred <- multiFC(data.file=data.withage.raw,settings.list=settings.use,
+																 do.retro=FALSE,retro.min.yrs=15,
+																 out.type="short",
+																 int.type = "Bootstrap", int.n = 100,
+																 boot.type = "meboot",
+																 tracing=TRUE)
+
 
 
 
