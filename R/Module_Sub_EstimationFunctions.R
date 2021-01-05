@@ -275,15 +275,18 @@ rate.est <- function(data.use, avg="wtmean", pred.label = NULL, last.n  = NULL){
 
 rate.pt.fc <- function(fit.obj=NULL, data,settings=NULL){
 	# fit.obj = object created from fitModel()
-	# data = data frame with one element of the list created by sub.fcdata() (VERIFY)
-	# settings argument is here for consistency with the other pt.fc functions. It doesn't do anything (for)
+	# data = value of predictor variable
+	# settings argument is here for consistency with the other pt.fc functions. It doesn't do anything (for now)
 
 	# How to get prediction intervals for rate model? See https://github.com/MichaelFolkes/forecastR_package/issues/12
 	# lower/upper step is in rate.est, here using only the resulting coeff
-
-	pt.fc.out <- c(data * fit.obj$model.fit$coefficient,
-								 data * fit.obj$model.fit$lower.coeff,
-								 data * fit.obj$model.fit$upper.coeff)
+	#print("------------")
+	#print(data)
+	#print("------------")
+	#print(names(fit.obj))
+	pt.fc.out <- c(data * fit.obj$coefficient,
+								 data * fit.obj$lower.coeff,
+								 data * fit.obj$upper.coeff)
 
 
 	names(pt.fc.out) <- c("Point","Lower", "Upper")

@@ -42,7 +42,9 @@ multiFC <- function(data.file, settings.list, do.retro = FALSE, retro.min.yrs=15
 
 out.type <- match.arg(out.type)
 
+
 dat.prepped <-  prepData(data.file,out.labels="v2")  # prep data for the model fit
+
 
 # start a list for storing
 out.list <- list()
@@ -83,7 +85,7 @@ for(model.name in names(settings.list) ){
 
 
 	fc.calc <- calcFC(fit.obj= model.fitted,data = dat.prepped$data, fc.yr= dat.prepped$specs$forecastingyear,
-					settings = settings.use, tracing=tracing)
+					settings = settings.use, tracing=tracing, predictors =  dat.prepped$predictors, covariates = dat.prepped$covariates)
 
 	out.list[[model.name]] <- fc.calc
 
@@ -106,6 +108,7 @@ for(model.name in names(settings.list) ){
 
 
 	 retro.out  <- 	doRetro(model= model.use, data = dat.prepped$data,
+ 			  predictors =  dat.prepped$predictors, covariates = dat.prepped$covariates,
 				retro.settings = list(min.yrs=retro.min.yrs),
 				fit.settings = settings.use,
 				fc.settings = settings.use,
