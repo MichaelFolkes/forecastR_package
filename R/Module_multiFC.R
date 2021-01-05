@@ -108,6 +108,7 @@ for(model.name in names(settings.list) ){
 
 
 	 retro.out  <- 	doRetro(model= model.use, data = dat.prepped$data,
+ 			  predictors =  dat.prepped$predictors, covariates = dat.prepped$covariates,
 				retro.settings = list(min.yrs=retro.min.yrs),
 				fit.settings = settings.use,
 				fc.settings = settings.use,

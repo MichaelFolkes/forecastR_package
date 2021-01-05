@@ -18,7 +18,7 @@
 #' @export
 #'
 #' @examples
-calcFC <- function(fit.obj= NULL, data = NULL, fc.yr= NULL, settings = NULL, tracing=FALSE, predictors = predictors, covariates = covariates ){
+calcFC <- function(fit.obj= NULL, data = NULL, fc.yr= NULL, settings = NULL, tracing=FALSE, predictors = NULL, covariates = NULL ){
 # Check inputs
 
 	if(any(is.null(c(fit.obj,data)))){warning("Some inputs are missing");stop()}

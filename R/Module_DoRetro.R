@@ -51,6 +51,10 @@ if(option=="retro"){
 #'
 #' @param model A character vector of length one. It is the model name and must match one of the model names in the \code{estimation.functions} list object.
 #' @param data A data frame. Equivalent to the "data" element in the list output from \code{\link{prepData}}.
+#' @param predictors A list. Optional input needed for return rate model. Equal to the element named \code{predictors} from output of
+#'   \code{\link{prepData}}. Default is NULL.
+#' @param covariates A list. Optional input needed for covariate model. Equal to the element named \code{covariates} from output of
+#'   \code{\link{prepData}}. Default is NULL.
 #' @param retro.settings A list
 #' @param fit.settings A list
 #' @param fc.settings A list
@@ -65,7 +69,7 @@ if(option=="retro"){
 #' @export
 #'
 #' @examples
-doRetro <- function(model= NULL, data = NULL, retro.settings = NULL, fit.settings = NULL,
+doRetro <- function(model= NULL, data = NULL, predictors = NULL, covariates = NULL, retro.settings = NULL, fit.settings = NULL,
 		fc.settings = NULL, tracing=FALSE,out.type = c("short", "full") , interval.n = 500,
 		interval.quants = TRUE,pt.fc.in = NULL){
 # this function runs through a retrospective test
@@ -123,7 +127,8 @@ for(fc.yr.retro in retro.yrs){
 
  fitted.pm.array[,,paste("FC",fc.yr.retro,sep="")] <- model.fitted$fitted.pm
 
-  fc.calc <- calcFC(fit.obj= model.fitted,data = data.use, fc.yr= fc.yr.retro, settings = fc.settings,tracing=FALSE)
+  fc.calc <- calcFC(fit.obj= model.fitted,data = data.use, predictors =  predictors, covariates = covariates,
+  									fc.yr= fc.yr.retro, settings = fc.settings,tracing=FALSE)
 
   retro.mat.fc[paste("FC",fc.yr.retro,sep=""),] <- fc.calc$pt.fc
  }

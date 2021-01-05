@@ -132,6 +132,7 @@ settings.use <- list(Naive1 = list(model.type="Naive",settings=list(avg.yrs=1)),
 source("R/Module_calcFC.R")
 source("R/Module_FitModel.R")
 source("R/Module_multiFC.R")
+
 multiresults.ptfconly <- multiFC(data.file=data.withage.raw,settings.list=settings.use,
 																 do.retro=FALSE,retro.min.yrs=15,
 																 out.type="short",
@@ -145,14 +146,17 @@ multiresults.ptfconly
 
 
 ### RETRO STILL NEEDS DEBUGGING
+source("R/Module_multiFC.R")
+source("R/Module_doRetro.R")
 multiresults.retro <- multiFC(data.file=data.withage.raw,settings.list=settings.use,
 															do.retro=TRUE,retro.min.yrs=15,
 															out.type="short",
 															int.type = "None", int.n = 100,
 															boot.type = "meboot",
-															tracing=FALSE)
+															tracing=TRUE)
 
 # check the components of the multifc output
+names(multiresults.retro)
 names(multiresults.retro$retro.pm)
 
 # extract the fc table
