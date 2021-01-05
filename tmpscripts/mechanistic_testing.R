@@ -22,6 +22,8 @@
  #data.withoutage <- prepData(data.withoutage.raw,out.labels="v2")
  names(data.withage)
 
+ data.withage$specs
+
  data.withage$covariates
  data.withage$predictors
 
@@ -103,7 +105,7 @@ rate.calcFC.out<- calcFC(fit.obj= rate.fitmodel.out,
 				 settings = NULL, tracing=TRUE)
 
 rate.calcFC.out
-calcFC
+#calcFC
 
 
 #########################################################################################
@@ -111,9 +113,9 @@ calcFC
 
 
 
-settings.use <- list(#Naive1 = list(model.type="Naive",settings=list(avg.yrs=1)),
-										 #Naive3 = list(model.type="Naive",settings=list(avg.yrs=3)),
-										 #Naive5 = list(model.type="Naive",settings=list(avg.yrs=5)),
+settings.use <- list(Naive1 = list(model.type="Naive",settings=list(avg.yrs=1)),
+										 Naive3 = list(model.type="Naive",settings=list(avg.yrs=3)),
+										 Naive5 = list(model.type="Naive",settings=list(avg.yrs=5)),
 										 #SibRegSimple = list(model.type="SibRegSimple",settings=NULL),
 										 #SibRegLogPower =  list(model.type="SibRegLogPower",settings=NULL),
 										 #SibRegKalman =  list(model.type="SibRegKalman",settings=NULL),
@@ -121,24 +123,28 @@ settings.use <- list(#Naive1 = list(model.type="Naive",settings=list(avg.yrs=1))
 										 #TimeSeriesArimaNoBC = list(model.type="TimeSeriesArima",settings=list(BoxCox=FALSE)),
 										 #TimeSeriesExpSmoothBC = list(model.type="TimeSeriesExpSmooth",settings=list(BoxCox=TRUE)),
 										 #TimeSeriesExpSmoothNoBC = list(model.type="TimeSeriesExpSmooth",settings=list(BoxCox=FALSE))
-										 ReturnRateJuvAllYr =  list(mode.type = "ReturnRate", settings = list(avg="wtmean", pred.label = "Pred_Juv_Outmigrants", last.n = NULL)),
-										 ReturnRateJuvLast5 =  list(mode.type = "ReturnRate", settings = list(avg="wtmean", pred.label = "Pred_Juv_Outmigrants", last.n = 5)),
-										 ReturnRateRelAllYr =  list(mode.type = "ReturnRate", settings = list(avg="wtmean", pred.label = "Pred_Hat_Releases", last.n = NULL)),
-										 ReturnRateRelLast5 =  list(mode.type = "ReturnRate", settings = list(avg="wtmean", pred.label = "Pred_Hat_Releases", last.n = 5))
+										 ReturnRateJuvAllYr =  list(model.type = "ReturnRate", settings = list(avg="wtmean", pred.label = "Pred_Juv_Outmigrants", last.n = NULL)),
+										 ReturnRateJuvLast5 =  list(model.type = "ReturnRate", settings = list(avg="wtmean", pred.label = "Pred_Juv_Outmigrants", last.n = 5)),
+										 ReturnRateRelAllYr =  list(model.type = "ReturnRate", settings = list(avg="wtmean", pred.label = "Pred_Hat_Releases", last.n = NULL)),
+										 ReturnRateRelLast5 =  list(model.type = "ReturnRate", settings = list(avg="wtmean", pred.label = "Pred_Hat_Releases", last.n = 5))
 										 )
 
-
+source("R/Module_calcFC.R")
 source("R/Module_FitModel.R")
+source("R/Module_multiFC.R")
 multiresults.ptfconly <- multiFC(data.file=data.withage.raw,settings.list=settings.use,
 																 do.retro=FALSE,retro.min.yrs=15,
 																 out.type="short",
 																 int.type = "None", int.n = 100,
 																 boot.type = "meboot",
-																 tracing=FALSE)
+																 tracing=TRUE)
+
+
+
 multiresults.ptfconly
 
 
-
+### RETRO STILL NEEDS DEBUGGING
 multiresults.retro <- multiFC(data.file=data.withage.raw,settings.list=settings.use,
 															do.retro=TRUE,retro.min.yrs=15,
 															out.type="short",

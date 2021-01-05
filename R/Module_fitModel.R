@@ -52,7 +52,7 @@ if(model %in%  c("Naive")){
 if(tracing){print("starting naive variations -------------------")}
 
 #replacing stop() with return(NULL) will stop the function, not put it into debug mode
-print("flag1")
+#print("flag1")
 if(is.null(settings) | !("avg.yrs" %in% names(settings))){print("flag2");warning("avg.yrs for naive model not specified"); stop()}
 
 

@@ -217,7 +217,7 @@ if(length(predictor.list)>0){
 
 
 	names(tmpsub.pred) <- paste(age.prefix,extract_ages, sep= age.sep)
-	print(tmpsub.pred)
+	#print(tmpsub.pred)
 	data.obj <- c(data.obj,list(predictors = tmpsub.pred))
 
 }
