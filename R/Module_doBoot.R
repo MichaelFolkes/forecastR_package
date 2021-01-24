@@ -59,6 +59,9 @@ if(length(names(data$data)) > 1 ){out.mat.cols <- c(names(data$data),"Total")}
 
 out.mat <- matrix(NA, ncol= length(out.mat.cols) ,nrow = length(data.booted), dimnames = list( 1:length(data.booted),out.mat.cols))
 
+print("data.booted[[1]]---------------------------");print(data.booted[[1]])
+print("args.fitmodel------------------------------");print(args.fitmodel)
+print("args.calcfc---------------------------------"); print(args.calcfc)
 
 for(i in 1:length(data.booted)){
 	out.mat[i,] <-	unlist(fitModelandcalcFC(data = data.booted[[i]], fitmodel.args = args.fitmodel, calcfc.args = args.calcfc))
