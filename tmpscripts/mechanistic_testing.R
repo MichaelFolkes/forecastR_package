@@ -1,5 +1,7 @@
  require(forecastR)
  library(tidyverse)
+ library(meboot)
+
 #
 # data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates.csv", stringsAsFactors = FALSE)
 
@@ -218,6 +220,7 @@ multiresults.int.retro
 
 
 # BootStrap Interval NOT WORKING
+source("R/Module_doBoot.R")
 multiresults.int.boot <- multiFC(data.file=data.withage.raw,settings.list=settings.use,
 																 do.retro=FALSE,retro.min.yrs=15,
 																 out.type="short",
