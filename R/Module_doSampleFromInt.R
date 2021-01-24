@@ -19,10 +19,6 @@ int.sample <- NULL
 
 
 for(age.use in age.classes){
-    print("==========")
-	print(age.use)
-    print(fc.obj$pt.fc[,age.use])
-print(fc.obj$upper[,age.use])
 
 	results <- sampleFromStats(average = fc.obj$pt.fc[,age.use], q = fc.obj$upper[,age.use], p = 0.9)
 	#results$results is the full sampled vector, can include -ve values
@@ -32,8 +28,6 @@ print(fc.obj$upper[,age.use])
 #int.sample <- round(as.data.frame(int.sample))
 int.sample <- (as.data.frame(int.sample))
  
-print(head(int.sample))
-
 
 if(interval.quants){
 	int.out <- as.data.frame(lapply(int.sample,function(x){quantile(x,probs=c(0.1,0.25,0.5,0.75,0.9))}))

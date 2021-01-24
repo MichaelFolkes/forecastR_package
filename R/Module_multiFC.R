@@ -93,11 +93,11 @@ for(model.name in names(settings.list) ){
 
 	if(int.type=="Prediction"){
 
-		print("flag1")
+
 
 			int.quants <- doSampleFromInt(fc.obj=fc.calc, interval.n=int.n,interval.quants=TRUE)
 
-			print("flag2")
+
 
 			if(tracing){
 			print("prediction quants")
@@ -107,7 +107,7 @@ for(model.name in names(settings.list) ){
 
 
 
-	if(do.retro){
+	if(do.retro | int.type=="Retrospective"){
 
 
 

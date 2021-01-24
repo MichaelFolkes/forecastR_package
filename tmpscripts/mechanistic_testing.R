@@ -202,20 +202,23 @@ multiresults.int.pred <- multiFC(data.file=data.withage.raw,settings.list=settin
 																 boot.type = "meboot",
 																 tracing=TRUE)
 
+multiresults.int.pred
 
 
-
-# Retrospective Interval NOT WORKING
-multiresults.int.pred <- multiFC(data.file=data.withage.raw,settings.list=settings.use,
-																 do.retro=FALSE,retro.min.yrs=15,
+# Retrospective Interval
+# Note: if int-type = "retrospective". ot will run a retrospective even if do.retro != TRUE
+multiresults.int.retro <- multiFC(data.file=data.withage.raw,settings.list=settings.use,
+																 do.retro=TRUE,retro.min.yrs=15,
 																 out.type="short",
 																 int.type = "Retrospective", int.n = 100,
 																 boot.type = "meboot",
 																 tracing=TRUE)
 
+multiresults.int.retro
+
 
 # BootStrap Interval NOT WORKING
-multiresults.int.pred <- multiFC(data.file=data.withage.raw,settings.list=settings.use,
+multiresults.int.boot <- multiFC(data.file=data.withage.raw,settings.list=settings.use,
 																 do.retro=FALSE,retro.min.yrs=15,
 																 out.type="short",
 																 int.type = "Bootstrap", int.n = 100,
