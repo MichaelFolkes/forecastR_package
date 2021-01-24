@@ -7,6 +7,8 @@
 doRetro(
   model = NULL,
   data = NULL,
+  predictors = NULL,
+  covariates = NULL,
   retro.settings = NULL,
   fit.settings = NULL,
   fc.settings = NULL,
@@ -21,6 +23,12 @@ doRetro(
 \item{model}{A character vector of length one. It is the model name and must match one of the model names in the \code{estimation.functions} list object.}
 
 \item{data}{A data frame. Equivalent to the "data" element in the list output from \code{\link{prepData}}.}
+
+\item{predictors}{A list. Optional input needed for return rate model. Equal to the element named \code{predictors} from output of
+\code{\link{prepData}}. Default is NULL.}
+
+\item{covariates}{A list. Optional input needed for covariate model. Equal to the element named \code{covariates} from output of
+\code{\link{prepData}}. Default is NULL.}
 
 \item{retro.settings}{A list}
 

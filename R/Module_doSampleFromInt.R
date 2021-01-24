@@ -17,7 +17,13 @@ doSampleFromInt <- function(fc.obj, interval.n=1000,interval.quants=FALSE){
 age.classes <- dimnames(fc.obj$lower)[[2]]
 int.sample <- NULL
 
+
 for(age.use in age.classes){
+    print("==========")
+	print(age.use)
+    print(fc.obj$pt.fc[,age.use])
+print(fc.obj$upper[,age.use])
+
 	results <- sampleFromStats(average = fc.obj$pt.fc[,age.use], q = fc.obj$upper[,age.use], p = 0.9)
 	#results$results is the full sampled vector, can include -ve values
 	int.sample[[age.use]] <- results$results
@@ -25,7 +31,8 @@ for(age.use in age.classes){
 
 #int.sample <- round(as.data.frame(int.sample))
 int.sample <- (as.data.frame(int.sample))
-
+ 
+print(head(int.sample))
 
 
 if(interval.quants){
@@ -43,9 +50,15 @@ return(int.out)
 
 sampleFromStats <- function(average, q, p=0.9, n=1000){
 
+
+
+
 	sd.val <- (q-average)/qnorm(p)
 	#take a large sample, then will resample postitive values:
+	print(sd.val)
 	res <- rnorm(min(c(n*10, 1e6)), average, sd.val)
+	
+	
 	sample.stats <- quantile(res, probs = c(0.1, .5, .9))
 
 	#res.bounded vector has zero as lower bound (but sample.stats values are taken from full distribution)

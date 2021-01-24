@@ -7,7 +7,8 @@
 plotModelFit(
   fit.obj,
   options = list(plot.which = "all", age.which = "all", plot.add = FALSE),
-  fc.add = NULL
+  fc.add = NULL,
+  tracing = FALSE
 )
 }
 \arguments{
