@@ -125,6 +125,15 @@ createBoots <- function(dat.prepped, boot.type=c("meboot", "stlboot"), boot.n=10
 }#END createBoots
 
 
+#' @title Function to apply fitModel() then calcFC(), and return the pt.fc
+#' 
+#' @param data  output from \code{\link{prepData}} 
+#' @param fitmodel.args  model fitting specs as per \code{\link{fitModel}} 
+#' @param calcfc.args forecast specs as per \code{\link{calcFC}}
+#'
+#' @return point forecast.
+#' @export
+
 fitModelandcalcFC <- function( data = NULL, fitmodel.args =list (model= NULL,  settings = NULL), calcfc.args = list(fc.yr= NULL,  settings = NULL)){
 # function to apply fitModel() then calcFC(), and save to ptfc.
 
@@ -134,14 +143,22 @@ fitModelandcalcFC <- function( data = NULL, fitmodel.args =list (model= NULL,  s
 	 pt.fc <- calcFC(fit.obj= fit.out, data = data, fc.yr= calcfc.args$fc.yr,
 						settings = calcfc.args$settings, tracing=FALSE)[[1]]
 
+					# NEED TO CHANGE THIS TO HANDLE NEW calcFC Arguments: predictors, covariates
+
 	return(pt.fc)
 
 }#end fitModelandcalcFC
 
+#' @title Plot a Summary of Bootstrapped Series
+#'
+#' @param dat.prepped the $data element from the output of \code{\link{prepData}} 
+#' @param boot.type one of "meboot" or "stlboot"
+#' @param age.which one of "all", "total", or specific age class (e.g. "Age 4")
+#'
+#' @return one or more plots.
+#' @export
 
 plotBootSeries <- function(dat.prepped, boot.type = c("meboot","stlboot"), age.which="all"){
-	# dat.prepped is the $data element from the output of prepData()
-	# plot a sample of 10 bootstrapped series for each selected age class)
 
 	# need to make sure that this is robust
 	if(age.which %in% c("all","total")){

@@ -64,6 +64,10 @@ print("args.fitmodel------------------------------");print(args.fitmodel)
 print("args.calcfc---------------------------------"); print(args.calcfc)
 
 for(i in 1:length(data.booted)){
+
+	tmp <- fitModelandcalcFC(data = data.booted[[i]], fitmodel.args = args.fitmodel, calcfc.args = args.calcfc)
+	print(tmp)
+
 	out.mat[i,] <-	unlist(fitModelandcalcFC(data = data.booted[[i]], fitmodel.args = args.fitmodel, calcfc.args = args.calcfc))
 }
 
