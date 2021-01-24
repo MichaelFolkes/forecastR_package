@@ -44,8 +44,8 @@ dat.rank <- apply(dat.arr, 3, function(x){
   str(dat.rank)
 
   #rank by column name
-  getRanks(dat.arr[,,1], columnToRank = "MRE")
+  rankModels(dat.arr[,,1], columnToRank = "MRE")
   #rank by column index
-  getRanks(dat.arr[,,1], columnToRank = 1)
+  rankModels(dat.arr[,,1], columnToRank = 1)
 }
 }

@@ -222,7 +222,7 @@ rate.est <- function(data.use, avg="wtmean", pred.label = NULL, last.n  = NULL){
 
 	data.use$rate <- data.use[[2]]/data.use[[pred.label]]
 
-	if(avg == "wtmean"){  data.use <- na.omit(data.use); rate.use <- sum(data.use[[1]]) / sum(data.use[[pred.label]])	}
+	if(avg == "wtmean"){  data.use <- na.omit(data.use); rate.use <- sum(data.use[[2]]) / sum(data.use[[pred.label]])	}
 	if(avg == "mean"){ rate.use <- mean(data.use$rate,na.rm=TRUE) }
 	if(avg == "median"){ rate.use <- median(data.use$rate,na.rm=TRUE) }
 

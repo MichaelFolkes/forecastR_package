@@ -83,6 +83,14 @@ rate.fitmodel.out$`Age 3`$model.fit$coefficients
 rate.fitmodel.out$fitted.pm
 names(rate.fitmodel.out$"Age 3")
 
+names(rate.fitmodel.out)
+rate.fitmodel.out$"Age 6"$model.fit$coefficients
+rate.fitmodel.out$"Age 6"$model.fit$lower.coeff
+rate.fitmodel.out$"Age 6"$model.fit$upper.coeff
+
+quantile(rate.fitmodel.out$"Age 6"$model.fit$data.used$rate,0.9)
+
+
 # plot the model fit
 source("R/Module_plotModelFit.R")
 plotModelFit(rate.fitmodel.out, options= list(plot.which = "all",age.which="all",plot.add=FALSE),fc.add = NULL, tracing = TRUE)
@@ -122,7 +130,7 @@ settings.use <- list(Naive1 = list(model.type="Naive",settings=list(avg.yrs=1)),
 										 #TimeSeriesArimaBC = list(model.type="TimeSeriesArima",settings=list(BoxCox=TRUE)),
 										 #TimeSeriesArimaNoBC = list(model.type="TimeSeriesArima",settings=list(BoxCox=FALSE)),
 										 #TimeSeriesExpSmoothBC = list(model.type="TimeSeriesExpSmooth",settings=list(BoxCox=TRUE)),
-										 #TimeSeriesExpSmoothNoBC = list(model.type="TimeSeriesExpSmooth",settings=list(BoxCox=FALSE))
+										 #TimeSeriesExpSmoothNoBC = list(model.type="TimeSeriesExpSmooth",settings=list(BoxCox=FALSE)),
 										 ReturnRateJuvAllYr =  list(model.type = "ReturnRate", settings = list(avg="wtmean", pred.label = "Pred_Juv_Outmigrants", last.n = NULL)),
 										 ReturnRateJuvLast5 =  list(model.type = "ReturnRate", settings = list(avg="wtmean", pred.label = "Pred_Juv_Outmigrants", last.n = 5)),
 										 ReturnRateRelAllYr =  list(model.type = "ReturnRate", settings = list(avg="wtmean", pred.label = "Pred_Hat_Releases", last.n = NULL)),
@@ -184,8 +192,9 @@ source("R/Module_calcFC.R")
 source("R/Module_FitModel.R")
 source("R/Module_multiFC.R")
 source("R/Module_doRetro.R")
+source("R/Module_doSampleFromInt.R")
 
-# Prediction Interval NOT WORKING
+# Prediction Interval
 multiresults.int.pred <- multiFC(data.file=data.withage.raw,settings.list=settings.use,
 																 do.retro=FALSE,retro.min.yrs=15,
 																 out.type="short",
@@ -193,18 +202,23 @@ multiresults.int.pred <- multiFC(data.file=data.withage.raw,settings.list=settin
 																 boot.type = "meboot",
 																 tracing=TRUE)
 
+multiresults.int.pred
 
-# Retrospective Interval NOT WORKING
-multiresults.int.pred <- multiFC(data.file=data.withage.raw,settings.list=settings.use,
-																 do.retro=FALSE,retro.min.yrs=15,
+
+# Retrospective Interval
+# Note: if int-type = "retrospective". ot will run a retrospective even if do.retro != TRUE
+multiresults.int.retro <- multiFC(data.file=data.withage.raw,settings.list=settings.use,
+																 do.retro=TRUE,retro.min.yrs=15,
 																 out.type="short",
 																 int.type = "Retrospective", int.n = 100,
 																 boot.type = "meboot",
 																 tracing=TRUE)
 
+multiresults.int.retro
+
 
 # BootStrap Interval NOT WORKING
-multiresults.int.pred <- multiFC(data.file=data.withage.raw,settings.list=settings.use,
+multiresults.int.boot <- multiFC(data.file=data.withage.raw,settings.list=settings.use,
 																 do.retro=FALSE,retro.min.yrs=15,
 																 out.type="short",
 																 int.type = "Bootstrap", int.n = 100,
