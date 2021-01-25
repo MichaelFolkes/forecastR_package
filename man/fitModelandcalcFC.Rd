@@ -7,7 +7,9 @@
 fitModelandcalcFC(
   data = NULL,
   fitmodel.args = list(model = NULL, settings = NULL),
-  calcfc.args = list(fc.yr = NULL, settings = NULL)
+  calcfc.args = list(fc.yr = NULL, settings = NULL),
+  predictors = NULL,
+  covariates = NULL
 )
 }
 \arguments{

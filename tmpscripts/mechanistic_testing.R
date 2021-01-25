@@ -219,15 +219,7 @@ multiresults.int.retro <- multiFC(data.file=data.withage.raw,settings.list=setti
 multiresults.int.retro
 
 
-# BootStrap Interval NOT WORKING
-
-
-require(forecastR)
-library(tidyverse)
-
-
-source("R/Module_doBoot.R")
-#source("R/Module_Sub_boots_functions.R")
+# BootStrap Interval
 
 multiresults.int.boot <- multiFC(data.file=data.withage.raw,settings.list=settings.use,
 																 do.retro=FALSE,retro.min.yrs=15,
@@ -235,34 +227,4 @@ multiresults.int.boot <- multiFC(data.file=data.withage.raw,settings.list=settin
 																 int.type = "Bootstrap", int.n = 100,
 																 boot.type = "meboot",
 																 tracing=TRUE)
-
-
-
-
-fitModel(model= "ReturnRate", data = data.withage$data,
-				 settings = list(avg="wtmean", pred.label = "Pred_Juv_Outmigrants", last.n = NULL),
-				 tracing=FALSE)
-
-
-calcFC(fit.obj= rate.fitmodel.out,
-			 data =data.withage$data,
-			 fc.yr= data.withage$specs$forecastingyear,
-			 predictors =  data.withage$predictors,
-			 covariates = NULL,
-			 settings = NULL, tracing=TRUE)
-
-
-
-fitModelandcalcFC(data = data = data.withage$data,
-									fitmodel.args =  list(model= "ReturnRate", settings = list(avg="wtmean", pred.label = "Pred_Juv_Outmigrants", last.n = NULL),
-									calcfc.args
-
-
-
-
-
-
-
-
-
 

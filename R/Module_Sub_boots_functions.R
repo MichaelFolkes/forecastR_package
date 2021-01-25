@@ -134,14 +134,19 @@ createBoots <- function(dat.prepped, boot.type=c("meboot", "stlboot"), boot.n=10
 #' @return point forecast.
 #' @export
 
-fitModelandcalcFC <- function( data = NULL, fitmodel.args =list (model= NULL,  settings = NULL), calcfc.args = list(fc.yr= NULL,  settings = NULL)){
+fitModelandcalcFC <- function( data = NULL, fitmodel.args =list (model= NULL,  settings = NULL), calcfc.args = list(fc.yr= NULL,  settings = NULL),predictors = NULL, covariates = NULL){
 # function to apply fitModel() then calcFC(), and save to ptfc.
 
 	 fit.out <- fitModel(model= fitmodel.args$model, data = data,
 						settings = fitmodel.args$settings,tracing=FALSE)
 
+	#print("predictors")
+	#print(data)
+	
 	 pt.fc <- calcFC(fit.obj= fit.out, data = data, fc.yr= calcfc.args$fc.yr,
-						settings = calcfc.args$settings, tracing=FALSE)[[1]]
+						settings = calcfc.args$settings, tracing=FALSE,
+						predictors = predictors,
+						covariates = covariates)[[1]]
 
 					# NEED TO CHANGE THIS TO HANDLE NEW calcFC Arguments: predictors, covariates
 
