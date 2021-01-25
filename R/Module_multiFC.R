@@ -143,6 +143,8 @@ for(model.name in names(settings.list) ){
 		if(int.type=="Bootstrap"){
 
 
+
+
 			boot.int <- doBoot(data= dat.prepped, args.fitmodel= list(model= model.use, settings = settings.use),
 						args.calcfc = list(fc.yr= dat.prepped$specs$forecastingyear,  settings = settings.use),
 						args.boot = list(boot.type=boot.type, boot.n= int.n , plot.diagnostics=FALSE),

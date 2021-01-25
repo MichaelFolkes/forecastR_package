@@ -1,6 +1,6 @@
  require(forecastR)
  library(tidyverse)
- library(meboot)
+ #library(meboot)
 
 #
 # data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates.csv", stringsAsFactors = FALSE)
@@ -18,8 +18,8 @@
 
  #TEST WITH FinalSampleFile_WithAge_exclTotal.csv!!!!!!!!!!!!!
 
- source("R/Module_Sub_EstimationFunctions.R")
- source("R/Module_prepData.R")
+ #source("R/Module_Sub_EstimationFunctions.R")
+ #source("R/Module_prepData.R")
  data.withage <- prepData(data.withage.raw,out.labels="v2")
  #data.withoutage <- prepData(data.withoutage.raw,out.labels="v2")
  names(data.withage)
@@ -67,8 +67,8 @@ fit.test.last5.juv$num.obs.used
 ####################
 # Testing the wrapper functions (withage data)
 
-source("R/Module_fitModel.R")
-source("R/Module_Sub_PerformanceMeasures.R")
+#source("R/Module_fitModel.R")
+#source("R/Module_Sub_PerformanceMeasures.R")
 
 
 # fit the model
@@ -94,7 +94,7 @@ quantile(rate.fitmodel.out$"Age 6"$model.fit$data.used$rate,0.9)
 
 
 # plot the model fit
-source("R/Module_plotModelFit.R")
+#source("R/Module_plotModelFit.R")
 plotModelFit(rate.fitmodel.out, options= list(plot.which = "all",age.which="all",plot.add=FALSE),fc.add = NULL, tracing = TRUE)
 
 
@@ -105,8 +105,8 @@ plotModelFit(rate.fitmodel.out, options= list(plot.which = "all",age.which="all"
 
 
 # calculate the forecast
-source("R/Module_calcFC.R")
-source("R/Module_Sub_EstimationFunctions.R")
+#source("R/Module_calcFC.R")
+#source("R/Module_Sub_EstimationFunctions.R")
 rate.calcFC.out<- calcFC(fit.obj= rate.fitmodel.out,
                                data =data.withage$data,
 				 fc.yr= data.withage$specs$forecastingyear,
@@ -139,9 +139,9 @@ settings.use <- list(Naive1 = list(model.type="Naive",settings=list(avg.yrs=1)),
 										 ReturnRateRelLast5 =  list(model.type = "ReturnRate", settings = list(avg="wtmean", pred.label = "Pred_Hat_Releases", last.n = 5))
 										 )
 
-source("R/Module_calcFC.R")
-source("R/Module_FitModel.R")
-source("R/Module_multiFC.R")
+#source("R/Module_calcFC.R")
+#source("R/Module_FitModel.R")
+#source("R/Module_multiFC.R")
 
 multiresults.ptfconly <- multiFC(data.file=data.withage.raw,settings.list=settings.use,
 																 do.retro=FALSE,retro.min.yrs=15,
@@ -156,8 +156,8 @@ multiresults.ptfconly
 
 
 ### RETROSPECTIVE
-source("R/Module_multiFC.R")
-source("R/Module_doRetro.R")
+#source("R/Module_multiFC.R")
+#source("R/Module_doRetro.R")
 multiresults.retro <- multiFC(data.file=data.withage.raw,settings.list=settings.use,
 															do.retro=TRUE,retro.min.yrs=15,
 															out.type="short",
@@ -190,11 +190,11 @@ ranktest3$Total
 # Test the intervals
 
 
-source("R/Module_calcFC.R")
-source("R/Module_FitModel.R")
-source("R/Module_multiFC.R")
-source("R/Module_doRetro.R")
-source("R/Module_doSampleFromInt.R")
+#source("R/Module_calcFC.R")
+#source("R/Module_FitModel.R")
+#source("R/Module_multiFC.R")
+#source("R/Module_doRetro.R")
+#source("R/Module_doSampleFromInt.R")
 
 # Prediction Interval
 multiresults.int.pred <- multiFC(data.file=data.withage.raw,settings.list=settings.use,
@@ -219,33 +219,12 @@ multiresults.int.retro <- multiFC(data.file=data.withage.raw,settings.list=setti
 multiresults.int.retro
 
 
-# BootStrap Interval NOT WORKING
-source("R/Module_doBoot.R")
+# BootStrap Interval
+
 multiresults.int.boot <- multiFC(data.file=data.withage.raw,settings.list=settings.use,
 																 do.retro=FALSE,retro.min.yrs=15,
 																 out.type="short",
 																 int.type = "Bootstrap", int.n = 100,
 																 boot.type = "meboot",
 																 tracing=TRUE)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
