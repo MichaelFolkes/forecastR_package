@@ -22,7 +22,7 @@
 #' @export
 #'
 #' @examples
-fitModel <- function(model= c("Naive", "Mechanistic", "SibRegSimple","SibRegKalman","SibRegLogPower","TimeSeriesArima","TimeSeriesExpSmooth"), data = NULL, settings = NULL,tracing=FALSE){
+fitModel <- function(model= c("Naive", "ReturnRate", "Mechanistic", "SibRegSimple","SibRegKalman","SibRegLogPower","TimeSeriesArima","TimeSeriesExpSmooth"), data = NULL, settings = NULL,tracing=FALSE){
 # Check inputs
 model <- match.arg(model)
 
@@ -52,7 +52,8 @@ if(model %in%  c("Naive")){
 if(tracing){print("starting naive variations -------------------")}
 
 #replacing stop() with return(NULL) will stop the function, not put it into debug mode
-if(is.null(settings) | !("avg.yrs" %in% names(settings))){warning("avg.yrs for naive model not specified"); stop()}
+#print("flag1")
+if(is.null(settings) | !("avg.yrs" %in% names(settings))){print("flag2");warning("avg.yrs for naive model not specified"); stop()}
 
 
 if(tracing){print("starting data reorg for naive fits")}
@@ -85,9 +86,76 @@ if(!any(is.na(ages))){  # if have age classes, loop through them
 } # end if naive variation
 
 
-if(model %in%  c("Mechanistic")){
+if(model %in%  c("ReturnRate")){
 
-}#END mechanistic
+
+	if(tracing){print("starting return rate model")}
+
+	#check if there are settings
+	if(is.null(settings)) {warning("required settings avg, pred.label, and last.n for rate model not specified. Using default values")
+		avg.use <- "wtmean"
+		pred.label.use <- NULL
+		last.n.use <- NULL
+		}
+
+	if(!is.null(settings)) {
+		avg.use <- settings$avg
+		pred.label.use <- settings$pred.label
+		last.n.use <- settings$last.n
+	}
+
+
+  # too many variations, so just forcing all or nothing settings
+	#if(!is.null(settings)){
+	#	  if(!("avg" %in% names(settings))){warning("avg for rate model not specified. Using default = wtmean")}
+	#		if(!("pred.label" %in% names(settings))){warning("pred.label for rate model not specified.Using default = first Pred_ column from left")}
+	#	  if(!("last.n" %in% names(settings)) ){	warning("last.n for rate model not specified.Using default = all years")}
+	#			# Need to decide how to handle last.n vs missing years, (as per https://github.com/MichaelFolkes/forecastR_package/issues/15)
+	#    	# then build in check and warning accordingly
+	#			} # end checking settings
+
+
+	if(tracing){print("starting data reorg for rate fits")}
+
+	age.classes <- names(data)
+
+	ages <- as.numeric(gsub("\\D", "", age.classes)) # as per https://stat.ethz.ch/pipermail/r-help/2011-February/267946.html
+	age.prefix <- gsub(ages[1],"",age.classes[1])
+	#print(age.prefix)
+
+	# for now this handles the "noage" version, need to test to ensure robustness
+	# also: should be able to combine the 2 versions into 1 generic, but for now just make it work
+	if(any(is.na(ages))){
+		data.in <- data[["Total"]][,c("Run_Year","Total",pred.label.use)]
+
+		# check the data
+		dt.chk <- rate.datacheck(data.use = data.in, pred.label = pred.label.use, tracing=FALSE)
+		if(!dt.chk$var.check){warning("selected predictor variable not in data set"); stop()}
+		if(!dt.chk$yrs.check & !is.null(last.n.use)){warning("last.n specified, but missing years in data"); stop()}
+
+		out.list[["Total"]] <- estimation.functions[[model]]$estimator(data.use = data.in,avg=avg.use, pred.label = pred.label.use, last.n  = last.n.use)
+	} # end if no age classes
+
+
+	if(!any(is.na(ages))){  # if have age classes, loop through them
+		for(age.do in ages){
+			if(tracing){print(paste("starting age",age.do))}
+
+			data.in <- data[[paste(age.prefix,age.do,sep="")]][,c("Run_Year",paste(gsub(" ","_",age.prefix),age.do,sep=""),pred.label.use)]
+			if(tracing){print(data.in)}
+   		# check the data
+   		dt.chk <- rate.datacheck(data.use = data.in, pred.label = pred.label.use, tracing=FALSE)
+   		if(!dt.chk$var.check){warning("selected predictor variable not in data set"); stop()}
+   		if(!dt.chk$yrs.check & !is.null(last.n.use)){warning("last.n specified, but missing years in data"); stop()}
+
+   		out.list[[paste(age.prefix,age.do,sep="")]] <- estimation.functions[[model]]$estimator(data.use = data.in,avg=avg.use, pred.label = pred.label.use, last.n  = last.n.use)
+
+
+		}} # end looping through age classes if have them
+
+
+
+}#END Rate
 
 
 #SIBLING REGRESSION VARIATIONS

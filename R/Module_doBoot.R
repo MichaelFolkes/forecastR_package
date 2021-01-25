@@ -47,6 +47,15 @@ if(any(is.null(data),is.null(args.calcfc$fc.yr))){warning("must provide data fil
 data.booted <- createBoots(data, boot.type= args.boot$boot.type, boot.n=args.boot$boot.n, plot.diagnostics=args.boot$plot.diagnostics)
 
 
+if("predictors" %in% names(data)){ predictors.use <- data$predictors}
+if(!("predictors" %in% names(data))){ predictors.use <- NULL}
+
+# NOTE: need to figure out covariate bootstrap approach
+# See https://github.com/MichaelFolkes/forecastR_package/issues/20
+# for now, not bootstrapping the covariates
+if("covariates" %in% names(data)){ covariates.use <- data$covariates}
+if(!("covariates" %in% names(data))){ covariates.use <- NULL}
+
 
 # NOTE: doing this step below in a loop. it works with lapply as well, but
 #       the speed tests came out thesame, and then have to rearrange the ouputs from a list.
@@ -60,9 +69,14 @@ if(length(names(data$data)) > 1 ){out.mat.cols <- c(names(data$data),"Total")}
 out.mat <- matrix(NA, ncol= length(out.mat.cols) ,nrow = length(data.booted), dimnames = list( 1:length(data.booted),out.mat.cols))
 
 
+
 for(i in 1:length(data.booted)){
-	out.mat[i,] <-	unlist(fitModelandcalcFC(data = data.booted[[i]], fitmodel.args = args.fitmodel, calcfc.args = args.calcfc))
-}
+
+	out.mat[i,] <-	unlist(fitModelandcalcFC(data = data.booted[[i]], fitmodel.args = args.fitmodel, calcfc.args = args.calcfc,
+												predictors = predictors.use,
+												covariates = covariates.use))
+
+	}
 
 out.mat <- as.data.frame(round(out.mat))
 

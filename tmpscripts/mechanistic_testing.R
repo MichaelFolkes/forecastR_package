@@ -1,212 +1,230 @@
  require(forecastR)
+ library(tidyverse)
+ #library(meboot)
+
 #
 # data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates.csv", stringsAsFactors = FALSE)
 
 
-#### MECHANISTIC (RATE) ####
+ require(forecastR)
+ # test the alternate input filr versions
+ #data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates_Orig.csv", stringsAsFactors = FALSE)
+ data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates_Test.csv", stringsAsFactors = FALSE)
+ #data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal.csv", stringsAsFactors = FALSE)
+ tail(data.withage.raw)
+
+ #data.withoutage.raw <- read.csv("inst/extdata/FinalSampleFile_WithoutAge_covariates.csv", stringsAsFactors = FALSE)
 
 
+ #TEST WITH FinalSampleFile_WithAge_exclTotal.csv!!!!!!!!!!!!!
 
-rate.datacheck <- function(data.use,tracing=FALSE){
-	# verify that all the required components are there
-	# and check for any special values that might crash the estimate
+ #source("R/Module_Sub_EstimationFunctions.R")
+ #source("R/Module_prepData.R")
+ data.withage <- prepData(data.withage.raw,out.labels="v2")
+ #data.withoutage <- prepData(data.withoutage.raw,out.labels="v2")
+ names(data.withage)
 
-	if(tracing){print("Starting mechanistic.datacheck() - Placeholder only for now")}
+ data.withage$specs
 
+ data.withage$covariates
+ data.withage$predictors
 
-	# NA values a problem? -> don't think, need to test
-	# Missing years a problem? -> not likely
-	# Zero values a problem? -> if in denominator yes!
+ data.withage$data$`Age 3`
 
-	# just a placholder step
-	tmp.out <- range(data.use)
-
-	return(tmp.out)
-
-}#END rate.datacheck
-
-
-rate.est <- function(data.use,avg.yrs, method=c("mean", "median"), tracing=FALSE){
-	# do the estimation (1 instance)
-	# data.use format required as per preamble in naive.fit() subroutine above
-
-	if(tracing){print("Starting rate.est()")}
-
-	model.fit <- rate.fit(data.use=data.use,avg.yrs = avg.yrs, method = method)
-
-	return(c(list(model.type = "Mechanistic",formula=paste("y = avg(y in",avg.yrs,"previous years)"), var.names = "abd" , est.fn = "classic"), model.fit,list(fitted.values = model.fit$fitted.values.raw) ))
-
-	results <- c()
-
- c(list(model.type = "Naive",formula=paste("y = avg(y in",avg.yrs,"previous years)"), var.names = "abd" , est.fn = "classic"), model.fit,list(fitted.values = model.fit$fitted.values.raw) )
-
-	return(results)
-
-
-}#END rate.est
-
-
-
-
-
-rate.pt.fc <- function(fit.obj=NULL, data,settings=NULL){
-	# don't need any coefficients, because just averaging the years fed in by the previous step
-	# data = vector of N years, as pre-filtered by the sub.fcdata() subroutine
-	# current setting: if ANY of the input values are NA, then the pt fc is NA
-
-	# How to get prediction intervals for rate model? See https://github.com/avelez-espino/forecastR_phase4/issues/125
-
-	if(length(data)>1){	pt.fc.out <- c(mean(data,na.rm=FALSE),unlist(quantile(data,probs=c(0.1,0.9),na.rm=FALSE)) ) }
-	if(length(data)==1){
-		pt.fc.out <- mean(data,na.rm=FALSE)
-		pt.fc.out <- c( pt.fc.out, pt.fc.out * c(0.5,1.5))
-	}
-
-	return(pt.fc.out)
-
-}#END rate.pt.fc
-
-
-
-# Merge object
-
-rate.list <- list(estimator = rate.est, datacheck= rate.datacheck, pt.fc =rate.pt.fc )
 
 
 
 ############
-# TEsting
+# Testing  Estimation Functions (with Age data)
 
-require(forecastR)
-data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates.csv", stringsAsFactors = FALSE)
-data.withoutage.raw <- read.csv("inst/extdata/FinalSampleFile_WithoutAge_covariates.csv", stringsAsFactors = FALSE)
+rate.datacheck(data.use = data.withage$data$`Age 3`, pred.label = "Pred_Juv_Outmigrants", tracing=TRUE)
+ rate.datacheck(data.use = data.withage$data$`Age 3`, pred.label = NULL, tracing=TRUE)
 
+fit.test.allyr.juv <- rate.est(data.withage$data$`Age 3` %>% select(Run_Year, Age_3,Pred_Juv_Outmigrants, Pred_Hat_Releases),
+				 avg="wtmean", pred.label = NULL, last.n  = NULL) # if pred.label = NULL, pick the first pred column -> discuss
 
-data.withage <- prepData(data.withage.raw,out.labels="v2")
-data.withoutage <- prepData(data.withoutage.raw,out.labels="v2")
+names(fit.test.allyr.juv)
+fit.test.allyr.juv$model.type
+fit.test.allyr.juv$model.fit
 
+# should sort out this replication, but keeping it in for now (later dependencies...)
+fit.test.allyr.juv$obs.values
+fit.test.allyr.juv$fitted.values
+fit.test.allyr.juv$model.fit$obs.values
+fit.test.allyr.juv$model.fit$fitted.values
+fit.test.allyr.juv$num.obs.used
 
+fit.test.last5.juv <-rate.est(data.withage$data$`Age 3` %>% select(Run_Year, Age_3,Pred_Juv_Outmigrants, Pred_Hat_Releases),
+				 avg="wtmean", pred.label = NULL, last.n  = 5)
+fit.test.last5.juv$model.fit$data.used
 
-rate.fit <- function(data.use, avg="wtmean"){
-	# data.use is a data frame with 2 columns: abundance, predictor
-	# avg is the type of average to use for the rate
-
-
-
-	data.use$rate <- data.use$abundance/data.use$predictor
-
-
-	if(avg == "wtmean"){  data.use <- na.omit(data.use)
-												rate.use <- sum(data.use$abundance) / sum(data.use$predictor)
-												}
-
-	if(avg == "mean"){ rate.use <- mean(data.use$rate,na.rm=TRUE) }
-	if(avg == "median"){ rate.use <- mean(data.use$rate,na.rm=TRUE) }
-	if(avg == "geomean"){ rate.use <- mean(data.use$rate,na.rm=TRUE) }
-
-
-#"min","max","p10","p90"
-
-
-
-	model.fit <- list(coefficients = statistic,
-										obs.values =  ,
-										fitted.values = ,
-										data = data.use,
-										residuals= data.use$residuals,
-										)
-
-	results <- c(list(model.type = "Mechanistic",formula=paste0(statistic,"*", predictor.colname),
-										var.names = predictor.colname,
-										est.fn = paste0(method,"(rate[BYstart>=", BYstart, "])")),
-							 model.fit=model.fit,
-							 list(fitted.values = data.use$fitted.values))
-
-
-	return(results)
-}#END rate.fit
-
-test.fit.fn <- rate.fit
-
-test.est.fn <- rate.list[["estimator"]]
-
-
-
-	#test.fm <- fitModel(model= "Naive", data = data.withage$data,
-	#								 settings = list(avg.yrs=3),tracing=FALSE)
+fit.test.last5.juv$num.obs.used
 
 
 
 
 
+####################
+# Testing the wrapper functions (withage data)
+
+#source("R/Module_fitModel.R")
+#source("R/Module_Sub_PerformanceMeasures.R")
+
+
+# fit the model
+rate.fitmodel.out <- fitModel(model= "ReturnRate", data = data.withage$data,
+			      settings = list(avg="wtmean", pred.label = "Pred_Juv_Outmigrants", last.n = NULL),
+			      tracing=FALSE)
+
+names(rate.fitmodel.out )
+rate.fitmodel.out$'Age 3'$var.names
+names(rate.fitmodel.out$`Age 3` )
+names(rate.fitmodel.out$`Age 3`$model.fit)
+rate.fitmodel.out$`Age 3`$model.type
+rate.fitmodel.out$`Age 3`$model.fit$coefficients
+rate.fitmodel.out$fitted.pm
+names(rate.fitmodel.out$"Age 3")
+
+names(rate.fitmodel.out)
+rate.fitmodel.out$"Age 6"$model.fit$coefficients
+rate.fitmodel.out$"Age 6"$model.fit$lower.coeff
+rate.fitmodel.out$"Age 6"$model.fit$upper.coeff
+
+quantile(rate.fitmodel.out$"Age 6"$model.fit$data.used$rate,0.9)
+
+
+# plot the model fit
+#source("R/Module_plotModelFit.R")
+plotModelFit(rate.fitmodel.out, options= list(plot.which = "all",age.which="all",plot.add=FALSE),fc.add = NULL, tracing = TRUE)
 
 
 
 
-################################################
-# OLD DRAFT CODE
-# USE THIS AS THE STARTING POINT, BUT BUILD IT INTO fitModel() and calcFC() functions
 
 
 
 
+# calculate the forecast
+#source("R/Module_calcFC.R")
+#source("R/Module_Sub_EstimationFunctions.R")
+rate.calcFC.out<- calcFC(fit.obj= rate.fitmodel.out,
+                               data =data.withage$data,
+				 fc.yr= data.withage$specs$forecastingyear,
+				 predictors =  data.withage$predictors,
+				 covariates = NULL,
+				 settings = NULL, tracing=TRUE)
 
-# forecast.rate <- function(fit.obj, fc.year){
-
-
-forecast.rate <- function(fit.obj, data, data.settings=NULL){
-
- 	#fc.year <- data.working$specs$forecastingyear
-
- 	predictors <- lapply(unique(data.working$data$age), function(age,fc.year, data){
-
- 		broodyear <- fc.year-age
- 		predictor.cols <- grep(pattern = "pred_", tolower(colnames(data)))
- 		predictors <- data[data$Brood_Year==broodyear, predictor.cols]
-
- 		if(nrow(predictors)==0) predictors[1,1:ncol(predictors)] <- NA
- 		predictors$age <- age
- 		predictors[1,]
-
- 	}, fc.year, data.working$data)
-
- 	predictors.df <- do.call("rbind", predictors)
- 	colnames(predictors.df) <- tolower(colnames(predictors.df))
- 	predictors.long <- reshape(predictors.df, direction = "long", varying = list(predictor.colnames), timevar="variable", times = predictor.colnames,  v.names="value")
- 	predictors.long <- subset(predictors.long, select = -id)
-
- 	lapply(rate.stats$stats, function(x, predictors.long){
-
- 		dat.tmp <- merge(x, predictors.long)
- 		dat.tmp$forecast <- dat.tmp$statistic* dat.tmp$value
- 		dat.tmp.wide <- reshape(dat.tmp[,c("variable", "age", "forecast")], direction = 'wide', timevar = 'variable', idvar = "age")
- 		return(list(forecast.wide=dat.tmp.wide, forecast.long=dat.tmp))
-
- 	}, predictors.long)
-
- }#END forecast.rate
+rate.calcFC.out
+#calcFC
 
 
-require(forecastR)
-data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates.csv", stringsAsFactors = FALSE)
+#########################################################################################
+# multiFC()
 
 
 
-#FinalSampleFile_WithAge_exclTotal_covariates.csv
+settings.use <- list(Naive1 = list(model.type="Naive",settings=list(avg.yrs=1)),
+										 Naive3 = list(model.type="Naive",settings=list(avg.yrs=3)),
+										 Naive5 = list(model.type="Naive",settings=list(avg.yrs=5)),
+										 #SibRegSimple = list(model.type="SibRegSimple",settings=NULL),
+										 #SibRegLogPower =  list(model.type="SibRegLogPower",settings=NULL),
+										 #SibRegKalman =  list(model.type="SibRegKalman",settings=NULL),
+										 #TimeSeriesArimaBC = list(model.type="TimeSeriesArima",settings=list(BoxCox=TRUE)),
+										 #TimeSeriesArimaNoBC = list(model.type="TimeSeriesArima",settings=list(BoxCox=FALSE)),
+										 #TimeSeriesExpSmoothBC = list(model.type="TimeSeriesExpSmooth",settings=list(BoxCox=TRUE)),
+										 #TimeSeriesExpSmoothNoBC = list(model.type="TimeSeriesExpSmooth",settings=list(BoxCox=FALSE)),
+										 ReturnRateJuvAllYr =  list(model.type = "ReturnRate", settings = list(avg="wtmean", pred.label = "Pred_Juv_Outmigrants", last.n = NULL)),
+										 ReturnRateJuvLast5 =  list(model.type = "ReturnRate", settings = list(avg="wtmean", pred.label = "Pred_Juv_Outmigrants", last.n = 5)),
+										 ReturnRateRelAllYr =  list(model.type = "ReturnRate", settings = list(avg="wtmean", pred.label = "Pred_Hat_Releases", last.n = NULL)),
+										 ReturnRateRelLast5 =  list(model.type = "ReturnRate", settings = list(avg="wtmean", pred.label = "Pred_Hat_Releases", last.n = 5))
+										 )
 
-data.working <- prepData(data.withage.raw,out.labels="v2")
-BYstart <- 2000
-predictor.colname <- "Pred_Juv_Outmigrants"
+#source("R/Module_calcFC.R")
+#source("R/Module_FitModel.R")
+#source("R/Module_multiFC.R")
 
-lapply(data.working$data, function(x, BYstart, predictor.colname){rate.fit(model.data = x, BYstart = BYstart, predictor.colname = predictor.colname)}, BYstart, predictor.colname)
+multiresults.ptfconly <- multiFC(data.file=data.withage.raw,settings.list=settings.use,
+																 do.retro=FALSE,retro.min.yrs=15,
+																 out.type="short",
+																 int.type = "None", int.n = 100,
+																 boot.type = "meboot",
+																 tracing=TRUE)
 
 
-fit.obj <- fit.rate(data.use = data.working$data$`Age 3`, BYstart = BYstart, predictor.colname = predictor.colname)
 
-forecastR:::sub.fcdata(fit = fit.obj, data = data.working$data$`Age 3`, fc.yr = 2017)
-tail(data.working$data$`Age 3`)
-forecast.rate(fit.obj = fit.obj, fc.year = data.working$specs$forecastingyear)
+multiresults.ptfconly
 
-lapply(data.working$data, function(x, BYstart, predictor.colname){fit.rate(data.use = x, BYstart = BYstart, predictor.colname = predictor.colname)}, BYstart, predictor.colname)
 
+### RETROSPECTIVE
+#source("R/Module_multiFC.R")
+#source("R/Module_doRetro.R")
+multiresults.retro <- multiFC(data.file=data.withage.raw,settings.list=settings.use,
+															do.retro=TRUE,retro.min.yrs=15,
+															out.type="short",
+															int.type = "None", int.n = 100,
+															boot.type = "meboot",
+															tracing=TRUE)
+
+# check the components of the multifc output
+names(multiresults.retro)
+names(multiresults.retro$retro.pm)
+
+# extract the fc table
+multiresults.retro$table.ptfc
+
+# extract 1 version of the retrospective performance summary
+multiresults.retro[["retro.pm"]][["retro.pm.bal"]]
+
+
+# do three alternative model rankings
+ranktest1 <- rankModels(multiresults.retro$retro.pm$retro.pm.bal)
+ranktest2 <- rankModels(multiresults.retro$retro.pm$retro.pm.bal, columnToRank = c("MRE","MAE") )
+ranktest3 <- rankModels(multiresults.retro$retro.pm$retro.pm.bal, relative.bol=TRUE )
+
+ranktest1$Total
+ranktest2$Total
+ranktest3$Total
+
+
+#########################################################################################
+# Test the intervals
+
+
+#source("R/Module_calcFC.R")
+#source("R/Module_FitModel.R")
+#source("R/Module_multiFC.R")
+#source("R/Module_doRetro.R")
+#source("R/Module_doSampleFromInt.R")
+
+# Prediction Interval
+multiresults.int.pred <- multiFC(data.file=data.withage.raw,settings.list=settings.use,
+																 do.retro=FALSE,retro.min.yrs=15,
+																 out.type="short",
+																 int.type = "Prediction", int.n = 100,
+																 boot.type = "meboot",
+																 tracing=TRUE)
+
+multiresults.int.pred
+
+
+# Retrospective Interval
+# Note: if int-type = "retrospective". ot will run a retrospective even if do.retro != TRUE
+multiresults.int.retro <- multiFC(data.file=data.withage.raw,settings.list=settings.use,
+																 do.retro=TRUE,retro.min.yrs=15,
+																 out.type="short",
+																 int.type = "Retrospective", int.n = 100,
+																 boot.type = "meboot",
+																 tracing=TRUE)
+
+multiresults.int.retro
+
+
+# BootStrap Interval
+
+multiresults.int.boot <- multiFC(data.file=data.withage.raw,settings.list=settings.use,
+																 do.retro=FALSE,retro.min.yrs=15,
+																 out.type="short",
+																 int.type = "Bootstrap", int.n = 100,
+																 boot.type = "meboot",
+																 tracing=TRUE)
 

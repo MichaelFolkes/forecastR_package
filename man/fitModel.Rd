@@ -5,8 +5,8 @@
 \title{General Model Fitting Functon}
 \usage{
 fitModel(
-  model = c("Naive", "Mechanistic", "SibRegSimple", "SibRegKalman", "SibRegLogPower",
-    "TimeSeriesArima", "TimeSeriesExpSmooth"),
+  model = c("Naive", "ReturnRate", "Mechanistic", "SibRegSimple", "SibRegKalman",
+    "SibRegLogPower", "TimeSeriesArima", "TimeSeriesExpSmooth"),
   data = NULL,
   settings = NULL,
   tracing = FALSE

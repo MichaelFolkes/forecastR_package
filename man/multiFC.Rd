@@ -10,7 +10,7 @@ multiFC(
   do.retro = FALSE,
   retro.min.yrs = 15,
   out.type = c("short", "full"),
-  int.type = "None",
+  int.type = c("None", "Retrospective", "Prediction", "Bootstrap"),
   int.n = 100,
   boot.type = "meboot",
   tracing = FALSE

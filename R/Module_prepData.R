@@ -1,7 +1,3 @@
-
-
-
-
 #' @title Convert from raw data structure
 #'
 #' @param datafile datafile is a csv file in either the old format (withage
@@ -47,11 +43,12 @@ if(has.age.col){has.age.data <-  any(tolower(unique(datafile$Age_Class)) != "tot
 if(has.age.data) { file.type <- "WithAge" }
 if(!has.age.data){ file.type <- "WithoutAge"}
 
-cov.list <- names(datafile)[grep("Cov_",names(datafile))]
+cov.list <- names(datafile)[grep("cov_",tolower(names(datafile)))]
 #print(cov.list)
+#print(length(cov.list))
 predictor.list <- names(datafile)[grep("pred_",tolower(names(datafile)))]
-
-
+#print(predictor.list)
+#print(length(predictor.list))
 
 stockabundance <- gsub("[[:space:]]", "_", datafile$Stock_Abundance[1])
 stockname <- datafile$Stock_Name[1]
@@ -68,6 +65,12 @@ forecastingyear <- datafile$Forecasting_Year[1]
 # see https://github.com/avelez-espino/forecastR_phase4/issues/55
 # doing this here based on run year (rather than based on fcyear-age-1 vs brood year)
 # this should handle all the alternative file formats
+
+# NOTE: this also handles the issue of additional run years added to include covariates or predictors
+# use the original source below for extracting the covariates and/or predictors
+
+datafile.orig <- datafile
+
 datafile <- datafile[datafile$Run_Year < forecastingyear, ]
 
 
@@ -83,8 +86,20 @@ datafile_new <- NA
 tmpsub <-  datafile[,c("Run_Year",paste("Average_",stockabundance,sep=""),cov.list, predictor.list)]
 names(tmpsub) <- c("Run_Year","Total",cov.list, predictor.list)
 
+
+
+
 # merge into data obj
 data.obj <- list(data=list(Total=tmpsub) , output.pre = datafile_new,specs = list(stockabundance=stockabundance, stockname=stockname, stockspecies=stockspecies , forecastingyear=forecastingyear))
+
+if(length(cov.list)>0){
+	data.obj <- c(data.obj,list(covariates = datafile.orig[,c("Run_Year",cov.list)]))
+	}
+
+if(length(predictor.list)>0){
+	data.obj <- c(data.obj,list(predictors = datafile.orig[,c("Run_Year",predictor.list)]))
+	}
+
 
 
 }#END file without age classes
@@ -177,6 +192,39 @@ rownames(data.original) <- NULL
 # merge into data obj
 data.obj <- list(data=tmpsub, data.original=data.original, output.pre = datafile_new,specs = list(stockabundance=stockabundance, stockname=stockname, stockspecies=stockspecies , forecastingyear=forecastingyear))
 
+
+
+if(length(cov.list)>0){
+
+	tmpsub.cov <- lapply(extract_ages, FUN=function(age, datafile.orig, year.labels){
+		dat.tmp.orig <- datafile.orig[datafile.orig$Age_Class==age, c(year.labels,cov.list)]
+		return(dat.tmp.orig)
+	}, datafile.orig, year.labels)
+
+
+	names(tmpsub.cov) <- paste(age.prefix,extract_ages, sep= age.sep)
+
+	data.obj <- c(data.obj,list(covariates = tmpsub.cov))
+}
+
+if(length(predictor.list)>0){
+
+	tmpsub.pred <- lapply(extract_ages, FUN=function(age, datafile.orig, year.labels){
+		dat.tmp.orig <- datafile.orig[datafile.orig$Age_Class==age, c(year.labels,predictor.list)]
+		#print(dat.tmp.orig)
+		return(dat.tmp.orig)
+	}, datafile.orig, year.labels)
+
+
+	names(tmpsub.pred) <- paste(age.prefix,extract_ages, sep= age.sep)
+	#print(tmpsub.pred)
+	data.obj <- c(data.obj,list(predictors = tmpsub.pred))
+
+}
+
+
+
+
 }#END if(file.type == "OldWithAge")
 
 return(data.obj)
@@ -184,6 +232,8 @@ return(data.obj)
 }# END prepData
 
 
+
+#############################################################
 
 prepData.off <- function(datafile,out.labels = "v1"){
 	# old format required columns: TBI

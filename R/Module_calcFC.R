@@ -5,6 +5,11 @@
 #'   details for each age class.
 #' @param data A list. Equal to the element named \code{data} from output of
 #'   \code{\link{prepData}}.
+#' @param predictors A list. Optional input needed for return rate model. Equal to the element named \code{predictors} from output of
+#'   \code{\link{prepData}}. Default is NULL.
+#' @param covariates A list. Optional input needed for covariate model. Equal to the element named \code{covariates} from output of
+#'   \code{\link{prepData}}. Default is NULL.
+#'
 #' @param fc.yr An integer of length one. The forecast year. If NULL (the default), then calculate as the year after the last run year in the data set.
 #' @param settings A list. The model-specific list of settings used in \code{\link{fitModel}}.
 #' @param tracing A Boolean. Default is FALSE
@@ -13,7 +18,7 @@
 #' @export
 #'
 #' @examples
-calcFC <- function(fit.obj= NULL, data = NULL, fc.yr= NULL, settings = NULL, tracing=FALSE){
+calcFC <- function(fit.obj= NULL, data = NULL, fc.yr= NULL, settings = NULL, tracing=FALSE, predictors = NULL, covariates = NULL ){
 # Check inputs
 
 	if(any(is.null(c(fit.obj,data)))){warning("Some inputs are missing");stop()}
@@ -35,20 +40,23 @@ calcFC <- function(fit.obj= NULL, data = NULL, fc.yr= NULL, settings = NULL, tra
 
 
 	# do the point forecast (for all age classes, have set up NoAge to work with the same function)
-
-	out.list <- sub.pt.fc(fit=fit.obj,data.source=data ,fc.yr = fc.yr,fit.settings=settings)
+ #print(predictors)
+	out.list <- sub.pt.fc(fit=fit.obj,data.source=data ,fc.yr = fc.yr,fit.settings=settings,pred. = predictors,cov. = covariates)
 
 	return(out.list)
 
 }# end calcFC()
 
 
+##########################################################################################################
 
-sub.fcdata <- function(fit,data,fc.yr){
+sub.fcdata <- function(fit,data,fc.yr,pred = NULL, cov = NULL){
 	# This function uses the fitted model parameters to calculate a forecast
 	# with optional bootstrap distribution
 
 	# FOR NOW: JUST MAKING THIS WORK WITH THE BASIC SIBLING REGRESSION AND KALMAN FILTER SIBLING REGRESSION
+
+
 
 data.list <- list()
 
@@ -77,14 +85,23 @@ if(any(is.na(ages))){
 		data.list[["Total"]] <-  data[["Total"]][,2]
 		}
 
+
+	if(model.type %in% c("ReturnRate")){
+
+		warning("ReturnRate FC for noAge data not yet implemented")
+		stop()
+	}
+
+
 } # end if no age classes
 
 if(!any(is.na(ages))){  # if have age classes, loop through them
 
 #PATCH WARNING: HARDWIRED COLUMN SUBSET THROUGHOUT NEEDS TO BE FIXED
 
-for(age.use in names(data)){
 
+for(age.use in names(data)){
+	#print("flag1")
 	age.num <- as.numeric(gsub("\\D", "", age.use)) # as per https://stat.ethz.ch/pipermail/r-help/2011-February/267946.html
 	age.prefix <- gsub(age.num,"",age.use)
 	model.type <- fit[[age.use]]$model.type
@@ -114,7 +131,18 @@ for(age.use in names(data)){
 		# The arima/ets object has all the pieces it needs for forecast(), but
 		# we are using the data later for the boxcox back conversion, so need to include it here
 		data.list[[age.use]] <-  data[[paste(age.prefix,age.num,sep="")]][,3] # get the same age class
-		}
+	}
+
+
+	if(model.type %in% c("ReturnRate")){
+		# return rate model needs only the predictor variable for the fc year (already lined up with appropriate lag in input data)
+		data.pre <-  pred[[paste(age.prefix,age.num,sep="")]]
+		data.list[[age.use]] <- data.pre[data.pre$Run_Year == fc.yr,fit[[age.use]]$var.names] #
+
+	}
+
+
+
 
 }} # end looping through age classes if have them / need them
 
@@ -126,7 +154,9 @@ return(data.list)
 
 
 
-sub.pt.fc <- function(fit,data.source,fc.yr,fit.settings = NULL){
+##########################################################################################################
+
+sub.pt.fc <- function(fit,data.source,fc.yr,fit.settings = NULL,pred. = NULL, cov.= NULL){
 
 # extract data needed for the fc (one element for each age class)
 
@@ -134,8 +164,15 @@ sub.pt.fc <- function(fit,data.source,fc.yr,fit.settings = NULL){
 	#GP: not fixing the issue, so commenting out
 	#if("lambda" %in% tolower(names(fit[[1]]))) fit.settings$BoxCox <- TRUE
 
-data <- sub.fcdata(fit = fit , data = data.source, fc.yr=fc.yr)
+# had to change argument names because of error: "promise already under evaluation: recursive default argument reference or earlier problems?"
+# solution as per: https://stackoverflow.com/questions/4357101/promise-already-under-evaluation-recursive-default-argument-reference-or-earlie
 
+data <- sub.fcdata(fit = fit , data = data.source, fc.yr=fc.yr,pred = pred.,cov = cov.)
+
+
+
+#print("output from sub.fcdata()")
+#print(data)
 
 #generate output matrix
 out.mat <-  matrix(NA,nrow=1,ncol=length(names(data)),dimnames = list(paste("FC",fc.yr,sep=""),
@@ -153,9 +190,13 @@ for(age.use in names(data)){
 	age.prefix <- gsub(age.num,"",age.use)
 
 	model.type <- fit[[age.use]]$model.type
-	coeff <- fit[[age.use]]$coefficients
-	fit.obj <- fit[[age.use]]$fit.obj
-
+	#print(model.type)
+	coeff <- fit[[age.use]]$model.fit$coefficients
+  #print(coeff)
+	#print(names(fit[[age.use]]))
+	fit.obj <- fit[[age.use]]$model.fit
+  #print("fit.obj feeding into pt fc")
+  #print(fit.obj)
 	#print(age.use)
 	#print(model.type)
 	#print(data[[age.use]])

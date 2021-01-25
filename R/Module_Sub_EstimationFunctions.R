@@ -129,7 +129,8 @@ if(tracing){print("Starting naive.est()")}
 
 
 model.fit <- naive.fit(data.use=model.data,avg.yrs = avg.yrs,method = "classic" )
-return(c(list(model.type = "Naive",formula=paste("y = avg(y in",avg.yrs,"previous years)"), var.names = "abd" , est.fn = "classic"), model.fit,list(fitted.values = model.fit$fitted.values.raw) ))
+return(c(list(model.type = "Naive",formula=paste("y = avg(y in",avg.yrs,"previous years)"), var.names = "abd" , est.fn = "classic"),
+				 model.fit,list(fitted.values = model.fit$fitted.values.raw) ))
 
 } # end naive.est
 
@@ -167,10 +168,137 @@ naive.list <- list(estimator = naive.est, datacheck= naive.datacheck, pt.fc =nai
 
 
 
-#### MECHANISTIC (RATE) ####
+#### MECHANISTIC (Return RATE) ####
+
+
+rate.datacheck <- function(data.use, pred.label = NULL, tracing=FALSE){
+	# verify that all the required components are there
+	# and check for any special values that might crash the estimate
+
+	if(tracing){print("Starting rate.datacheck()")}
+
+	# NA values a problem? -> don't think, need to test
+	# Missing years a problem? -> maybe
+	# Zero values a problem? -> if in denominator yes!
+
+	if(!is.null((pred.label))){
+		pred.check <- pred.label %in% names(data.use)
+	}
+
+
+	if(is.null((pred.label))){
+		pred.check <- sum(grepl("Pred_", names(data.use))) > 0
+	}
+
+
+	yrs.check <-   sum(!(min(data.use$Run_Year):max(data.use$Run_Year) %in% data.use$Run_Year)) == 0
+
+	tmp.out <- list(var.check = pred.check,
+									yrs.check = yrs.check,
+									Predictor = paste("User-selected predictor variable in data set:", pred.check),
+									Years = paste("Complete years:", yrs.check)
+	)
+
+	return(tmp.out)
+
+}#END rate.datacheck
+
+
+rate.est <- function(data.use, avg="wtmean", pred.label = NULL, last.n  = NULL){
+	# data.use is a data frame with at least 3 columns: first column is run year, second is abd, remaining are Pred
+	# avg is the type of average to use for the rate
+	# pred.label is the column label for the predictor variable. If NULL, function picks the first one (Put this in the Documentation)
+	# last.n determines the number of years to use for the rate calc. If NULL, use all years
+
+	data.orig <- data.use # for later
+
+	if(is.null(pred.label)){ pred.label <-  names(data.use)[min(grep("Pred_",names(data.use)))]} # pick the first one, if none specified
+	#print(pred.label)
+
+	last.year <- max(data.use[[1]])
+
+	# handling year filter as per https://github.com/MichaelFolkes/forecastR_package/issues/15
+	if(!is.null(last.n)){ data.use <- data.use[data.use[[1]] > (last.year -last.n), ] }
+
+	data.use$rate <- data.use[[2]]/data.use[[pred.label]]
+
+	if(avg == "wtmean"){  data.use <- na.omit(data.use); rate.use <- sum(data.use[[2]]) / sum(data.use[[pred.label]])	}
+	if(avg == "mean"){ rate.use <- mean(data.use$rate,na.rm=TRUE) }
+	if(avg == "median"){ rate.use <- median(data.use$rate,na.rm=TRUE) }
+
+	# see https://github.com/MichaelFolkes/forecastR_package/issues/11
+	if(avg == "geomean"){ data.use <- data.use %>% dplyr::filter(rate > 0) ;  rate.use <- exp(mean(log(data.use$rate,na.rm=TRUE))) }
+
+	#if(avg == "min"){ rate.use <- min(data.use$rate,na.rm=TRUE) }
+	#if(avg == "max"){ rate.use <- max(data.use$rate,na.rm=TRUE) }
+
+	#use these for the prediction interval in pt.fc fn
+
+	if(dim(data.use)[1]>1){
+		lower.rate.use <- quantile(data.use$rate,prob=0.1)
+		upper.rate.use <- quantile(data.use$rate,prob=0.9)
+	}
+
+	if(dim(data.use)[1]==1){
+		lower.rate.use <- rate.use *0.5
+		upper.rate.use <- rate.use *1.5
+	}
+
+
+	fits <- data.orig[[pred.label]] * rate.use
+
+
+	model.fit <- list(coefficients = rate.use,
+										lower.coeff = lower.rate.use,
+										upper.coeff = upper.rate.use,
+										obs.values = data.orig[[2]] ,
+										fitted.values = fits,
+										data = data.orig,
+										data.used = data.use,
+										residuals= data.orig[[2]] - fits	)
+
+	results <- c(list(model.type = "ReturnRate",formula=paste0(names(data.orig)[2],"* return rate based on last",last.n,"yrs of", pred.label),
+										var.names = pred.label,
+										est.fn = paste0(avg," of (rate[last", last.n,"yrs])"),
+										model.fit=model.fit,
+										fitted.values = fits,
+							      obs.values = data.orig[[2]],
+										residuals = data.orig[[2]] - fits,
+										run.yrs = data.orig[[1]],
+							      num.obs.used = sum(!is.na(data.use$rate))  )
+										)
+
+
+	return(results)
+}#END rate.est
+
+
+rate.pt.fc <- function(fit.obj=NULL, data,settings=NULL){
+	# fit.obj = object created from fitModel()
+	# data = value of predictor variable
+	# settings argument is here for consistency with the other pt.fc functions. It doesn't do anything (for now)
+
+	# How to get prediction intervals for rate model? See https://github.com/MichaelFolkes/forecastR_package/issues/12
+	# lower/upper step is in rate.est, here using only the resulting coeff
+	#print("------------")
+	#print(data)
+	#print("------------")
+	#print(names(fit.obj))
+	pt.fc.out <- c(data * fit.obj$coefficient,
+								 data * fit.obj$lower.coeff,
+								 data * fit.obj$upper.coeff)
+
+
+	names(pt.fc.out) <- c("Point","Lower", "Upper")
+	return(pt.fc.out)
+
+} #END rate.pt.fc
 
 
 
+# Merge object
+
+rate.list <- list(estimator = rate.est, datacheck= rate.datacheck, pt.fc =rate.pt.fc )
 
 
 #### SIMPLE SIBLING REGRESSION ####
@@ -720,6 +848,7 @@ expsmooth.list <- list(estimator = expsmooth.est, datacheck= expsmooth.datacheck
 #### MERGING ALL THE MODELS ####
 
 estimation.functions <- list(Naive = naive.list,
+														 ReturnRate = rate.list,
                              SibRegSimple = sibreg.simple.list,
                              SibRegKalman = sibreg.kalman.list,
                              SibRegLogPower = logpower.simple.list,

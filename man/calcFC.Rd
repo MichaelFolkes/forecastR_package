@@ -9,7 +9,9 @@ calcFC(
   data = NULL,
   fc.yr = NULL,
   settings = NULL,
-  tracing = FALSE
+  tracing = FALSE,
+  predictors = NULL,
+  covariates = NULL
 )
 }
 \arguments{
@@ -24,6 +26,12 @@ details for each age class.}
 \item{settings}{A list. The model-specific list of settings used in \code{\link{fitModel}}.}
 
 \item{tracing}{A Boolean. Default is FALSE}
+
+\item{predictors}{A list. Optional input needed for return rate model. Equal to the element named \code{predictors} from output of
+\code{\link{prepData}}. Default is NULL.}
+
+\item{covariates}{A list. Optional input needed for covariate model. Equal to the element named \code{covariates} from output of
+\code{\link{prepData}}. Default is NULL.}
 }
 \value{
 
