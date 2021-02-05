@@ -80,7 +80,7 @@ doRetro <- function(model= NULL, data = NULL, predictors = NULL, covariates = NU
 # inputs for this function include all the inputs needed for those
 # calls.
 
-# Note: Bootstrap intervals are currently not used the the retrospective test.
+# Note: Bootstrap intervals are currently not used in the retrospective test.
 #       (i.e. in call to calcFC(), do.boot is hardwired as FALSE)
 
 # settings =  a model-specific list of settings, where applicable
@@ -119,6 +119,9 @@ for(fc.yr.retro in retro.yrs){
 #print(fc.yr.retro)
   data.use <- data.extract(data,yrs=fc.yr.retro,option="retro")
   model.fitted <- fitModel(model= model, data = data.use, settings = fit.settings,tracing=FALSE)
+
+  #print(model.fitted)
+
 
  if(out.type=="full"){retro.fits.list[[paste0("FC",fc.yr.retro)]] <- model.fitted}
 

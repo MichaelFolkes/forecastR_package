@@ -22,7 +22,8 @@
 #' @export
 #'
 #' @examples
-fitModel <- function(model= c("Naive", "ReturnRate", "Mechanistic", "SibRegSimple","SibRegKalman","SibRegLogPower","TimeSeriesArima","TimeSeriesExpSmooth"), data = NULL, settings = NULL,tracing=FALSE){
+fitModel <- function(model= c("Naive", "ReturnRate", "Mechanistic", "SibRegSimple","SibRegKalman","SibRegLogPower","TimeSeriesArima","TimeSeriesExpSmooth"),
+										 data = NULL, settings = NULL,tracing=FALSE){
 # Check inputs
 model <- match.arg(model)
 
