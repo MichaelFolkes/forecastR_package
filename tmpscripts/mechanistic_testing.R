@@ -2,14 +2,11 @@
  library(tidyverse)
  #library(meboot)
 
-#
-# data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates.csv", stringsAsFactors = FALSE)
-
 
  require(forecastR)
  # test the alternate input filr versions
- #data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates_Orig.csv", stringsAsFactors = FALSE)
- data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates_Test.csv", stringsAsFactors = FALSE)
+ data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates_Orig.csv", stringsAsFactors = FALSE)
+ #data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates_Test.csv", stringsAsFactors = FALSE)
  #data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal.csv", stringsAsFactors = FALSE)
  tail(data.withage.raw)
 
@@ -30,35 +27,6 @@
  data.withage$predictors
 
  data.withage$data$`Age 3`
-
-
-
-
-############
-# Testing  Estimation Functions (with Age data)
-
-rate.datacheck(data.use = data.withage$data$`Age 3`, pred.label = "Pred_Juv_Outmigrants", tracing=TRUE)
- rate.datacheck(data.use = data.withage$data$`Age 3`, pred.label = NULL, tracing=TRUE)
-
-fit.test.allyr.juv <- rate.est(data.withage$data$`Age 3` %>% select(Run_Year, Age_3,Pred_Juv_Outmigrants, Pred_Hat_Releases),
-				 avg="wtmean", pred.label = NULL, last.n  = NULL) # if pred.label = NULL, pick the first pred column -> discuss
-
-names(fit.test.allyr.juv)
-fit.test.allyr.juv$model.type
-fit.test.allyr.juv$model.fit
-
-# should sort out this replication, but keeping it in for now (later dependencies...)
-fit.test.allyr.juv$obs.values
-fit.test.allyr.juv$fitted.values
-fit.test.allyr.juv$model.fit$obs.values
-fit.test.allyr.juv$model.fit$fitted.values
-fit.test.allyr.juv$num.obs.used
-
-fit.test.last5.juv <-rate.est(data.withage$data$`Age 3` %>% select(Run_Year, Age_3,Pred_Juv_Outmigrants, Pred_Hat_Releases),
-				 avg="wtmean", pred.label = NULL, last.n  = 5)
-fit.test.last5.juv$model.fit$data.used
-
-fit.test.last5.juv$num.obs.used
 
 
 
@@ -208,9 +176,9 @@ multiresults.int.pred
 
 
 # Retrospective Interval
-# Note: if int-type = "retrospective". ot will run a retrospective even if do.retro != TRUE
+# Note: if int-type = "retrospective". it will run a retrospective even if do.retro != TRUE
 multiresults.int.retro <- multiFC(data.file=data.withage.raw,settings.list=settings.use,
-																 do.retro=TRUE,retro.min.yrs=15,
+																 do.retro=FALSE,retro.min.yrs=15,
 																 out.type="short",
 																 int.type = "Retrospective", int.n = 100,
 																 boot.type = "meboot",
