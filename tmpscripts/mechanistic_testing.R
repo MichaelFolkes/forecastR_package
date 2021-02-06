@@ -5,8 +5,8 @@
 
  require(forecastR)
  # test the alternate input filr versions
- data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates_Orig.csv", stringsAsFactors = FALSE)
- #data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates_Test.csv", stringsAsFactors = FALSE)
+ #data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates_Orig.csv", stringsAsFactors = FALSE)
+ data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal_covariates_Test.csv", stringsAsFactors = FALSE)
  #data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal.csv", stringsAsFactors = FALSE)
  tail(data.withage.raw)
 
@@ -195,4 +195,21 @@ multiresults.int.boot <- multiFC(data.file=data.withage.raw,settings.list=settin
 																 int.type = "Bootstrap", int.n = 100,
 																 boot.type = "meboot",
 																 tracing=TRUE)
+
+##################
+# other model testing
+
+# fit the model
+tmp.fit <- fitModel(model= "TimeSeriesArima", data = data.withage$data,
+															settings = list(BoxCox=FALSE),
+															tracing=FALSE)
+tmp.fit
+
+tmp.fc <- calcFC(fit.obj= tmp.fit,
+												 data =data.withage$data,
+												 fc.yr= data.withage$specs$forecastingyear,
+												 predictors =  data.withage$predictors,
+												 covariates = NULL,
+												 settings = list(BoxCox=FALSE), tracing=TRUE)
+tmp.fc
 
