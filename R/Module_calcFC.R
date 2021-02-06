@@ -41,7 +41,12 @@ calcFC <- function(fit.obj= NULL, data = NULL, fc.yr= NULL, settings = NULL, tra
 
 	# do the point forecast (for all age classes, have set up NoAge to work with the same function)
  #print(predictors)
-	out.list <- sub.pt.fc(fit=fit.obj,data.source=data ,fc.yr = fc.yr,fit.settings=settings,pred. = predictors,cov. = covariates)
+	out.list <- sub.pt.fc(fit=fit.obj,
+												data.source=data ,
+												fc.yr = fc.yr,
+												fit.settings=settings,
+												pred. = predictors,
+												cov. = covariates)
 
 	return(out.list)
 
@@ -54,15 +59,18 @@ sub.fcdata <- function(fit,data,fc.yr,pred = NULL, cov = NULL){
 	# This function uses the fitted model parameters to calculate a forecast
 	# with optional bootstrap distribution
 
-	# FOR NOW: JUST MAKING THIS WORK WITH THE BASIC SIBLING REGRESSION AND KALMAN FILTER SIBLING REGRESSION
 
-
+print("starting sub.fcdata()")
 
 data.list <- list()
 
 age.classes <- names(data)
 ages <- as.numeric(gsub("\\D", "", age.classes)) # as per https://stat.ethz.ch/pipermail/r-help/2011-February/267946.html
 age.prefix <- gsub(ages[1],"",age.classes[1])
+
+
+#################
+# No Age
 
 # for now this handles the "noage" version, need to test to ensure robustness
 # also: should be able to combine the 2 versions into 1 generic, but for now just make it work
@@ -83,6 +91,8 @@ if(any(is.na(ages))){
 		# we are using the data later for the boxcox back conversion, so need to include it here
 		# PATCH WARNING: HARDWIRED COLUMN SUBSET NEEDS TO BE FIXED
 		data.list[["Total"]] <-  data[["Total"]][,2]
+
+
 		}
 
 
@@ -95,13 +105,18 @@ if(any(is.na(ages))){
 
 } # end if no age classes
 
+
+
+#################
+# WITH AGE
+
 if(!any(is.na(ages))){  # if have age classes, loop through them
 
 #PATCH WARNING: HARDWIRED COLUMN SUBSET THROUGHOUT NEEDS TO BE FIXED
 
 
 for(age.use in names(data)){
-	#print("flag1")
+	#print("age.use")
 	age.num <- as.numeric(gsub("\\D", "", age.use)) # as per https://stat.ethz.ch/pipermail/r-help/2011-February/267946.html
 	age.prefix <- gsub(age.num,"",age.use)
 	model.type <- fit[[age.use]]$model.type
@@ -169,8 +184,6 @@ sub.pt.fc <- function(fit,data.source,fc.yr,fit.settings = NULL,pred. = NULL, co
 
 data <- sub.fcdata(fit = fit , data = data.source, fc.yr=fc.yr,pred = pred.,cov = cov.)
 
-
-
 #print("output from sub.fcdata()")
 #print(data)
 
@@ -179,7 +192,7 @@ out.mat <-  matrix(NA,nrow=1,ncol=length(names(data)),dimnames = list(paste("FC"
 						names(data)  ))
 
 out.mat.lower <- out.mat.upper <- out.mat
-
+ print(out.mat)
 
 # loop through the age classes
 
@@ -190,13 +203,13 @@ for(age.use in names(data)){
 	age.prefix <- gsub(age.num,"",age.use)
 
 	model.type <- fit[[age.use]]$model.type
-	#print(model.type)
+	print(model.type)
 	coeff <- fit[[age.use]]$model.fit$coefficients
-  #print(coeff)
-	#print(names(fit[[age.use]]))
+  print(coeff)
+	print(names(fit[[age.use]]))
 	fit.obj <- fit[[age.use]]$model.fit
-  #print("fit.obj feeding into pt fc")
-  #print(fit.obj)
+  print("fit.obj feeding into pt fc")
+  print(fit.obj)
 	#print(age.use)
 	#print(model.type)
 	#print(data[[age.use]])

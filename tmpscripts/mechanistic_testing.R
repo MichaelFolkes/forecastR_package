@@ -10,7 +10,7 @@
  #data.withage.raw <- read.csv("inst/extdata/FinalSampleFile_WithAge_exclTotal.csv", stringsAsFactors = FALSE)
  tail(data.withage.raw)
 
- #data.withoutage.raw <- read.csv("inst/extdata/FinalSampleFile_WithoutAge_covariates.csv", stringsAsFactors = FALSE)
+
 
 
  #TEST WITH FinalSampleFile_WithAge_exclTotal.csv!!!!!!!!!!!!!
@@ -18,7 +18,7 @@
  #source("R/Module_Sub_EstimationFunctions.R")
  #source("R/Module_prepData.R")
  data.withage <- prepData(data.withage.raw,out.labels="v2")
- #data.withoutage <- prepData(data.withoutage.raw,out.labels="v2")
+
  names(data.withage)
 
  data.withage$specs
@@ -199,16 +199,32 @@ multiresults.int.boot <- multiFC(data.file=data.withage.raw,settings.list=settin
 ##################
 # other model testing
 
+data.withoutage.raw <- read.csv("inst/extdata/FinalSampleFile_WithoutAge_covariates.csv", stringsAsFactors = FALSE)
+data.withoutage <- prepData(data.withoutage.raw,out.labels="v2")
+
+data.use <-   data.withoutage
+#data.use <-   data.withage
+
 # fit the model
-tmp.fit <- fitModel(model= "TimeSeriesArima", data = data.withage$data,
+tmp.fit <- fitModel(model= "TimeSeriesArima", data = data.use$data,
 															settings = list(BoxCox=FALSE),
 															tracing=FALSE)
-tmp.fit
+names(tmp.fit)
+tmp.fit$Total$model.fit
+tmp.fit$"Age 4"
+names(tmp.fit$Total)
+tmp.fit$Total$coef
+
+
+plotModelFit(tmp.fit, options= list(plot.which = "all",age.which="all",plot.add=FALSE),fc.add = NULL, tracing = TRUE)
+
+
+
 
 tmp.fc <- calcFC(fit.obj= tmp.fit,
-												 data =data.withage$data,
-												 fc.yr= data.withage$specs$forecastingyear,
-												 predictors =  data.withage$predictors,
+												 data =data.use$data,
+												 fc.yr= data.use$specs$forecastingyear,
+												 predictors =  data.use$predictors,
 												 covariates = NULL,
 												 settings = list(BoxCox=FALSE), tracing=TRUE)
 tmp.fc

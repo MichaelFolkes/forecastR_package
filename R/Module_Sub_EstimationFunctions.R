@@ -705,7 +705,7 @@ if(!settings$BoxCox){lambda.use <- NULL }
 
 model.fit <- forecast::auto.arima(model.data, allowmean=TRUE, allowdrift=FALSE, lambda=lambda.use)
 
-
+#print(model.fit)
 
 return(c(list(model.type = "TimeSeriesArima",formula= NA ,var.names = NA,est.fn = "auto.arima()"),
 					model.fit,list(fit.obj=model.fit),list(obs.values = model.data, fitted.values = as.numeric(fitted(model.fit)) ) ))
