@@ -114,7 +114,7 @@ if(length(border.vec)==1){ border.vec <- rep(border.vec,length(list.in))}
 
 
 		if(labels){
-			text(i+0.22,quants.use[3], labels=quants.use[3],cex=0.8,adj=0,col="darkgrey")
+			text(i+0.22,quants.use[3], labels=prettyNum(round(quants.use[3]),big.mark =  ","),cex=0.8,adj=0,col="darkgrey")
 			#text(i+0.22,quants.use, labels=quants.use,cex=0.8,adj=0,col="darkgrey")
 			#text(i+0.22,range(vec.use,na.rm=TRUE), labels=range(vec.use,na.rm=TRUE),cex=0.8,adj=0,col="darkgrey")
 
