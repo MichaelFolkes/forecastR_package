@@ -22,7 +22,7 @@ for(age.use in age.classes){
 
 	results <- sampleFromStats(average = fc.obj$pt.fc[,age.use], q = fc.obj$upper[,age.use], p = 0.9)
 	#results$results is the full sampled vector, can include -ve values
-	int.sample[[age.use]] <- results$results
+	int.sample[[age.use]] <- results$results.bounded
 	}
 
 #int.sample <- round(as.data.frame(int.sample))
@@ -44,20 +44,30 @@ return(int.out)
 
 sampleFromStats <- function(average, q, p=0.9, n=1000){
 
-
+	print("Entering sampleFromStats()------------------------------------")
 
 
 	sd.val <- (q-average)/qnorm(p)
-	#take a large sample, then will resample postitive values:
+	
 	print(sd.val)
+	
+	
+	#res.bounded vector has zero as lower bound 
+	#take a large sample, then will resample postitive values:
 	res <- rnorm(min(c(n*10, 1e6)), average, sd.val)
-	
-	
-	sample.stats <- quantile(res, probs = c(0.1, .5, .9))
-
-	#res.bounded vector has zero as lower bound (but sample.stats values are taken from full distribution)
 	res.bounded <- sample(res[res>=0], size = n, replace = TRUE)
-	results <- list(sample.stats=sample.stats, results=res, results.bounded=res.bounded)
+	
+	# OLD: sample.stats values are taken from full distribution
+	sample.stats <- quantile(res, probs = c(0.1, .5, .9))
+	
+	# NEW: quants from bounded output
+	print(res.bounded)
+    sample.stats.bounded <- quantile(res.bounded, probs = c(0.1, .5, .9))
+
+	print(sample.stats.bounded)
+	
+	results <- list(sample.stats=sample.stats, results=res, results.bounded=res.bounded,
+	               sample.stats.bounded = sample.stats.bounded)
 	return(results)
 }#END sampleFromStats
 

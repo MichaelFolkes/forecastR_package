@@ -161,6 +161,10 @@ for(age.use in names(data)){
 
 }} # end looping through age classes if have them / need them
 
+#print("data.list ----------------------------------")
+#print(data.list)
+
+print("ending sub.fcdata()")
 
 
 return(data.list)
@@ -184,36 +188,39 @@ sub.pt.fc <- function(fit,data.source,fc.yr,fit.settings = NULL,pred. = NULL, co
 
 data <- sub.fcdata(fit = fit , data = data.source, fc.yr=fc.yr,pred = pred.,cov = cov.)
 
-#print("output from sub.fcdata()")
-#print(data)
+print("output from sub.fcdata()-----------------------")
+print(data)
 
 #generate output matrix
 out.mat <-  matrix(NA,nrow=1,ncol=length(names(data)),dimnames = list(paste("FC",fc.yr,sep=""),
 						names(data)  ))
 
 out.mat.lower <- out.mat.upper <- out.mat
+ print("out.mat template --------------------------------")
  print(out.mat)
 
 # loop through the age classes
 
 for(age.use in names(data)){
-
+   print("-------------------------------------------------")
+   print(age.use)
 
 	age.num <- as.numeric(gsub("\\D", "", age.use)) # as per https://stat.ethz.ch/pipermail/r-help/2011-February/267946.html
 	age.prefix <- gsub(age.num,"",age.use)
 
 	model.type <- fit[[age.use]]$model.type
 	print(model.type)
-	coeff <- fit[[age.use]]$model.fit$coefficients
+	#coeff <- fit[[age.use]]$model.fit$coefficients  # see note re: model.fit at beginnig of Module_Sub_EstimationFunctions.R
+	coeff <- fit[[age.use]]$coefficients 
   print(coeff)
 	print(names(fit[[age.use]]))
-	fit.obj <- fit[[age.use]]$model.fit
+	fit.obj <- fit[[age.use]]#$model.fit   # see note re: model.fit at beginnig of Module_Sub_EstimationFunctions.R
   print("fit.obj feeding into pt fc")
   print(fit.obj)
 	#print(age.use)
 	#print(model.type)
 	#print(data[[age.use]])
-	#print(fit.settings)
+	print(fit.settings)
 #	browser()
 	pt.fc.tmp <-  estimation.functions[[model.type]]$pt.fc(fit.obj=fit.obj, data = data[[age.use]],settings=fit.settings)
 
@@ -225,6 +232,8 @@ for(age.use in names(data)){
 
 } # end looping through age
 
+ print("out.mat after calcs --------------------------------")
+print(out.mat)
 
 #### TEMPORARY! See https://github.com/avelez-espino/forecastR_phase4/issues/121
 ###

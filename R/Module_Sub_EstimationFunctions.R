@@ -3,6 +3,18 @@
 
 
 
+####################################
+# HANDLING OF LIST OBJECTS SHOULD BE CLEANED UP FOR CONSISTENCY
+# model.fit element is created in each of the *.est functions,
+# but added to the output list without making it a sub-list.
+# should be: ..., model.fit = model.fit, ...
+# currently is: ..., model.fit, ...
+# Feb 2021 GP ---------------------
+# changing return rate model from what it should be to what all the other ones are, 
+# because implementing the fix means changing it throughout all the models and all the app pieces
+
+
+
 
 #### Generic Linear Model ####
 # used in the following
@@ -260,15 +272,16 @@ rate.est <- function(data.use, avg="wtmean", pred.label = NULL, last.n  = NULL){
 	results <- c(list(model.type = "ReturnRate",formula=paste0(names(data.orig)[2],"* return rate based on last",last.n,"yrs of", pred.label),
 										var.names = pred.label,
 										est.fn = paste0(avg," of (rate[last", last.n,"yrs])"),
-										model.fit=model.fit,
 										fitted.values = fits,
 							      obs.values = data.orig[[2]],
 										residuals = data.orig[[2]] - fits,
 										run.yrs = data.orig[[1]],
-							      num.obs.used = sum(!is.na(data.use$rate))  )
+							      num.obs.used = sum(!is.na(data.use$rate))  ),
+								 model.fit
 										)
 
-
+	print("--------------------------------------")
+	print(names(results))
 	return(results)
 }#END rate.est
 
@@ -282,14 +295,20 @@ rate.pt.fc <- function(fit.obj=NULL, data,settings=NULL){
 	# lower/upper step is in rate.est, here using only the resulting coeff
 	#print("------------")
 	#print(data)
-	#print("------------")
-	#print(names(fit.obj))
-	pt.fc.out <- c(data * fit.obj$coefficient,
+	print("----rate.pt.fc--------")
+	print(names(fit.obj))
+	print(data)
+	print(fit.obj$coefficients)
+	print(fit.obj$lower.coeff)
+	print(fit.obj$upper.coeff)
+	
+	pt.fc.out <- c(data * fit.obj$coefficients,
 								 data * fit.obj$lower.coeff,
 								 data * fit.obj$upper.coeff)
 
 
 	names(pt.fc.out) <- c("Point","Lower", "Upper")
+	print(pt.fc.out)
 	return(pt.fc.out)
 
 } #END rate.pt.fc
@@ -367,7 +386,15 @@ sibreg.pt.fc <- function(fit.obj, data,settings=NULL){
 # fit.obj = object created from fitModel()
 # data = data frame with one element of the list created by sub.fcdata()
 
-			pt.fc <- predict.lm(fit.obj,newdata = data, interval= "prediction", level=0.8 )
+
+# This has a temporary patch below
+# fit.obj$fit.obj should not be necessary
+# -> should fix list object handling between sibreg.simple.est() and this fn.
+
+    		#print("entering sibreg.pt.fc -----------------------------")
+			#print(names(fit.obj))
+
+			pt.fc <- predict.lm(fit.obj$fit.obj,newdata = data, interval= "prediction", level=0.8 )
 
 	return(pt.fc)
 
@@ -539,7 +566,7 @@ names(coef.kf) <- c("a.kf","b","a.lower","a.upper")
 fitted.kf <-  output$smoothe.mean.a + output$b * x
 
 model.fit <- list(   coefficients= coef.kf ,coefficients.table = coef.kf ,
-					residuals= fitted.kf - y ,
+					residuals= y - fitted.kf , # change from fitted - y to be consistent with other models
 					fit.obj = list(coefficients = coef.kf, output),
 					obs.values = model.data[,1]   ,fitted.values.raw = fitted.kf,
 					data = model.data[,2:dim(model.data)[2]],
@@ -643,9 +670,17 @@ return(c(list(model.type = "SibRegLogPower",formula=logpower.formula,var.names =
 logpower.pt.fc <- function(fit.obj, data, settings = NULL){
 # fit.obj = object created from fitModel()
 # data = data frame with one element of the list created by sub.fcdata()
-			pt.fc.raw <- predict.lm(fit.obj,newdata = data , interval= "prediction", level=0.8 )
+			
+# This has a temporary patch below
+# fit.obj$fit.obj should not be necessary
+# -> should fix list object handling between logpower.simple.est() and this fn.
+			
+			#print("entering logpower.pt.fc -----------------------------")
+			#print(names(fit.obj))
+			
+			pt.fc.raw <- predict.lm(fit.obj$fit.obj,newdata = data , interval= "prediction", level=0.8 )
 			n <- length(fit.obj$fitted.values)
-			bias.correction <- (summary(fit.obj)$sigma^2 * ((n-2)/n)) / 2
+			bias.correction <- (summary(fit.obj$fit.obj)$sigma^2 * ((n-2)/n)) / 2
 			pt.fc <- exp(pt.fc.raw + bias.correction) # convert back from log, including bias correction
 			# bias correction as per Sprugel (1983),
 			# adapting code from earlier version of ForecastR, which used:
@@ -705,7 +740,7 @@ if(!settings$BoxCox){lambda.use <- NULL }
 
 model.fit <- forecast::auto.arima(model.data, allowmean=TRUE, allowdrift=FALSE, lambda=lambda.use)
 
-#print(model.fit)
+
 
 return(c(list(model.type = "TimeSeriesArima",formula= NA ,var.names = NA,est.fn = "auto.arima()"),
 					model.fit,list(fit.obj=model.fit),list(obs.values = model.data, fitted.values = as.numeric(fitted(model.fit)) ) ))
@@ -719,7 +754,17 @@ arima.pt.fc <- function(fit.obj, data ,settings=list(BoxCox=FALSE)){
 # data = not needed, because captured in output from auto.arima
 # just feeding in an obj with NA
 
+
+# This has a temporary patch below
+# fit.obj$fit.obj should not be necessary
+# -> should fix list object handling between arima.est() and this fn.
+
+
 # https://stats.stackexchange.com/questions/155305/how-does-r-calculate-prediction-intervals-in-the-forecast-package
+
+   #print("entering arima.pt.fc -------------")
+   #print(names(fit.obj))
+
 
 	#print("settings$BoxCox")
 	#print(settings$BoxCox)
@@ -741,7 +786,7 @@ arima.pt.fc <- function(fit.obj, data ,settings=list(BoxCox=FALSE)){
 
 	# do it via forecast(), which is the same approach used for exp smooth fc via ets()
 
-	fc.out <- forecast::forecast(fit.obj, h=1,lambda=lambda.use,biasadj=TRUE,level=80)
+	fc.out <- forecast::forecast(fit.obj$fit.obj, h=1,lambda=lambda.use,biasadj=TRUE,level=80)
 	pt.fc <-  as.numeric(c(fc.out$mean,fc.out$lower, fc.out$upper))
 
 	#why still need to back convert? The forecast() call already uses lambda???
@@ -801,7 +846,7 @@ model.fit <- forecast::ets(model.data, model="ZZZ", lambda=lambda.use)
 
 
 return(c(list(model.type = "TimeSeriesExpSmooth",formula= NA ,var.names = NA,est.fn = "ets()"),
-					model.fit,list(fit.obj=model.fit),list(obs.values = model.data, fitted.values = as.numeric(fitted(model.fit)) ) ))
+					model.fit ,list(fit.obj=model.fit),list(obs.values = model.data, fitted.values = as.numeric(fitted(model.fit)) ) ))
 
 
 } # end expsmooth.est
@@ -814,6 +859,13 @@ expsmooth.pt.fc <- function(fit.obj, data, settings=list(BoxCox=FALSE)){
 
 # https://stats.stackexchange.com/questions/155305/how-does-r-calculate-prediction-intervals-in-the-forecast-package
 
+# This has a temporary patch below
+# fit.obj$fit.obj should not be necessary
+# -> should fix list object handling between arima.est() and this fn.
+
+
+   #print("entering arima.pt.fc -------------")
+   #print(names(fit.obj))
 
 
 if(settings$BoxCox){lambda.use <- forecast::BoxCox.lambda(data, method="guerrero") }
@@ -825,7 +877,7 @@ if(!settings$BoxCox){lambda.use <- NULL }
 	#print("lambda fc")
 	#print(lambda.use)
 
-    fc.out <- forecast::forecast(fit.obj, h=1,lambda=lambda.use,biasadj=TRUE,level=80)
+    fc.out <- forecast::forecast(fit.obj$fit.obj, h=1,lambda=lambda.use,biasadj=TRUE,level=80)
 	pt.fc <-  as.numeric(c(fc.out$mean,fc.out$lower, fc.out$upper))
 
 

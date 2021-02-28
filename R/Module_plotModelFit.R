@@ -124,7 +124,21 @@ bg.col <- rgb(1, 0, 0,bg.fade)
 	plot(fit.obj[[age.plot]]$fitted.values, fit.obj[[age.plot]]$residuals, bty="n",xlab="Fitted", ylab="Residuals",
 			col="darkblue",bg=bg.col,cex=1.4)
 	abline(h=0,col="darkblue")
-	abline(lm(fit.obj[[age.plot]]$residuals ~ fit.obj[[age.plot]]$fitted.values),col="red",lwd=2)
+	
+	# add fitted line only if  resid vs. fit is NOT a straight vertical line (i.e. from ARIMA(0,0,0))
+	# see https://github.com/SOLV-Code/forecastR-ServerApp/issues/31
+	print("-------")
+	
+	min.fit <- min(fit.obj[[age.plot]]$fitted.values,na.rm = TRUE)
+	max.fit <- max(fit.obj[[age.plot]]$fitted.values,na.rm = TRUE)	
+	print(max.fit - min.fit)
+	print(min.fit != max.fit)
+	
+	if(round(min.fit) != round(max.fit)){
+		abline(lm(fit.obj[[age.plot]]$residuals ~ fit.obj[[age.plot]]$fitted.values),col="red",lwd=2)
+	}
+	
+	
 	points(fit.obj[[age.plot]]$fitted.values,fit.obj[[age.plot]]$residuals,pch=21,col="darkblue",bg=bg.col,cex=1.4)
 	title(main= paste(fit.obj[[age.plot]]$model.type,age.plot,sep=" - "))
 
