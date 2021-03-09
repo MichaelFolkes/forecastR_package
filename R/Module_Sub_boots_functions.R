@@ -112,10 +112,16 @@ createBoots <- function(dat.prepped, boot.type=c("meboot", "stlboot"), boot.n=10
 
 
 	boot.output <- lapply(dat.prepped$data, function(x){
+		
+		# OLD version -> crashes with new data format
 		#name of age column varies, so use index:
-		series.use <- x[,ncol(x)]
+		#series.use <- x[,ncol(x)]
+		
+		series.use <- x[,grepl("Age_",names(x)) | grepl("Total",names(x))]
+		
 		boot.out <- bootSeries(series = series.use, boot.type = boot.type, boot.n = boot.n , plot.diagnostics = plot.diagnostics,plot.type="sample" )
-		if(plot.diagnostics){title(main= paste(boot.n, boot.type,dimnames(x)[[2]][ncol(x)]))}
+		if(plot.diagnostics){title(main= paste(boot.n, boot.type,
+							    names(x)[grepl("Age_",names(x)) | grepl("Total",names(x))] ))}
 		return(boot.out)
 		})
 
@@ -134,7 +140,8 @@ createBoots <- function(dat.prepped, boot.type=c("meboot", "stlboot"), boot.n=10
 #' @return point forecast.
 #' @export
 
-fitModelandcalcFC <- function( data = NULL, fitmodel.args =list (model= NULL,  settings = NULL), calcfc.args = list(fc.yr= NULL,  settings = NULL),predictors = NULL, covariates = NULL){
+fitModelandcalcFC <- function( data = NULL, fitmodel.args =list (model= NULL,  settings = NULL), 
+calcfc.args = list(fc.yr= NULL,  settings = NULL),predictors = NULL, covariates = NULL){
 # function to apply fitModel() then calcFC(), and save to ptfc.
 
 	 fit.out <- fitModel(model= fitmodel.args$model, data = data,
@@ -237,8 +244,15 @@ reformatBootData <- function(boot.output, prepData.ouput){
 	#in the orginal prepared data.
 	for(ageclass in names(boot.output)){
 		for(boot.index in 1:boot.n){
-			prepdata.columncount <- ncol(output.list[[boot.index]][[ageclass]])
-			output.list[[boot.index]][[ageclass]][,prepdata.columncount] <- boot.output[[ageclass]]$series.boot[,boot.index]
+			
+			# old version, messed up with data that has cov or pred
+			#prepdata.columncount <- ncol(output.list[[boot.index]][[ageclass]])
+			#output.list[[boot.index]][[ageclass]][,prepdata.columncount] <- boot.output[[ageclass]]$series.boot[,boot.index]
+			
+			cols.names <- names(output.list[[boot.index]][[ageclass]])
+			col.put <- grepl("Age_",cols.names) | grepl("Total",cols.names)
+			output.list[[boot.index]][[ageclass]][,col.put] <- boot.output[[ageclass]]$series.boot[,boot.index]
+			
 		}
 	}
 

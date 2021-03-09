@@ -9,10 +9,22 @@ if(option=="obs"){
 	obs.mat <- matrix(NA, nrow = length(yrs) , ncol = length(names(data)), dimnames = list(paste("Obs",yrs,sep=""),names(data)))
 	# do this in a loop for now, but should transfer to apply-style
 	for(age.use in names(data)){
+		#print("--------")
+		#print(age.use)
+		
 		data.sub <-  data[[age.use]]
-		obs.mat[,age.use]	<- data.sub[data.sub[,"Run_Year"] %in% yrs,dim(data.sub)[2] ]
-# always have values in last col
-# (should work for withage and noage data
+		#print(data.sub)
+		
+		# Old version, got messed up with some new return rate input files
+		# always have values in last col
+		# (should work for withage and noage data
+		#obs.mat[,age.use]	<- data.sub[data.sub[,"Run_Year"] %in% yrs,dim(data.sub)[2] ]
+		
+		obs.mat[,age.use]	<- data.sub[data.sub[,"Run_Year"] %in% yrs,grepl("Age_",names(data.sub)) | grepl("Total",names(data.sub)) ]
+		
+		#print(obs.mat)
+		
+
 		}
 
 
@@ -136,7 +148,15 @@ for(fc.yr.retro in retro.yrs){
   retro.mat.fc[paste("FC",fc.yr.retro,sep=""),] <- fc.calc$pt.fc
  }
 #browser()
+	#print("-----")
+	#print(data)
 	retro.mat.obs <- data.extract(data = data ,yrs = retro.yrs,option="obs" )
+
+	#print("--retro.mat.fc--")
+	#print(retro.mat.fc)
+
+	#print("--retro.mat.obs--")
+	#print(retro.mat.obs)
 
 	retro.mat.resids <- retro.mat.fc - retro.mat.obs
 	log.resids <- log1p(retro.mat.fc) - log1p(retro.mat.obs)  # to handle records with 0 abd for some ages
@@ -151,7 +171,10 @@ for(fc.yr.retro in retro.yrs){
 	#int.sample <- errors.sample + unlist(lapply(pt.fc.in$pt.fc,FUN=function(x){rep(x,interval.n)})) # creates a vector with n replicates of the pt fc
 #browser()
 	# VERSION WITH LOGNORMAL ERRORS (NEED TO DIG INTO BIAS CORRECTION!)
+	#print("-------lognormal error --------")
+	#print(log.resids)
 	sd.est <-  lapply(as.data.frame(log.resids),sd,na.rm=TRUE)
+	#print(sd.est)
 	errors.sample <- as.data.frame(lapply(sd.est,function(x){sample.raw <- rnorm(interval.n *1.1,0,x);sample.out <- sample.raw[sample.raw<=quantile(sample.raw,probs=0.9)] }))
 	#bias.correction <- lapply(sd.est,FUN=function(x){bias.corr <- (x^2 * ((interval.n-2)/interval.n)) / 2})
 	#errors.corr	 <- errors.sample + unlist(lapply(bias.correction,FUN=function(x){rep(x,interval.n)}))

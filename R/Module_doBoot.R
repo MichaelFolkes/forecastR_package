@@ -47,6 +47,7 @@ if(any(is.null(data),is.null(args.calcfc$fc.yr))){warning("must provide data fil
 data.booted <- createBoots(data, boot.type= args.boot$boot.type, boot.n=args.boot$boot.n, plot.diagnostics=args.boot$plot.diagnostics)
 
 
+
 if("predictors" %in% names(data)){ predictors.use <- data$predictors}
 if(!("predictors" %in% names(data))){ predictors.use <- NULL}
 
@@ -68,7 +69,16 @@ if(length(names(data$data)) > 1 ){out.mat.cols <- c(names(data$data),"Total")}
 
 out.mat <- matrix(NA, ncol= length(out.mat.cols) ,nrow = length(data.booted), dimnames = list( 1:length(data.booted),out.mat.cols))
 
+#print("pred")
+#print(predictors.use[[2]])
 
+#print("booted2")
+#print(head(data.booted[[2]][[2]]))
+#print("booted3")
+#print(head(data.booted[[3]][[2]]))
+
+#print("cov")
+#print(covariates.use)
 
 for(i in 1:length(data.booted)){
 
@@ -76,9 +86,39 @@ for(i in 1:length(data.booted)){
 												predictors = predictors.use,
 												covariates = covariates.use))
 
+	
+
 	}
 
 out.mat <- as.data.frame(round(out.mat))
+
+#print("boot: out.mat")
+#print(out.mat)
+
+
+# TEMPORARY PATCH FOR NaN output
+#details at https://github.com/SOLV-Code/forecastR-ServerApp/issues/51
+#print("Starting patch")
+
+boot.col.means <- colMeans(out.mat,na.rm=TRUE)
+
+
+
+for(i in 1:length(boot.col.means)){
+    print(names(out.mat)[i])
+	print(!is.finite(out.mat[,i]))
+	out.mat[!is.finite(out.mat[,i]),i] <-boot.col.means[i]
+	}
+
+#print("patched boot.col.means")
+#print(boot.col.means)
+#print(out.mat$'Age 5')
+
+
+
+
+
+
 
 
 if(plot.out){

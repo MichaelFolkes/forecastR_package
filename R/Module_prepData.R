@@ -90,7 +90,8 @@ names(tmpsub) <- c("Run_Year","Total",cov.list, predictor.list)
 
 
 # merge into data obj
-data.obj <- list(data=list(Total=tmpsub) , output.pre = datafile_new,specs = list(stockabundance=stockabundance, stockname=stockname, stockspecies=stockspecies , forecastingyear=forecastingyear))
+data.obj <- list(data=list(Total=tmpsub) , output.pre = datafile_new,
+specs = list(stockabundance=stockabundance, stockname=stockname, stockspecies=stockspecies , forecastingyear=forecastingyear))
 
 if(length(cov.list)>0){
 	data.obj <- c(data.obj,list(covariates = datafile.orig[,c("Run_Year",cov.list)]))
@@ -341,7 +342,7 @@ prepData.off <- function(datafile,out.labels = "v1"){
 		names(datafile_new) <- extract_names
 
 		datafile_new <- cbind(datafile_new,Total = rowSums(datafile_new))
-		browser()
+		#browser()
 
 		# adding run year columns
 		for(age.use in extract_ages){

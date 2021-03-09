@@ -241,7 +241,7 @@ out.list[[paste(age.prefix,age.do,sep="")]] <- c(estimation.functions[[model]]$e
 
 
 if(tolower(model) == "complexsibreg"){
-  browser()
+  #browser()
 age.classes <- names(data)
 
 
