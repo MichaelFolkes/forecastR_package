@@ -280,8 +280,8 @@ rate.est <- function(data.use, avg="wtmean", pred.label = NULL, last.n  = NULL){
 								 model.fit
 										)
 
-	print("--------------------------------------")
-	print(names(results))
+	#print("--------------------------------------")
+	#print(names(results))
 	return(results)
 }#END rate.est
 
@@ -295,12 +295,12 @@ rate.pt.fc <- function(fit.obj=NULL, data,settings=NULL){
 	# lower/upper step is in rate.est, here using only the resulting coeff
 	#print("------------")
 	#print(data)
-	print("----rate.pt.fc--------")
-	print(names(fit.obj))
-	print(data)
-	print(fit.obj$coefficients)
-	print(fit.obj$lower.coeff)
-	print(fit.obj$upper.coeff)
+	#print("----rate.pt.fc--------")
+	#print(names(fit.obj))
+	#print(data)
+	#print(fit.obj$coefficients)
+	#print(fit.obj$lower.coeff)
+	#print(fit.obj$upper.coeff)
 	
 	pt.fc.out <- c(data * fit.obj$coefficients,
 								 data * fit.obj$lower.coeff,
@@ -308,7 +308,7 @@ rate.pt.fc <- function(fit.obj=NULL, data,settings=NULL){
 
 
 	names(pt.fc.out) <- c("Point","Lower", "Upper")
-	print(pt.fc.out)
+	#print(pt.fc.out)
 	return(pt.fc.out)
 
 } #END rate.pt.fc

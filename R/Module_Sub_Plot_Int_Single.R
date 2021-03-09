@@ -13,7 +13,7 @@ calcInterval <- function(dat.prepped,
 # Point Forecast					
 pt.fc <- fitModelandcalcFC(data = dat.prepped$data, fitmodel.args = args.fitmodel,calcfc.args = args.calcfc)					
 
-print(pt.fc)
+#print(pt.fc)
 				
 
 # Bootstrap Interval				
@@ -23,7 +23,7 @@ boot.out <- doBoot(data= dat.prepped, args.fitmodel= args.fitmodel,
 					full.out = full.out)
 
 					
-print(boot.out)					
+#print(boot.out)					
 					
 
 # Prediction Interval				

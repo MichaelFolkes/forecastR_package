@@ -69,6 +69,8 @@ ages.list <- names(dat.prepped$data )
 
 for(model.name in names(settings.list) ){
 
+print(paste("starting",model.name))
+
 	#extract the settings
 	model.use <- settings.list[[model.name]]$model.type
 	settings.use <-  settings.list[[model.name]]$settings
