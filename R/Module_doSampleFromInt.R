@@ -44,12 +44,12 @@ return(int.out)
 
 sampleFromStats <- function(average, q, p=0.9, n=1000){
 
-	print("Entering sampleFromStats()------------------------------------")
+	#print("Entering sampleFromStats()------------------------------------")
 
 
 	sd.val <- (q-average)/qnorm(p)
 	
-	print(sd.val)
+	#print(sd.val)
 	
 	
 	#res.bounded vector has zero as lower bound 
@@ -61,10 +61,10 @@ sampleFromStats <- function(average, q, p=0.9, n=1000){
 	sample.stats <- quantile(res, probs = c(0.1, .5, .9))
 	
 	# NEW: quants from bounded output
-	print(res.bounded)
+	#print(res.bounded)
     sample.stats.bounded <- quantile(res.bounded, probs = c(0.1, .5, .9))
 
-	print(sample.stats.bounded)
+	#print(sample.stats.bounded)
 	
 	results <- list(sample.stats=sample.stats, results=res, results.bounded=res.bounded,
 	               sample.stats.bounded = sample.stats.bounded)
