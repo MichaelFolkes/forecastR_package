@@ -225,7 +225,6 @@ yrs.use.y <- yrs.use.y[yrs.use.y %in% (yrs.use.x+1)]
 #print(yrs.use.y)
 
 
-
 data.in <- data.frame(y  = age.y[age.y[,"Run_Year"] %in% (yrs.use.y),paste("Age_",age.do,sep="")],
 				x = age.x[age.x[,"Run_Year"] %in% yrs.use.x,paste("Age_",age.do-1,sep="")])
 
@@ -239,11 +238,18 @@ names(data.in) <- paste("Age",c(age.do,age.do-1),sep="")
 print(names(data))
 
 if(grepl("Pool",model ){
-# can potentially pool all the younger age classes
-limit.pool <- age.do -1  
-# pick the number of ages to pool 
-#(smaller of user-specified cap and potential number)
-do.pool <- min(settings$max.pool,limit.pool) 
+# can potentially pool all the younger age classes 
+#(i.e. = to the oldest age class below the age being forecasted)
+oldest.pool <- age.do -1  
+# pick the number of ages to pool: smaller of user-specified cap and potential number (=oldest.pool)
+do.pool <- min(settings$max.pool,oldest.pool) 
+# pick the youngest age to pool: larger of youngest age and age.do - do.pool
+youngest.pool <-  max(min(ages),oldest.pool-do.pool)
+print(oldest.pool)
+print(do.pool)
+print(youngest.pool)
+ages.pool <- youngest.pool:oldest.pool
+
 
 
 age.x <- 

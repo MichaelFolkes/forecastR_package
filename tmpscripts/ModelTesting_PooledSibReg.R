@@ -14,6 +14,16 @@ data.withage <- prepData(data.withage.raw,out.labels="v2")
 names(data.withage$data)
 data.withage$data$"Age 4"
 
+pooling.fn <- function(data.use,ages.pool){
+# can only pool in sequence! (i.e. not meaningful to pool age 5 and 2, but can pool 5,4,3,2)
+
+
+
+
+
+
+}
+
 
 
 # fit the model
