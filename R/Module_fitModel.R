@@ -161,7 +161,7 @@ if(model %in%  c("ReturnRate")){
 
 #SIBLING REGRESSION VARIATIONS
 
-if(model %in%  c("SibRegSimple","SibRegKalman","SibRegLogPower")){
+if(model %in%  c("SibRegSimple","SibRegKalman","SibRegLogPower","SibRegPooledSimple")){
 # if doing any of the sibling regressions, fit the specified model to all age classes
 # except the youngest. For the youngest age class, use N5 -> eventually convert this into a user choice
 # Note: to be consistent with old code, the sibreg variations use
@@ -199,10 +199,14 @@ for(age.do in ages[-1]){
 if(tracing){print(paste("starting age",age.do))}
 
 
+#############
+# NOT POOLED
+
+if(!grepl("Pool",model ){
+
 # match up the run years
 age.y <- data[[paste(age.prefix,age.do,sep="")]] # response age class
 age.x <- data[[paste(age.prefix,age.do-1,sep="")]] # predictor age class
-
 
 # need this to handle inputs where have different starting brood years for age classes
 # (e.g. after trimming data by run year using slide in GUI)
@@ -220,10 +224,44 @@ yrs.use.y <- yrs.use.y[yrs.use.y %in% (yrs.use.x+1)]
 #print("yrs.y")
 #print(yrs.use.y)
 
+
 data.in <- data.frame(y  = age.y[age.y[,"Run_Year"] %in% (yrs.use.y),paste("Age_",age.do,sep="")],
 				x = age.x[age.x[,"Run_Year"] %in% yrs.use.x,paste("Age_",age.do-1,sep="")])
 
 names(data.in) <- paste("Age",c(age.do,age.do-1),sep="")
+
+} # end if NOT pooled
+
+##########
+# POOLING STEP
+
+print(names(data))
+
+if(grepl("Pool",model ){
+# can potentially pool all the younger age classes 
+#(i.e. = to the oldest age class below the age being forecasted)
+oldest.pool <- age.do -1  
+# pick the number of ages to pool: smaller of user-specified cap and potential number (=oldest.pool)
+do.pool <- min(settings$max.pool,oldest.pool) 
+# pick the youngest age to pool: larger of youngest age and age.do - do.pool
+youngest.pool <-  max(min(ages),oldest.pool-do.pool)
+print(oldest.pool)
+print(do.pool)
+print(youngest.pool)
+ages.pool <- youngest.pool:oldest.pool
+
+
+
+age.x <- 
+
+
+
+
+} # end of pooled
+##########
+
+
+
 
 
 if(tracing){ print(yrs.match); print(data.in)}
@@ -234,7 +272,7 @@ if(tracing){ print(yrs.match); print(data.in)}
 out.list[[paste(age.prefix,age.do,sep="")]] <- c(estimation.functions[[model]]$estimator(data.in,settings=settings) ,list(run.yrs = yrs.use.y))
 
 
-}
+} # end looping through age classes
 
 
 } # end if sibling regression variation
