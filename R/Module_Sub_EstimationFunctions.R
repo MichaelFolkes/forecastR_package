@@ -452,9 +452,6 @@ if(tracing){print("Starting sibreg.simple.est()")}
 
 
 sibreg.formula <-  paste(names(model.data)[1], " ~ -1 + ",names(model.data)[2])
-
-
-
 model.fit <- lm.fit(formula.use = sibreg.formula ,data.use=model.data)
 return(c(list(model.type = "SibRegSimple",formula=sibreg.formula,var.names = names(model.data)[2],  est.fn = "lm()"),
 					model.fit,list(fitted.values = model.fit$fitted.values.raw) ))
